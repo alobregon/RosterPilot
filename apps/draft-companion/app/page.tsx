@@ -14,11 +14,15 @@ import type { DraftConfig, DraftPick, PlayerRanking, Position } from '@/lib/type
 const DEFAULT_CONFIG: DraftConfig = {
   teamCount: 10,
   userDraftSlot: 7,
+  scoringFormat: 'HALF_PPR',
   qbStarters: 1,
   rbStarters: 2,
   wrStarters: 3,
   teStarters: 1,
   flexStarters: 1,
+  dstStarters: 1,
+  kStarters: 1,
+  benchSpots: 6,
 };
 
 const POSITION_FILTERS: Array<'ALL' | Position> = ['ALL', 'QB', 'RB', 'WR', 'TE', 'K', 'DST'];
@@ -143,6 +147,8 @@ export default function DraftCompanionPage() {
           <strong>Rankings</strong>
           <span className="muted">{importMessage}</span>
           {error ? <span className="error">{error}</span> : null}
+          <strong>League</strong>
+          <span className="muted">Half-PPR • 1QB / 2RB / 3WR / 1TE / 1 FLEX (RB/WR/TE) / 1 DST / 1 K / 6 bench</span>
         </div>
         <div className="setupControls">
           <label>
