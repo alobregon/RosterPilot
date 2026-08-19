@@ -5,6 +5,9 @@
   "packageManager": "npm@11.0.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
+    "dev:draft": "npm --workspace @rosterpilot/draft-companion run dev",
+    "build:draft": "npm --workspace @rosterpilot/draft-companion run build",
+    "typecheck:draft": "npm --workspace @rosterpilot/draft-companion run typecheck",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
