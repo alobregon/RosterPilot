@@ -78,6 +78,28 @@ function rosterFit(position: Position, roster: PlayerRanking[], config: DraftCon
     { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0 },
   );
 
+  if (position === 'K' || position === 'DST') {
+    const target = position === 'K' ? config.kStarters : config.dstStarters;
+    if (target <= 0) return 0;
+    if (counts[position] >= target) return 5;
+
+    // The default league has 16 roster spots and one K + one DST. Treat those as
+    // final-round needs rather than allowing them to displace RB/WR/TE bench upside.
+    const totalRosterSlots =
+      config.qbStarters +
+      config.rbStarters +
+      config.wrStarters +
+      config.teStarters +
+      config.flexStarters +
+      config.dstStarters +
+      config.kStarters +
+      config.benchSpots;
+    const specialStarterSlots = config.dstStarters + config.kStarters;
+    const lateSpecialTeamsThreshold = Math.max(0, totalRosterSlots - specialStarterSlots);
+
+    return roster.length >= lateSpecialTeamsThreshold ? 88 : 10;
+  }
+
   const target: Partial<Record<Position, number>> = {
     QB: config.qbStarters,
     RB: config.rbStarters,
@@ -85,13 +107,11 @@ function rosterFit(position: Position, roster: PlayerRanking[], config: DraftCon
     TE: config.teStarters,
   };
 
-  if (position === 'K' || position === 'DST') {
-    return roster.length < 10 ? 20 : counts[position] === 0 ? 65 : 20;
-  }
-
   const starterTarget = target[position] ?? 0;
   if (counts[position] < starterTarget) return 100;
 
+  // FLEX is RB/WR/TE for this league. Once base starters at the candidate's
+  // position are satisfied, preserve value for the open FLEX slot.
   if ((position === 'RB' || position === 'WR' || position === 'TE') && config.flexStarters > 0) {
     const flexEligible = counts.RB + counts.WR + counts.TE;
     const baseFlexEligible = config.rbStarters + config.wrStarters + config.teStarters;
@@ -132,6 +152,9 @@ function buildReasons(
 
   if (valueGap >= 5) reasons.push(`${valueGap} picks of ranking value at your next selection`);
   if (breakdown.rosterFit >= 90) reasons.push(`Fills a priority ${player.position} starter slot`);
+  if ((player.position === 'K' || player.position === 'DST') && breakdown.rosterFit >= 80) {
+    reasons.push(`Late-round ${player.position} starter slot is still open`);
+  }
 
   if (player.tier != null) {
     const sameTierRemaining = available.filter(
