@@ -1,5 +1,17 @@
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST';
 
+export interface RankingSourceMetadata {
+  provider?: string;
+  upsideRating?: number;
+  bustRating?: number;
+  strengthOfScheduleRating?: number;
+  ecrVsAdp?: number;
+  averageDifference?: number;
+  percentOverConsensus?: number;
+  percentOverCount?: number;
+  percentOverTotal?: number;
+}
+
 export interface PlayerRanking {
   id: string;
   name: string;
@@ -10,7 +22,9 @@ export interface PlayerRanking {
   tier?: number;
   adp?: number;
   projectedPoints?: number;
+  byeWeek?: number;
   notes?: string;
+  sourceMetadata?: RankingSourceMetadata;
 }
 
 export interface DraftPick {
