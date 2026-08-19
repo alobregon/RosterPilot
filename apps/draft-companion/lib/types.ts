@@ -1,4 +1,5 @@
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST';
+export type ScoringFormat = 'STANDARD' | 'HALF_PPR' | 'PPR';
 
 export interface RankingSourceMetadata {
   provider?: string;
@@ -38,11 +39,15 @@ export interface DraftPick {
 export interface DraftConfig {
   teamCount: number;
   userDraftSlot: number;
+  scoringFormat: ScoringFormat;
   qbStarters: number;
   rbStarters: number;
   wrStarters: number;
   teStarters: number;
   flexStarters: number;
+  dstStarters: number;
+  kStarters: number;
+  benchSpots: number;
 }
 
 export interface RecommendationBreakdown {
