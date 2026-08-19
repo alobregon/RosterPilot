@@ -41,7 +41,16 @@ Optional columns:
 - Tier
 - ADP
 - Projected Points
+- Bye Week
 - Notes
+
+## FantasyPros CSV compatibility
+
+FantasyPros overall rankings exports are supported directly. The importer understands combined `POS` values such as `RB1`, `WR3`, `QB1`, and `TE2`, maps `TIERS` to the internal tier field, and imports `BYE` plus provider metadata used for future recommendation tuning.
+
+The first real FantasyPros fixture contained 100 ranked players and normalized all 100 with zero import warnings. The actual user ranking export is intentionally not committed to this public repository; regression tests use synthetic rows with the same schema.
+
+See `docs/RANKING_IMPORT_FORMATS.md` for the provider mapping and validation details.
 
 ## Status
 
