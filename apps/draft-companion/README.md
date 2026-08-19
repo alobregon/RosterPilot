@@ -15,6 +15,25 @@ Standalone web application for RosterPilot's live fantasy-football draft assista
 
 The recommendation engine is intentionally deterministic. User-provided rankings remain the primary value signal; roster fit, tier urgency, and value at the next user pick modify that baseline.
 
+## Default league preset
+
+The current validation preset is:
+
+- 10 teams
+- Half-PPR
+- 1 QB
+- 2 RB
+- 3 WR
+- 1 TE
+- 1 FLEX (RB/WR/TE)
+- 1 DST
+- 1 K
+- 6 bench spots
+
+That produces a 16-player roster and 160 total selections in a complete 10-team draft. DST and kicker are intentionally deprioritized by the V1 roster-fit model until the final two roster spots.
+
+See `docs/LEAGUE_CONFIG.md` for the complete configuration and recommendation implications.
+
 ## Run locally
 
 From the repository root:
