@@ -5,11 +5,15 @@ import type { DraftConfig, DraftPick, PlayerRanking } from '../lib/types';
 const config: DraftConfig = {
   teamCount: 10,
   userDraftSlot: 7,
+  scoringFormat: 'HALF_PPR',
   qbStarters: 1,
   rbStarters: 2,
   wrStarters: 3,
   teStarters: 1,
   flexStarters: 1,
+  dstStarters: 1,
+  kStarters: 1,
+  benchSpots: 6,
 };
 
 const players: PlayerRanking[] = [
@@ -40,5 +44,23 @@ describe('recommendation engine', () => {
     const result = recommendPlayers({ players, picks: [], config, currentOverallPick: 1, limit: 6 });
     const player = result.find((item) => item.player.id === 'wr-4');
     expect(player?.reasons.some((reason) => reason.includes('Final WR'))).toBe(true);
+  });
+
+  it('defers kicker and DST until the final two roster spots', () => {
+    const specialPlayers: PlayerRanking[] = [
+      { id: 'rb-a', name: 'RB A', position: 'RB', overallRank: 20, tier: 3 },
+      { id: 'k-a', name: 'K A', position: 'K', overallRank: 1, tier: 1 },
+      { id: 'dst-a', name: 'DST A', position: 'DST', overallRank: 2, tier: 1 },
+    ];
+
+    const early = recommendPlayers({
+      players: specialPlayers,
+      picks: [],
+      config,
+      currentOverallPick: 1,
+      limit: 3,
+    });
+
+    expect(early[0].player.position).toBe('RB');
   });
 });
