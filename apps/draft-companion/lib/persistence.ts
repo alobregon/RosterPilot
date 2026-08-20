@@ -9,12 +9,14 @@ export interface DraftSnapshot {
   config: DraftConfig;
   players: PlayerRanking[];
   picks: DraftPick[];
+  favoritePlayerIds: string[];
 }
 
 export function serializeDraftSnapshot(args: {
   config: DraftConfig;
   players: PlayerRanking[];
   picks: DraftPick[];
+  favoritePlayerIds?: string[];
   savedAt?: Date;
 }): string {
   const snapshot: DraftSnapshot = {
@@ -23,6 +25,7 @@ export function serializeDraftSnapshot(args: {
     config: args.config,
     players: args.players,
     picks: args.picks,
+    favoritePlayerIds: [...new Set(args.favoritePlayerIds ?? [])],
   };
   return JSON.stringify(snapshot);
 }
@@ -40,7 +43,22 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
     const playerIds = new Set(value.players.map((player) => player.id));
     if (value.picks.some((pick) => !playerIds.has(pick.playerId))) return null;
 
-    return value as unknown as DraftSnapshot;
+    let favoritePlayerIds: string[] = [];
+    if (value.favoritePlayerIds != null) {
+      if (!Array.isArray(value.favoritePlayerIds) || !value.favoritePlayerIds.every((id) => typeof id === 'string')) {
+        return null;
+      }
+      favoritePlayerIds = [...new Set(value.favoritePlayerIds.filter((id) => playerIds.has(id)))];
+    }
+
+    return {
+      version: value.version,
+      savedAt: value.savedAt,
+      config: value.config,
+      players: value.players,
+      picks: value.picks,
+      favoritePlayerIds,
+    } as DraftSnapshot;
   } catch {
     return null;
   }
