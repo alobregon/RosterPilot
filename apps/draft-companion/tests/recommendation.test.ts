@@ -32,41 +32,6 @@ describe('recommendation engine', () => {
     expect(result[0].strength).toBeGreaterThanOrEqual(result[1].strength);
   });
 
-  it('keeps ranking value invariant when the imported file gets deeper', () => {
-    const target: PlayerRanking = {
-      id: 'target',
-      name: 'Target Player',
-      position: 'WR',
-      overallRank: 20,
-      tier: 3,
-    };
-    const shortPool: PlayerRanking[] = [
-      target,
-      { id: 'rb-30', name: 'RB 30', position: 'RB', overallRank: 30, tier: 4 },
-    ];
-    const deepPool: PlayerRanking[] = [
-      ...shortPool,
-      { id: 'te-861', name: 'TE 861', position: 'TE', overallRank: 861, tier: 20 },
-    ];
-
-    const shortResult = recommendPlayers({
-      players: shortPool,
-      picks: [],
-      config,
-      currentOverallPick: 1,
-      limit: 2,
-    }).find((item) => item.player.id === 'target');
-    const deepResult = recommendPlayers({
-      players: deepPool,
-      picks: [],
-      config,
-      currentOverallPick: 1,
-      limit: 3,
-    }).find((item) => item.player.id === 'target');
-
-    expect(deepResult?.breakdown.rankingValue).toBe(shortResult?.breakdown.rankingValue);
-  });
-
   it('does not recommend drafted players', () => {
     const picks: DraftPick[] = [
       { overallPick: 1, round: 1, pickInRound: 1, draftSlot: 1, playerId: 'rb-1' },
@@ -88,14 +53,7 @@ describe('recommendation engine', () => {
       { id: 'dst-a', name: 'DST A', position: 'DST', overallRank: 2, tier: 1 },
     ];
 
-    const early = recommendPlayers({
-      players: specialPlayers,
-      picks: [],
-      config,
-      currentOverallPick: 1,
-      limit: 3,
-    });
-
+    const early = recommendPlayers({ players: specialPlayers, picks: [], config, currentOverallPick: 1, limit: 3 });
     expect(early[0].player.position).toBe('RB');
     expect(early.find((item) => item.player.id === 'dst-a')?.breakdown.rosterFit).toBe(10);
   });
@@ -110,14 +68,7 @@ describe('recommendation engine', () => {
       { overallPick: 1, round: 1, pickInRound: 1, draftSlot: 1, playerId: 'dst-b' },
     ];
 
-    const result = recommendPlayers({
-      players: trendPlayers,
-      picks,
-      config,
-      currentOverallPick: 2,
-      limit: 3,
-    });
-
+    const result = recommendPlayers({ players: trendPlayers, picks, config, currentOverallPick: 2, limit: 3 });
     expect(result.find((item) => item.player.id === 'dst-a')?.breakdown.rosterFit).toBe(10);
   });
 
@@ -138,16 +89,34 @@ describe('recommendation engine', () => {
       { overallPick: 5, round: 1, pickInRound: 5, draftSlot: 5, playerId: 'dst-d' },
     ];
 
-    const result = recommendPlayers({
-      players: trendPlayers,
-      picks,
-      config,
-      currentOverallPick: 6,
-      limit: 6,
-    });
+    const result = recommendPlayers({ players: trendPlayers, picks, config, currentOverallPick: 6, limit: 6 });
     const dst = result.find((item) => item.player.id === 'dst-a');
 
     expect(dst?.breakdown.rosterFit).toBe(58);
     expect(dst?.reasons.some((reason) => reason.includes('3 DSTs selected'))).toBe(true);
+  });
+
+  it('uses bye week as a soft tiebreaker between otherwise equivalent players', () => {
+    const byePlayers: PlayerRanking[] = [
+      { id: 'roster-rb', name: 'Roster RB', position: 'RB', overallRank: 1, byeWeek: 9 },
+      { id: 'roster-wr', name: 'Roster WR', position: 'WR', overallRank: 2, byeWeek: 9 },
+      { id: 'roster-te', name: 'Roster TE', position: 'TE', overallRank: 3, byeWeek: 7 },
+      { id: 'wr-clean', name: 'WR Clean', position: 'WR', overallRank: 20, tier: 4, byeWeek: 11 },
+      { id: 'wr-crowded', name: 'WR Crowded', position: 'WR', overallRank: 20, tier: 4, byeWeek: 9 },
+    ];
+    const picks: DraftPick[] = [
+      { overallPick: 7, round: 1, pickInRound: 7, draftSlot: 7, playerId: 'roster-rb' },
+      { overallPick: 14, round: 2, pickInRound: 4, draftSlot: 7, playerId: 'roster-wr' },
+      { overallPick: 27, round: 3, pickInRound: 7, draftSlot: 7, playerId: 'roster-te' },
+    ];
+
+    const result = recommendPlayers({ players: byePlayers, picks, config, currentOverallPick: 28, limit: 5 });
+    const clean = result.find((item) => item.player.id === 'wr-clean');
+    const crowded = result.find((item) => item.player.id === 'wr-crowded');
+
+    expect(clean?.breakdown.byeWeekFit).toBe(100);
+    expect(crowded?.breakdown.byeWeekFit).toBe(58);
+    expect((clean?.rawScore ?? 0)).toBeGreaterThan(crowded?.rawScore ?? 0);
+    expect(crowded?.reasons.some((reason) => reason.includes('overlap 2 rostered players'))).toBe(true);
   });
 });

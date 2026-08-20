@@ -24,7 +24,7 @@ body {
 button, input { font: inherit; }
 button { color: inherit; }
 
-.shell { max-width: 1500px; margin: 0 auto; padding: 36px 28px 72px; }
+.shell { max-width: 1600px; margin: 0 auto; padding: 36px 28px 72px; }
 .hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 24px; }
 .hero h1 { font-size: clamp(2.3rem, 5vw, 4.3rem); line-height: .95; margin: 8px 0 14px; letter-spacing: -.055em; }
 .hero p { max-width: 720px; color: var(--muted); font-size: 1.04rem; line-height: 1.65; margin: 0; }
@@ -35,7 +35,7 @@ button { color: inherit; }
   background: var(--accent); color: #05110b; font-weight: 800; white-space: nowrap;
 }
 .secondaryButton { background: transparent; color: var(--text); }
-.secondaryButton:disabled { opacity: .35; cursor: default; }
+.secondaryButton:disabled, .playerRow:disabled { opacity: .35; cursor: default; }
 
 .statusBar, .setupCard, .panel {
   border: 1px solid var(--border); background: rgba(17, 21, 29, .92); border-radius: 18px;
@@ -62,6 +62,26 @@ button { color: inherit; }
 .panelHeader h2 { margin: 4px 0 0; letter-spacing: -.025em; font-size: 1.35rem; }
 .countPill { border: 1px solid var(--border); background: var(--panel-soft); color: var(--muted); padding: 6px 9px; border-radius: 999px; font-size: .72rem; }
 
+.draftBoardPanel { margin-bottom: 14px; }
+.draftBoardScroller { overflow: auto; border: 1px solid var(--border); border-radius: 13px; background: #0c1016; }
+.draftBoardHeader, .draftBoardRow { display: grid; min-width: max-content; }
+.draftBoardHeader { position: sticky; top: 0; z-index: 3; background: #10151d; border-bottom: 1px solid var(--border); }
+.roundHeader, .teamHeader, .roundLabel, .draftCell { min-width: 0; border-right: 1px solid var(--border); }
+.roundHeader, .roundLabel { display: grid; place-items: center; color: var(--muted); font-size: .72rem; font-weight: 800; }
+.teamHeader { padding: 9px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.teamHeader strong { font-size: .78rem; white-space: nowrap; }
+.teamHeader small { color: var(--muted); font-size: .66rem; }
+.teamHeader.userTeam { background: rgba(127, 230, 178, .08); }
+.draftBoardRow { border-bottom: 1px solid var(--border); }
+.draftBoardRow:last-child { border-bottom: 0; }
+.draftCell { min-height: 66px; padding: 7px 9px; display: flex; flex-direction: column; gap: 3px; justify-content: center; position: relative; }
+.draftCell > small { position: absolute; top: 5px; right: 7px; color: #596577; font-size: .62rem; font-variant-numeric: tabular-nums; }
+.draftCell strong { padding-right: 22px; font-size: .78rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.draftCell span { color: var(--muted); font-size: .66rem; }
+.draftCell.userCell { background: rgba(127, 230, 178, .035); }
+.draftCell.currentPick { box-shadow: inset 0 0 0 2px var(--accent); background: rgba(127, 230, 178, .11); }
+.draftCell .onClock { color: var(--accent); }
+
 .searchInput { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--border); background: #0c1016; color: var(--text); outline: none; }
 .searchInput:focus { border-color: var(--accent-strong); box-shadow: 0 0 0 3px rgba(66, 206, 142, .08); }
 .filters { display: flex; gap: 7px; flex-wrap: wrap; margin: 11px 0 14px; }
@@ -70,7 +90,7 @@ button { color: inherit; }
 
 .playerList { max-height: 640px; overflow: auto; padding-right: 4px; }
 .playerRow { width: 100%; border: 0; border-top: 1px solid var(--border); background: transparent; display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; padding: 12px 8px; cursor: pointer; }
-.playerRow:hover { background: rgba(127, 230, 178, .055); }
+.playerRow:hover:not(:disabled) { background: rgba(127, 230, 178, .055); }
 .rank { color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
 .playerIdentity { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .playerIdentity strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -91,6 +111,7 @@ button { color: inherit; }
 .rosterList { display: grid; gap: 7px; }
 .rosterRow { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--border); }
 .positionBadge { color: var(--accent); font-size: .74rem; font-weight: 900; }
+.rosterBye { display: block; color: var(--muted); font-size: .68rem; margin-top: 2px; }
 
 .historyPanel { margin-top: 14px; }
 .historyGrid { display: grid; grid-template-columns: repeat(8, minmax(110px, 1fr)); gap: 8px; }

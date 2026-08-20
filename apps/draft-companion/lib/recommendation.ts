@@ -9,17 +9,14 @@ import type {
 import { nextUserOverallPick, picksForSlot } from './draft';
 
 const WEIGHTS = {
-  rankingValue: 0.5,
+  rankingValue: 0.47,
   rosterFit: 0.2,
   tierUrgency: 0.15,
   valueAtPick: 0.15,
+  byeWeekFit: 0.03,
 } as const;
 
 const POSITION_RUN_WINDOW = 8;
-
-// Absolute rank should mean the same thing regardless of whether a user uploads
-// a top-100 list or an 861-player export. A 100-pick half-life preserves strong
-// differentiation near the top while keeping deep values non-zero.
 const RANKING_VALUE_HALF_LIFE = 100;
 
 export function recommendPlayers(args: {
@@ -51,13 +48,15 @@ export function recommendPlayers(args: {
         }),
         tierUrgency: tierUrgency(player, available),
         valueAtPick: valueAtPick(player, nextPick),
+        byeWeekFit: byeWeekFit(player, userRoster),
       };
 
       const rawScore = clamp(
         breakdown.rankingValue * WEIGHTS.rankingValue +
           breakdown.rosterFit * WEIGHTS.rosterFit +
           breakdown.tierUrgency * WEIGHTS.tierUrgency +
-          breakdown.valueAtPick * WEIGHTS.valueAtPick,
+          breakdown.valueAtPick * WEIGHTS.valueAtPick +
+          breakdown.byeWeekFit * WEIGHTS.byeWeekFit,
         0,
         100,
       );
@@ -67,7 +66,7 @@ export function recommendPlayers(args: {
         rawScore,
         strength: Math.round(55 + rawScore * 0.44),
         breakdown,
-        reasons: buildReasons(player, breakdown, available, nextPick, {
+        reasons: buildReasons(player, breakdown, available, nextPick, userRoster, {
           picks,
           players,
           currentOverallPick,
@@ -116,9 +115,6 @@ function rosterFit(
 
     if (roster.length >= lateSpecialTeamsThreshold) return 88;
 
-    // Kicker remains a deliberate final-round preference. DST is different:
-    // if the room begins a genuine defense run, increase urgency without blindly
-    // chasing a single early selection. Tier scarcity remains a separate factor.
     if (position === 'DST') {
       const run = recentPositionRun('DST', draftContext);
       if (run.count >= 4) return 72;
@@ -139,8 +135,6 @@ function rosterFit(
   const starterTarget = target[position] ?? 0;
   if (counts[position] < starterTarget) return 100;
 
-  // FLEX is RB/WR/TE for this league. Once base starters at the candidate's
-  // position are satisfied, preserve value for the open FLEX slot.
   if ((position === 'RB' || position === 'WR' || position === 'TE') && config.flexStarters > 0) {
     const flexEligible = counts.RB + counts.WR + counts.TE;
     const baseFlexEligible = config.rbStarters + config.wrStarters + config.teStarters;
@@ -170,11 +164,28 @@ function valueAtPick(player: PlayerRanking, nextPick: number): number {
   return clamp(50 + gap * 2.5, 10, 100);
 }
 
+function byeWeekFit(player: PlayerRanking, roster: PlayerRanking[]): number {
+  if (player.byeWeek == null) return 50;
+
+  const sameBye = roster.filter((existing) => existing.byeWeek === player.byeWeek);
+  const overlap = sameBye.length;
+
+  if (player.position === 'QB' && sameBye.some((existing) => existing.position === 'QB')) return 15;
+  if (player.position === 'TE' && sameBye.some((existing) => existing.position === 'TE')) return 25;
+
+  if (overlap === 0) return 100;
+  if (overlap === 1) return 82;
+  if (overlap === 2) return 58;
+  if (overlap === 3) return 35;
+  return 15;
+}
+
 function buildReasons(
   player: PlayerRanking,
   breakdown: RecommendationBreakdown,
   available: PlayerRanking[],
   nextPick: number,
+  userRoster: PlayerRanking[],
   draftContext: DraftTrendContext,
 ): string[] {
   const reasons: string[] = [];
@@ -199,6 +210,15 @@ function buildReasons(
     ).length;
     if (sameTierRemaining === 1) reasons.push(`Final ${player.position} remaining in Tier ${player.tier}`);
     else if (sameTierRemaining <= 3) reasons.push(`Only ${sameTierRemaining} ${player.position}s remain in Tier ${player.tier}`);
+  }
+
+  if (player.byeWeek != null) {
+    const overlap = userRoster.filter((existing) => existing.byeWeek === player.byeWeek).length;
+    if (overlap === 0 && userRoster.length >= 3) {
+      reasons.push(`Bye Week ${player.byeWeek} does not overlap your current roster`);
+    } else if (overlap >= 2) {
+      reasons.push(`Bye Week ${player.byeWeek} would overlap ${overlap} rostered players`);
+    }
   }
 
   if (breakdown.rankingValue >= 85) reasons.push('Among the strongest remaining values in your rankings');

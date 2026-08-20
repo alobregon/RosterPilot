@@ -55,6 +55,7 @@ export interface RecommendationBreakdown {
   rosterFit: number;
   tierUrgency: number;
   valueAtPick: number;
+  byeWeekFit: number;
 }
 
 export interface Recommendation {

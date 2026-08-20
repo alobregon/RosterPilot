@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent, useMemo, useState } from 'react';
+import { buildDraftBoard, isDraftComplete, rosterForSlot, rosterSize, totalDraftPicks } from '@/lib/board';
 import {
   draftSlotForOverallPick,
   nextUserOverallPick,
@@ -36,14 +37,17 @@ export default function DraftCompanionPage() {
   const [importMessage, setImportMessage] = useState('Upload your rankings to begin.');
   const [error, setError] = useState<string | null>(null);
 
-  const currentOverallPick = picks.length + 1;
+  const totalPicks = totalDraftPicks(config);
+  const complete = isDraftComplete(picks, config);
+  const currentOverallPick = complete ? totalPicks : picks.length + 1;
   const currentRound = roundForOverallPick(currentOverallPick, config.teamCount);
-  const currentSlot = draftSlotForOverallPick(currentOverallPick, config.teamCount);
+  const currentSlot = complete ? null : draftSlotForOverallPick(currentOverallPick, config.teamCount);
   const currentPickInRound = pickInRound(currentOverallPick, config.teamCount);
-  const nextUserPick = nextUserOverallPick(currentOverallPick, config);
+  const nextUserPick = complete ? null : nextUserOverallPick(currentOverallPick, config);
   const isUserOnClock = currentSlot === config.userDraftSlot;
 
   const draftedIds = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
+  const board = useMemo(() => buildDraftBoard(config, picks, players), [config, picks, players]);
   const availablePlayers = useMemo(
     () =>
       players.filter((player) => {
@@ -61,16 +65,14 @@ export default function DraftCompanionPage() {
   );
 
   const recommendations = useMemo(
-    () => recommendPlayers({ players, picks, config, currentOverallPick, limit: 3 }),
-    [players, picks, config, currentOverallPick],
+    () => (complete ? [] : recommendPlayers({ players, picks, config, currentOverallPick, limit: 3 })),
+    [players, picks, config, currentOverallPick, complete],
   );
 
-  const userRoster = useMemo(() => {
-    const userIds = new Set(
-      picks.filter((pick) => pick.draftSlot === config.userDraftSlot).map((pick) => pick.playerId),
-    );
-    return players.filter((player) => userIds.has(player.id));
-  }, [players, picks, config.userDraftSlot]);
+  const userRoster = useMemo(
+    () => rosterForSlot(config.userDraftSlot, picks, players),
+    [players, picks, config.userDraftSlot],
+  );
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -82,7 +84,7 @@ export default function DraftCompanionPage() {
       setPlayers(result.players);
       setPicks([]);
       setImportMessage(
-        `${result.players.length} players imported${
+        `${result.players.length} players imported${result.detectedSource ? ` from ${result.detectedSource}` : ''}${
           result.warnings.length ? ` • ${result.warnings.length} warning(s)` : ''
         }`,
       );
@@ -94,8 +96,8 @@ export default function DraftCompanionPage() {
   }
 
   function draftPlayer(player: PlayerRanking) {
-    if (draftedIds.has(player.id)) return;
-    const overallPick = currentOverallPick;
+    if (complete || draftedIds.has(player.id)) return;
+    const overallPick = picks.length + 1;
     setPicks((existing) => [
       ...existing,
       {
@@ -132,11 +134,15 @@ export default function DraftCompanionPage() {
       <section className="statusBar">
         <Status
           label="Current"
-          value={`R${currentRound} • ${currentRound}.${String(currentPickInRound).padStart(2, '0')}`}
+          value={complete ? 'Draft complete' : `R${currentRound} • ${currentRound}.${String(currentPickInRound).padStart(2, '0')}`}
         />
-        <Status label="Overall pick" value={`${currentOverallPick}`} />
-        <Status label="On the clock" value={isUserOnClock ? 'YOU' : `Team ${currentSlot}`} emphasis={isUserOnClock} />
-        <Status label="Your next pick" value={`#${nextUserPick}`} />
+        <Status label="Overall pick" value={complete ? `${totalPicks}/${totalPicks}` : `${currentOverallPick}/${totalPicks}`} />
+        <Status
+          label="On the clock"
+          value={complete ? '—' : isUserOnClock ? 'YOU' : `Team ${currentSlot}`}
+          emphasis={isUserOnClock}
+        />
+        <Status label="Your next pick" value={nextUserPick ? `#${nextUserPick}` : '—'} />
         <button className="secondaryButton" onClick={undoLastPick} disabled={picks.length === 0}>
           Undo last pick
         </button>
@@ -183,11 +189,67 @@ export default function DraftCompanionPage() {
         </div>
       </section>
 
+      <section className="panel draftBoardPanel">
+        <div className="panelHeader">
+          <div>
+            <span className="eyebrow">Live draft</span>
+            <h2>Draft board</h2>
+          </div>
+          <span className="countPill">{picks.length} / {totalPicks} picks</span>
+        </div>
+        <div className="draftBoardScroller">
+          <div className="draftBoardHeader" style={{ gridTemplateColumns: `64px repeat(${config.teamCount}, minmax(122px, 1fr))` }}>
+            <div className="roundHeader">Rnd</div>
+            {Array.from({ length: config.teamCount }, (_, index) => {
+              const slot = index + 1;
+              const count = picks.filter((pick) => pick.draftSlot === slot).length;
+              return (
+                <div className={slot === config.userDraftSlot ? 'teamHeader userTeam' : 'teamHeader'} key={slot}>
+                  <strong>{slot === config.userDraftSlot ? 'YOU' : `Team ${slot}`}</strong>
+                  <small>{count}/{rosterSize(config)}</small>
+                </div>
+              );
+            })}
+          </div>
+          {board.map((row, roundIndex) => (
+            <div
+              className="draftBoardRow"
+              style={{ gridTemplateColumns: `64px repeat(${config.teamCount}, minmax(122px, 1fr))` }}
+              key={roundIndex + 1}
+            >
+              <div className="roundLabel">{roundIndex + 1}</div>
+              {row.map((cell) => {
+                const current = !complete && cell.overallPick === currentOverallPick;
+                const userCell = cell.draftSlot === config.userDraftSlot;
+                const classes = ['draftCell', current ? 'currentPick' : '', userCell ? 'userCell' : '']
+                  .filter(Boolean)
+                  .join(' ');
+                return (
+                  <div className={classes} key={cell.overallPick}>
+                    <small>#{cell.overallPick}</small>
+                    {cell.player ? (
+                      <>
+                        <strong>{cell.player.name}</strong>
+                        <span>
+                          {cell.player.position}{cell.player.nflTeam ? ` • ${cell.player.nflTeam}` : ''}
+                        </span>
+                      </>
+                    ) : current ? (
+                      <strong className="onClock">On clock</strong>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </section>
+
       <div className="dashboardGrid">
         <section className="panel playersPanel">
           <div className="panelHeader">
             <div>
-              <span className="eyebrow">Live board</span>
+              <span className="eyebrow">Player pool</span>
               <h2>Available players</h2>
             </div>
             <span className="countPill">{players.length - draftedIds.size} available</span>
@@ -213,21 +275,24 @@ export default function DraftCompanionPage() {
           </div>
 
           <div className="playerList">
-            {availablePlayers.slice(0, 80).map((player) => (
-              <button className="playerRow" key={player.id} onClick={() => draftPlayer(player)}>
+            {availablePlayers.slice(0, 100).map((player) => (
+              <button className="playerRow" key={player.id} onClick={() => draftPlayer(player)} disabled={complete}>
                 <span className="rank">{player.overallRank}</span>
                 <span className="playerIdentity">
                   <strong>{player.name}</strong>
                   <small>
                     {player.position} {player.nflTeam ? `• ${player.nflTeam}` : ''}
                     {player.tier != null ? ` • Tier ${player.tier}` : ''}
+                    {player.byeWeek != null ? ` • Bye ${player.byeWeek}` : ''}
                   </small>
                 </span>
-                <span className="draftAction">Draft</span>
+                <span className="draftAction">{complete ? 'Complete' : 'Draft'}</span>
               </button>
             ))}
             {players.length === 0 ? (
               <EmptyState text="Import an .xlsx, .xls, or .csv rankings file. Required columns: Player, Position, Rank." />
+            ) : complete ? (
+              <EmptyState text="Draft complete. Use Undo last pick if you need to correct the final selection." />
             ) : availablePlayers.length === 0 ? (
               <EmptyState text="No available players match this filter." />
             ) : null}
@@ -253,6 +318,7 @@ export default function DraftCompanionPage() {
                         <strong>{recommendation.player.name}</strong>
                         <small>
                           {recommendation.player.position} • Rank {recommendation.player.overallRank}
+                          {recommendation.player.byeWeek != null ? ` • Bye ${recommendation.player.byeWeek}` : ''}
                         </small>
                       </div>
                       <span className="score">{recommendation.strength}%</span>
@@ -269,7 +335,7 @@ export default function DraftCompanionPage() {
                 ))}
               </div>
             ) : (
-              <EmptyState text="Recommendations appear after rankings are imported." />
+              <EmptyState text={complete ? 'Draft complete.' : 'Recommendations appear after rankings are imported.'} />
             )}
           </section>
 
@@ -279,14 +345,17 @@ export default function DraftCompanionPage() {
                 <span className="eyebrow">Team {config.userDraftSlot}</span>
                 <h2>Your roster</h2>
               </div>
-              <span className="countPill">{userRoster.length} players</span>
+              <span className="countPill">{userRoster.length} / {rosterSize(config)}</span>
             </div>
             <div className="rosterList">
               {userRoster.length ? (
                 userRoster.map((player) => (
                   <div className="rosterRow" key={player.id}>
                     <span className="positionBadge">{player.position}</span>
-                    <span>{player.name}</span>
+                    <span>
+                      {player.name}
+                      {player.byeWeek != null ? <small className="rosterBye">Bye {player.byeWeek}</small> : null}
+                    </span>
                   </div>
                 ))
               ) : (
