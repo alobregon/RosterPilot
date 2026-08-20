@@ -35,7 +35,7 @@ button { color: inherit; }
   background: var(--accent); color: #05110b; font-weight: 800; white-space: nowrap;
 }
 .secondaryButton { background: transparent; color: var(--text); }
-.secondaryButton:disabled, .playerRow:disabled { opacity: .35; cursor: default; }
+.secondaryButton:disabled, .draftPlayerButton:disabled { opacity: .35; cursor: default; }
 .statusActions { display: flex; gap: 8px; align-items: center; }
 
 .statusBar, .setupCard, .panel {
@@ -93,13 +93,17 @@ button { color: inherit; }
 .filter.active { color: #05110b; background: var(--accent); border-color: var(--accent); font-weight: 800; }
 
 .playerList { max-height: 640px; overflow: auto; padding-right: 4px; }
-.playerRow { width: 100%; border: 0; border-top: 1px solid var(--border); background: transparent; display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left; padding: 12px 8px; cursor: pointer; }
-.playerRow:hover:not(:disabled) { background: rgba(127, 230, 178, .055); }
+.playerRow { width: 100%; border-top: 1px solid var(--border); background: transparent; display: grid; grid-template-columns: 34px 48px minmax(0, 1fr) auto; gap: 8px; align-items: center; text-align: left; padding: 9px 8px; }
+.playerRow:hover { background: rgba(127, 230, 178, .055); }
+.favoriteButton, .draftPlayerButton { border: 0; background: transparent; cursor: pointer; }
+.favoriteButton { color: var(--muted); font-size: 1.12rem; line-height: 1; padding: 6px 4px; }
+.favoriteButton.active { color: var(--accent); }
+.favoriteButton:hover { color: var(--accent); }
+.draftPlayerButton { color: var(--accent); font-size: .78rem; font-weight: 800; padding: 8px 6px; }
 .rank { color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
 .playerIdentity { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .playerIdentity strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .playerIdentity small { color: var(--muted); }
-.draftAction { color: var(--accent); font-size: .78rem; font-weight: 800; }
 
 .recommendationList { display: grid; gap: 12px; }
 .recommendation { background: var(--panel-soft); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
