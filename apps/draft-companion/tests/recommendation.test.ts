@@ -86,4 +86,52 @@ describe('recommendation engine', () => {
     expect(crowded?.breakdown.byeWeekFit).toBe(58);
     expect((clean?.rawScore ?? 0)).toBeGreaterThan(crowded?.rawScore ?? 0);
   });
+
+  it('uses favorites as a bounded tiebreaker near fair value', () => {
+    const favoritePlayers: PlayerRanking[] = [
+      { id: 'wr-ranked-20', name: 'WR Ranked 20', position: 'WR', overallRank: 20, tier: 3, byeWeek: 10 },
+      { id: 'wr-favorite-21', name: 'WR Favorite 21', position: 'WR', overallRank: 21, tier: 3, byeWeek: 11 },
+    ];
+
+    const withoutFavorite = recommendPlayers({
+      players: favoritePlayers,
+      picks: [],
+      config,
+      currentOverallPick: 20,
+      limit: 2,
+    });
+    expect(withoutFavorite[0].player.id).toBe('wr-ranked-20');
+
+    const withFavorite = recommendPlayers({
+      players: favoritePlayers,
+      picks: [],
+      config,
+      currentOverallPick: 20,
+      favoritePlayerIds: ['wr-favorite-21'],
+      limit: 2,
+    });
+    expect(withFavorite[0].player.id).toBe('wr-favorite-21');
+    expect(withFavorite[0].breakdown.favoriteFit).toBeGreaterThan(50);
+    expect(withFavorite[0].reasons.some((reason) => reason.includes('Favorite'))).toBe(true);
+  });
+
+  it('does not let a favorite force a major reach', () => {
+    const favoritePlayers: PlayerRanking[] = [
+      { id: 'wr-value', name: 'WR Value', position: 'WR', overallRank: 20, tier: 3 },
+      { id: 'wr-reach', name: 'WR Reach', position: 'WR', overallRank: 80, tier: 7 },
+    ];
+
+    const result = recommendPlayers({
+      players: favoritePlayers,
+      picks: [],
+      config,
+      currentOverallPick: 20,
+      favoritePlayerIds: ['wr-reach'],
+      limit: 2,
+    });
+
+    expect(result[0].player.id).toBe('wr-value');
+    expect(result.find((item) => item.player.id === 'wr-reach')?.breakdown.favoriteFit).toBe(51);
+  });
+
 });
