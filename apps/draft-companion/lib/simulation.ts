@@ -1,87 +1,68 @@
-import { draftSlotForOverallPick } from './draft';
 import { draftPickAtOverall } from './corrections';
+import { draftSlotForOverallPick } from './draft';
 import { recommendPlayers } from './recommendation';
-import type { DraftConfig, DraftPick, PlayerRanking, Position, Recommendation } from './types';
+import type { DraftConfig, DraftPick, PlayerRanking, Position } from './types';
 
-export interface UserRecommendationSnapshot {
-  overallPick: number;
-  recommendations: Recommendation[];
-  selectedPlayerId: string;
-}
+export type RoomProfile = 'RANK_ORDER' | 'RB_RUSH' | 'WR_RUSH' | 'QB_RUSH' | 'TE_RUSH' | 'DST_EARLY';
 
 export interface DraftSimulationResult {
   picks: DraftPick[];
   userPlayerIds: string[];
-  userCounts: Record<Position, number>;
-  userRecommendations: UserRecommendationSnapshot[];
+  completed: boolean;
 }
 
-export function simulateDeterministicDraft(args: {
+export function simulateDraft(args: {
   players: PlayerRanking[];
   config: DraftConfig;
   favoritePlayerIds?: readonly string[];
+  roomProfile?: RoomProfile;
 }): DraftSimulationResult {
-  const { players, config, favoritePlayerIds = [] } = args;
-  const totalRosterSlots =
-    config.qbStarters + config.rbStarters + config.wrStarters + config.teStarters +
-    config.flexStarters + config.dstStarters + config.kStarters + config.benchSpots;
-  const totalPicks = config.teamCount * totalRosterSlots;
+  const { players, config, favoritePlayerIds = [], roomProfile = 'RANK_ORDER' } = args;
+  const rosterSlots = config.qbStarters + config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters + config.dstStarters + config.kStarters + config.benchSpots;
+  const total = config.teamCount * rosterSlots;
   const picks: DraftPick[] = [];
-  const draftedIds = new Set<string>();
-  const userRecommendations: UserRecommendationSnapshot[] = [];
+  const drafted = new Set<string>();
+  const userPlayerIds: string[] = [];
 
-  for (let overallPick = 1; overallPick <= totalPicks; overallPick += 1) {
-    const draftSlot = draftSlotForOverallPick(overallPick, config.teamCount);
+  for (let overallPick = 1; overallPick <= total; overallPick += 1) {
+    const slot = draftSlotForOverallPick(overallPick, config.teamCount);
+    const available = players.filter((player) => !drafted.has(player.id));
+    if (available.length === 0) break;
+
     let selected: PlayerRanking | undefined;
-
-    if (draftSlot === config.userDraftSlot) {
-      const recommendations = recommendPlayers({
-        players,
-        picks,
-        config,
-        currentOverallPick: overallPick,
-        favoritePlayerIds,
-        limit: 3,
-      });
-      selected = recommendations[0]?.player;
-      if (selected) {
-        userRecommendations.push({ overallPick, recommendations, selectedPlayerId: selected.id });
-      }
+    if (slot === config.userDraftSlot) {
+      selected = recommendPlayers({ players, picks, config, currentOverallPick: overallPick, favoritePlayerIds, limit: 1 })[0]?.player;
     } else {
-      selected = players.find((player) => !draftedIds.has(player.id));
+      selected = chooseOpponentPlayer(available, roomProfile, overallPick, config.teamCount);
     }
-
-    if (!selected) throw new Error(`No selectable player available at overall pick ${overallPick}.`);
-    draftedIds.add(selected.id);
+    if (!selected) break;
+    drafted.add(selected.id);
     picks.push(draftPickAtOverall(overallPick, selected.id, config.teamCount));
+    if (slot === config.userDraftSlot) userPlayerIds.push(selected.id);
   }
 
-  const playerById = new Map(players.map((player) => [player.id, player]));
-  const userPicks = picks.filter((pick) => pick.draftSlot === config.userDraftSlot);
-  const userCounts: Record<Position, number> = { QB: 0, RB: 0, WR: 0, TE: 0, DST: 0, K: 0 };
-  for (const pick of userPicks) {
-    const player = playerById.get(pick.playerId);
-    if (player) userCounts[player.position] += 1;
-  }
-
-  return {
-    picks,
-    userPlayerIds: userPicks.map((pick) => pick.playerId),
-    userCounts,
-    userRecommendations,
-  };
+  return { picks, userPlayerIds, completed: picks.length === total };
 }
 
-export function hasLegalStartingRoster(counts: Record<Position, number>, config: DraftConfig): boolean {
-  const skillCount = counts.RB + counts.WR + counts.TE;
-  const requiredSkillCount = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
-  return (
-    counts.QB >= config.qbStarters &&
-    counts.RB >= config.rbStarters &&
-    counts.WR >= config.wrStarters &&
-    counts.TE >= config.teStarters &&
-    skillCount >= requiredSkillCount &&
-    counts.DST >= config.dstStarters &&
-    counts.K >= config.kStarters
-  );
+function chooseOpponentPlayer(
+  available: PlayerRanking[],
+  profile: RoomProfile,
+  overallPick: number,
+  teamCount: number,
+): PlayerRanking {
+  const round = Math.floor((overallPick - 1) / teamCount) + 1;
+  const preferred = preferredPosition(profile, round);
+  const ranked = [...available].sort((a, b) => a.overallRank - b.overallRank);
+  if (!preferred) return ranked[0];
+  const positional = ranked.filter((player) => player.position === preferred);
+  return positional[0] ?? ranked[0];
+}
+
+function preferredPosition(profile: RoomProfile, round: number): Position | null {
+  if (profile === 'RB_RUSH' && round <= 4) return 'RB';
+  if (profile === 'WR_RUSH' && round <= 4) return 'WR';
+  if (profile === 'QB_RUSH' && round <= 3) return 'QB';
+  if (profile === 'TE_RUSH' && round <= 4) return 'TE';
+  if (profile === 'DST_EARLY' && round >= 8 && round <= 10) return 'DST';
+  return null;
 }

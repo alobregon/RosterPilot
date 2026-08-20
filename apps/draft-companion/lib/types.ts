@@ -9,6 +9,8 @@ export type DraftStrategy =
   | 'LATE_QB'
   | 'ELITE_TE'
   | 'UPSIDE_HEAVY';
+export type AvailabilityLabel = 'LIKELY' | 'UNCERTAIN' | 'UNLIKELY' | 'FINAL_PICK';
+export type PositionTrendStatus = 'QUIET' | 'DEVELOPING' | 'HOT';
 
 export interface RankingSourceMetadata {
   provider?: string;
@@ -20,6 +22,7 @@ export interface RankingSourceMetadata {
   percentOverConsensus?: number;
   percentOverCount?: number;
   percentOverTotal?: number;
+  adpSource?: 'EXPLICIT' | 'DERIVED_ECR_VS_ADP';
 }
 
 export interface PlayerRanking {
@@ -71,14 +74,14 @@ export interface RecommendationBreakdown {
   favoriteFit: number;
 }
 
-export type AvailabilityLabel = 'LIKELY' | 'UNCERTAIN' | 'UNLIKELY' | 'FINAL_PICK';
-
 export interface Recommendation {
   player: PlayerRanking;
   rawScore: number;
   recommendationPercent: number;
   availabilityLabel: AvailabilityLabel;
   returnPick?: number;
+  positionTrend: PositionTrendStatus;
+  marketFall?: number;
   breakdown: RecommendationBreakdown;
   reasons: string[];
 }

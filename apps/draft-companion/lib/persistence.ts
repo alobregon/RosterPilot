@@ -1,3 +1,4 @@
+import { draftSlotForOverallPick, pickInRound, roundForOverallPick } from './draft';
 import type { DraftConfig, DraftPick, PlayerRanking } from './types';
 
 export const DRAFT_SNAPSHOT_VERSION = 1;
@@ -43,45 +44,59 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
     if (value.version !== DRAFT_SNAPSHOT_VERSION) return null;
     if (typeof value.savedAt !== 'string') return null;
     if (!isDraftConfig(value.config)) return null;
+    const config = value.config;
     if (!Array.isArray(value.players) || !value.players.every(isPlayerRanking)) return null;
     if (!Array.isArray(value.picks) || !value.picks.every(isDraftPick)) return null;
 
-    const playerIds = new Set(value.players.map((player) => player.id));
-    if (value.picks.some((pick) => !playerIds.has(pick.playerId))) return null;
+    const players = value.players as PlayerRanking[];
+    const picks = value.picks as DraftPick[];
+    const playerIds = new Set(players.map((player) => player.id));
+    if (playerIds.size !== players.length) return null;
+    if (picks.some((pick) => !playerIds.has(pick.playerId))) return null;
+    if (new Set(picks.map((pick) => pick.overallPick)).size !== picks.length) return null;
+    if (new Set(picks.map((pick) => pick.playerId)).size !== picks.length) return null;
+    if (picks.some((pick) => !hasCorrectSnakeMetadata(pick, config.teamCount))) return null;
 
     let favoritePlayerIds: string[] = [];
     if (value.favoritePlayerIds != null) {
-      if (!Array.isArray(value.favoritePlayerIds) || !value.favoritePlayerIds.every((id) => typeof id === 'string')) {
-        return null;
-      }
+      if (!Array.isArray(value.favoritePlayerIds) || !value.favoritePlayerIds.every((id) => typeof id === 'string')) return null;
       favoritePlayerIds = [...new Set(value.favoritePlayerIds.filter((id) => playerIds.has(id)))];
     }
 
-    let teamNames: string[] = [];
+    let teamNames: string[];
     if (value.teamNames != null) {
       if (!Array.isArray(value.teamNames) || !value.teamNames.every((name) => typeof name === 'string')) return null;
-      const savedTeamNames = value.teamNames as string[];
-      teamNames = Array.from({ length: value.config.teamCount }, (_, index) => savedTeamNames[index] ?? '');
+      const savedNames = value.teamNames as string[];
+      teamNames = Array.from({ length: config.teamCount }, (_, index) => savedNames[index] ?? '');
     } else {
-      teamNames = Array.from({ length: value.config.teamCount }, () => '');
+      teamNames = Array.from({ length: config.teamCount }, () => '');
     }
 
-    const draftStarted =
-      typeof value.draftStarted === 'boolean' ? value.draftStarted : value.picks.length > 0;
+    if (value.draftStarted != null && typeof value.draftStarted !== 'boolean') return null;
+    const draftStarted = typeof value.draftStarted === 'boolean' ? value.draftStarted : picks.length > 0;
+    if (!draftStarted && picks.length > 0) return null;
 
     return {
       version: value.version,
       savedAt: value.savedAt,
-      config: value.config,
-      players: value.players,
-      picks: value.picks,
+      config,
+      players,
+      picks: [...picks].sort((a, b) => a.overallPick - b.overallPick),
       favoritePlayerIds,
       teamNames,
       draftStarted,
-    } as DraftSnapshot;
+    };
   } catch {
     return null;
   }
+}
+
+function hasCorrectSnakeMetadata(pick: DraftPick, teamCount: number): boolean {
+  return (
+    pick.round === roundForOverallPick(pick.overallPick, teamCount) &&
+    pick.pickInRound === pickInRound(pick.overallPick, teamCount) &&
+    pick.draftSlot === draftSlotForOverallPick(pick.overallPick, teamCount)
+  );
 }
 
 function isDraftConfig(value: unknown): value is DraftConfig {
@@ -99,46 +114,18 @@ function isDraftConfig(value: unknown): value is DraftConfig {
     isNonNegativeInteger(value.dstStarters) &&
     isNonNegativeInteger(value.kStarters) &&
     isNonNegativeInteger(value.benchSpots) &&
-    (value.draftStrategy == null ||
-      ['BALANCED', 'HERO_RB', 'ZERO_RB', 'ROBUST_RB', 'WR_HEAVY', 'LATE_QB', 'ELITE_TE', 'UPSIDE_HEAVY'].includes(
-        String(value.draftStrategy),
-      ))
+    (value.draftStrategy == null || ['BALANCED', 'HERO_RB', 'ZERO_RB', 'ROBUST_RB', 'WR_HEAVY', 'LATE_QB', 'ELITE_TE', 'UPSIDE_HEAVY'].includes(String(value.draftStrategy)))
   );
 }
 
 function isPlayerRanking(value: unknown): value is PlayerRanking {
   if (!isRecord(value)) return false;
-  return (
-    typeof value.id === 'string' &&
-    value.id.length > 0 &&
-    typeof value.name === 'string' &&
-    value.name.length > 0 &&
-    ['QB', 'RB', 'WR', 'TE', 'K', 'DST'].includes(String(value.position)) &&
-    typeof value.overallRank === 'number' &&
-    Number.isFinite(value.overallRank)
-  );
+  return typeof value.id === 'string' && value.id.length > 0 && typeof value.name === 'string' && value.name.length > 0 && ['QB', 'RB', 'WR', 'TE', 'K', 'DST'].includes(String(value.position)) && typeof value.overallRank === 'number' && Number.isFinite(value.overallRank);
 }
-
 function isDraftPick(value: unknown): value is DraftPick {
   if (!isRecord(value)) return false;
-  return (
-    isPositiveInteger(value.overallPick) &&
-    isPositiveInteger(value.round) &&
-    isPositiveInteger(value.pickInRound) &&
-    isPositiveInteger(value.draftSlot) &&
-    typeof value.playerId === 'string' &&
-    value.playerId.length > 0
-  );
+  return isPositiveInteger(value.overallPick) && isPositiveInteger(value.round) && isPositiveInteger(value.pickInRound) && isPositiveInteger(value.draftSlot) && typeof value.playerId === 'string' && value.playerId.length > 0;
 }
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function isPositiveInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value > 0;
-}
-
-function isNonNegativeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
-}
+function isRecord(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value); }
+function isPositiveInteger(value: unknown): value is number { return typeof value === 'number' && Number.isInteger(value) && value > 0; }
+function isNonNegativeInteger(value: unknown): value is number { return typeof value === 'number' && Number.isInteger(value) && value >= 0; }

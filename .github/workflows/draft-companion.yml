@@ -1,0 +1,32 @@
+name: Draft Companion CI
+
+on:
+  push:
+    branches: [master, agent/draft-companion-foundation]
+    paths:
+      - 'apps/draft-companion/**'
+      - 'docs/DRAFT_NIGHT_RUNBOOK.md'
+      - 'docs/RELEASE_READINESS.md'
+      - 'package.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/draft-companion.yml'
+  pull_request:
+    paths:
+      - 'apps/draft-companion/**'
+      - 'package.json'
+      - 'vitest.config.ts'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install
+      - run: npm run typecheck:draft
+      - run: npm run test:draft
+      - run: npm run build:draft

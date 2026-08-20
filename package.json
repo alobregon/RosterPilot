@@ -8,6 +8,7 @@
     "dev:draft": "npm --workspace @rosterpilot/draft-companion run dev",
     "build:draft": "npm --workspace @rosterpilot/draft-companion run build",
     "typecheck:draft": "npm --workspace @rosterpilot/draft-companion run typecheck",
+    "test:draft": "vitest run apps/draft-companion/tests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
