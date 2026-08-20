@@ -25,11 +25,18 @@ const picks: DraftPick[] = [
 
 describe('draft persistence', () => {
   it('round trips a normalized draft snapshot', () => {
-    const raw = serializeDraftSnapshot({ config, players, picks, savedAt: new Date('2026-08-19T22:00:00-05:00') });
+    const raw = serializeDraftSnapshot({
+      config,
+      players,
+      picks,
+      favoritePlayerIds: ['wr-dal'],
+      savedAt: new Date('2026-08-19T22:00:00-05:00'),
+    });
     const parsed = parseDraftSnapshot(raw);
     expect(parsed?.config).toEqual(config);
     expect(parsed?.players).toEqual(players);
     expect(parsed?.picks).toEqual(picks);
+    expect(parsed?.favoritePlayerIds).toEqual(['wr-dal']);
   });
 
   it('rejects corrupt JSON and unsupported versions', () => {
@@ -43,4 +50,12 @@ describe('draft persistence', () => {
     broken.picks[0].playerId = 'missing';
     expect(parseDraftSnapshot(JSON.stringify(broken))).toBeNull();
   });
+
+  it('restores older snapshots without favorites as an empty list', () => {
+    const raw = serializeDraftSnapshot({ config, players, picks, savedAt: new Date() });
+    const legacy = JSON.parse(raw);
+    delete legacy.favoritePlayerIds;
+    expect(parseDraftSnapshot(JSON.stringify(legacy))?.favoritePlayerIds).toEqual([]);
+  });
+
 });
