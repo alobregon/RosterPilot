@@ -22,6 +22,7 @@ const POSITION_RUN_WINDOW = 8;
 const RANKING_VALUE_HALF_LIFE = 100;
 const RECOMMENDATION_SHARE_TEMPERATURE = 8;
 const STRATEGY_MAX_ADJUSTMENT = 6;
+const FAVORITE_MAX_ADJUSTMENT = 5;
 
 interface DraftTrendContext {
   picks: DraftPick[];
@@ -51,9 +52,11 @@ export function recommendPlayers(args: {
   picks: DraftPick[];
   config: DraftConfig;
   currentOverallPick: number;
+  favoritePlayerIds?: readonly string[];
   limit?: number;
 }): Recommendation[] {
-  const { players, picks, config, currentOverallPick, limit = 3 } = args;
+  const { players, picks, config, currentOverallPick, favoritePlayerIds = [], limit = 3 } = args;
+  const favoriteIds = new Set(favoritePlayerIds);
   const draftedIds = new Set(picks.map((pick) => pick.playerId));
   const allAvailable = players.filter((player) => !draftedIds.has(player.id));
   if (allAvailable.length === 0) return [];
@@ -79,6 +82,7 @@ export function recommendPlayers(args: {
       byeWeekFit: byeWeekFit(player, userRoster),
       futureAvailability: availability.urgency,
       strategyFit: strategyFit(player, userRoster, config, selectionPick),
+      favoriteFit: favoriteFit(player, selectionPick, favoriteIds.has(player.id)),
     };
 
     const baseScore =
@@ -89,14 +93,24 @@ export function recommendPlayers(args: {
       breakdown.byeWeekFit * WEIGHTS.byeWeekFit +
       breakdown.futureAvailability * WEIGHTS.futureAvailability;
     const strategyAdjustment = ((breakdown.strategyFit - 50) / 50) * STRATEGY_MAX_ADJUSTMENT;
-    const rawScore = clamp(baseScore + strategyAdjustment, 0, 100);
+    const favoriteAdjustment = ((breakdown.favoriteFit - 50) / 50) * FAVORITE_MAX_ADJUSTMENT;
+    const rawScore = clamp(baseScore + strategyAdjustment + favoriteAdjustment, 0, 100);
 
     return {
       player,
       rawScore,
       breakdown,
       availability,
-      reasons: buildReasons(player, breakdown, available, selectionPick, userRoster, draftContext, availability),
+      reasons: buildReasons(
+        player,
+        breakdown,
+        available,
+        selectionPick,
+        userRoster,
+        draftContext,
+        availability,
+        favoriteIds.has(player.id),
+      ),
     };
   });
 
@@ -368,6 +382,18 @@ function totalRosterSlots(config: DraftConfig): number {
   );
 }
 
+function favoriteFit(player: PlayerRanking, selectionPick: number, isFavorite: boolean): number {
+  if (!isFavorite) return 50;
+
+  const valueGap = selectionPick - player.overallRank;
+  if (valueGap >= 10) return 100;
+  if (valueGap >= 5) return 90;
+  if (valueGap >= 0) return 80;
+  if (valueGap >= -5) return 65;
+  if (valueGap >= -10) return 55;
+  return 51;
+}
+
 function strategyFit(
   player: PlayerRanking,
   roster: PlayerRanking[],
@@ -492,6 +518,7 @@ function buildReasons(
   userRoster: PlayerRanking[],
   draftContext: DraftTrendContext,
   availability: FutureAvailabilityResult,
+  isFavorite: boolean,
 ): string[] {
   const reasons: string[] = [];
   const valueGap = selectionPick - player.overallRank;
@@ -508,6 +535,12 @@ function buildReasons(
   const strategy = draftContext.config?.draftStrategy ?? 'BALANCED';
   if (breakdown.strategyFit >= 85 && strategy !== 'BALANCED') {
     reasons.push(`Strong fit for ${strategyLabel(strategy)} strategy`);
+  }
+
+  if (isFavorite && breakdown.favoriteFit >= 55) {
+    if (valueGap >= 5) reasons.push(`Favorite who has fallen ${valueGap} picks past your ranking`);
+    else if (valueGap >= 0) reasons.push('Favorite available at or after your ranking');
+    else reasons.push(`Favorite within ${Math.abs(valueGap)} picks of your ranking`);
   }
 
   const run = recentPositionRun(player.position, draftContext);
