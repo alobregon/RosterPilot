@@ -24,6 +24,7 @@ describe('ranking spreadsheet importer', () => {
     expect(result.warnings).toEqual([]);
     expect(result.players).toHaveLength(1);
     expect(result.players[0]).toMatchObject({
+      id: 'j-example-rb-det',
       name: 'J. Example',
       position: 'RB',
       positionRank: 1,
@@ -43,6 +44,31 @@ describe('ranking spreadsheet importer', () => {
         percentOverTotal: 16,
       },
     });
+  });
+
+  it('keeps abbreviated-name collisions when the players are on different teams', () => {
+    const result = parseRankingRows([
+      { RK: 7, TIERS: 1, 'PLAYER NAME': 'J. Taylor', TEAM: 'IND', POS: 'RB5' },
+      { RK: 383, TIERS: 14, 'PLAYER NAME': 'J. Taylor', TEAM: 'JAC', POS: 'RB116' },
+    ]);
+
+    expect(result.warnings).toEqual([]);
+    expect(result.players).toHaveLength(2);
+    expect(new Set(result.players.map((player) => player.id)).size).toBe(2);
+    expect(result.players.map((player) => player.id)).toEqual([
+      'j-taylor-rb-ind',
+      'j-taylor-rb-jac',
+    ]);
+  });
+
+  it('still rejects an exact name, position, and team duplicate', () => {
+    const result = parseRankingRows([
+      { Rank: 12, Player: 'Duplicate Player', Position: 'WR', Team: 'SEA' },
+      { Rank: 13, Player: 'Duplicate Player', Position: 'WR', Team: 'SEA' },
+    ]);
+
+    expect(result.players).toHaveLength(1);
+    expect(result.warnings).toHaveLength(1);
   });
 
   it('continues to support plain position values from custom sheets', () => {

@@ -17,6 +17,11 @@ const WEIGHTS = {
 
 const POSITION_RUN_WINDOW = 8;
 
+// Absolute rank should mean the same thing regardless of whether a user uploads
+// a top-100 list or an 861-player export. A 100-pick half-life preserves strong
+// differentiation near the top while keeping deep values non-zero.
+const RANKING_VALUE_HALF_LIFE = 100;
+
 export function recommendPlayers(args: {
   players: PlayerRanking[];
   picks: DraftPick[];
@@ -30,7 +35,6 @@ export function recommendPlayers(args: {
 
   if (available.length === 0) return [];
 
-  const maxRank = Math.max(...players.map((player) => player.overallRank));
   const userPicks = picksForSlot(picks, config.userDraftSlot);
   const userPlayerIds = new Set(userPicks.map((pick) => pick.playerId));
   const userRoster = players.filter((player) => userPlayerIds.has(player.id));
@@ -39,7 +43,7 @@ export function recommendPlayers(args: {
   return available
     .map((player) => {
       const breakdown: RecommendationBreakdown = {
-        rankingValue: rankingValue(player.overallRank, maxRank),
+        rankingValue: rankingValue(player.overallRank),
         rosterFit: rosterFit(player.position, userRoster, config, {
           picks,
           players,
@@ -74,9 +78,9 @@ export function recommendPlayers(args: {
     .slice(0, limit);
 }
 
-function rankingValue(rank: number, maxRank: number): number {
-  if (maxRank <= 1) return 100;
-  return clamp(100 * (1 - (rank - 1) / maxRank), 0, 100);
+function rankingValue(rank: number): number {
+  if (rank <= 1) return 100;
+  return clamp(100 * Math.pow(0.5, (rank - 1) / RANKING_VALUE_HALF_LIFE), 0, 100);
 }
 
 function rosterFit(

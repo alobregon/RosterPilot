@@ -32,6 +32,41 @@ describe('recommendation engine', () => {
     expect(result[0].strength).toBeGreaterThanOrEqual(result[1].strength);
   });
 
+  it('keeps ranking value invariant when the imported file gets deeper', () => {
+    const target: PlayerRanking = {
+      id: 'target',
+      name: 'Target Player',
+      position: 'WR',
+      overallRank: 20,
+      tier: 3,
+    };
+    const shortPool: PlayerRanking[] = [
+      target,
+      { id: 'rb-30', name: 'RB 30', position: 'RB', overallRank: 30, tier: 4 },
+    ];
+    const deepPool: PlayerRanking[] = [
+      ...shortPool,
+      { id: 'te-861', name: 'TE 861', position: 'TE', overallRank: 861, tier: 20 },
+    ];
+
+    const shortResult = recommendPlayers({
+      players: shortPool,
+      picks: [],
+      config,
+      currentOverallPick: 1,
+      limit: 2,
+    }).find((item) => item.player.id === 'target');
+    const deepResult = recommendPlayers({
+      players: deepPool,
+      picks: [],
+      config,
+      currentOverallPick: 1,
+      limit: 3,
+    }).find((item) => item.player.id === 'target');
+
+    expect(deepResult?.breakdown.rankingValue).toBe(shortResult?.breakdown.rankingValue);
+  });
+
   it('does not recommend drafted players', () => {
     const picks: DraftPick[] = [
       { overallPick: 1, round: 1, pickInRound: 1, draftSlot: 1, playerId: 'rb-1' },
