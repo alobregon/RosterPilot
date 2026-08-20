@@ -1,5 +1,14 @@
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST';
 export type ScoringFormat = 'STANDARD' | 'HALF_PPR' | 'PPR';
+export type DraftStrategy =
+  | 'BALANCED'
+  | 'HERO_RB'
+  | 'ZERO_RB'
+  | 'ROBUST_RB'
+  | 'WR_HEAVY'
+  | 'LATE_QB'
+  | 'ELITE_TE'
+  | 'UPSIDE_HEAVY';
 
 export interface RankingSourceMetadata {
   provider?: string;
@@ -48,6 +57,7 @@ export interface DraftConfig {
   dstStarters: number;
   kStarters: number;
   benchSpots: number;
+  draftStrategy?: DraftStrategy;
 }
 
 export interface RecommendationBreakdown {
@@ -56,12 +66,14 @@ export interface RecommendationBreakdown {
   tierUrgency: number;
   valueAtPick: number;
   byeWeekFit: number;
+  futureAvailability: number;
+  strategyFit: number;
 }
 
 export interface Recommendation {
   player: PlayerRanking;
   rawScore: number;
-  strength: number;
+  recommendationPercent: number;
   breakdown: RecommendationBreakdown;
   reasons: string[];
 }

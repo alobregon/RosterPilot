@@ -5,15 +5,19 @@ Standalone web application for RosterPilot's live fantasy-football draft assista
 ## Current vertical slice
 
 - import rankings from `.xlsx`, `.xls`, or `.csv`
-- detect common `Player`, `Position`, `Rank`, `Team`, `Tier`, and `ADP` headers
+- support deep FantasyPros overall-ranking exports
 - manually enter picks in snake-draft order
+- render a full 10-team × 16-round live draft board
 - automatically assign each pick to the team on the clock
-- track the user's roster
-- undo the latest pick
+- track every team's picks plus the user's roster
+- undo or restart the draft
 - filter/search remaining players
-- calculate three explainable recommendation-strength scores
+- automatically persist normalized rankings, picks, league configuration, and strategy in browser storage
+- calculate three explainable recommendations with a single relative **Recommendation %** that sums to 100%
+- model roster fit, tiers, bye weeks, recent positional runs, opponent demand, and heuristic future availability
+- support Balanced, Hero RB, Zero RB, Robust RB, WR Heavy, Late QB, Elite TE, and Upside Heavy strategy presets
 
-The recommendation engine is intentionally deterministic. User-provided rankings remain the primary value signal; roster fit, tier urgency, and value at the next user pick modify that baseline.
+The recommendation engine is intentionally deterministic. User-provided rankings remain the primary value signal while live draft context changes the relative urgency of otherwise comparable choices.
 
 ## Default league preset
 
@@ -30,9 +34,11 @@ The current validation preset is:
 - 1 K
 - 6 bench spots
 
-That produces a 16-player roster and 160 total selections in a complete 10-team draft. DST and kicker are intentionally deprioritized by the V1 roster-fit model until the final two roster spots.
+That produces a 16-player roster and 160 total selections in a complete 10-team draft. DST and kicker are generally delayed, but the recommendation engine can react to an actual DST run and guarantees required lineup positions are filled before the roster is complete.
 
-See `docs/LEAGUE_CONFIG.md` for the complete configuration and recommendation implications.
+For the current user validation preset, choosing draft slot 1 or 2 starts with **Hero RB** selected; slots 3-10 start Balanced. Strategy remains editable during the draft.
+
+See `docs/LEAGUE_CONFIG.md` and `docs/RECOMMENDATION_ENGINE_V2.md` for the full configuration and scoring model.
 
 ## Run locally
 
@@ -65,12 +71,16 @@ Optional columns:
 
 ## FantasyPros CSV compatibility
 
-FantasyPros overall rankings exports are supported directly. The importer understands combined `POS` values such as `RB1`, `WR3`, `QB1`, and `TE2`, maps `TIERS` to the internal tier field, and imports `BYE` plus provider metadata used for future recommendation tuning.
+FantasyPros overall rankings exports are supported directly. The importer understands combined `POS` values such as `RB1`, `WR3`, `QB1`, and `TE2`, maps `TIERS` to the internal tier field, and imports `BYE` plus provider metadata used for recommendation tuning.
 
-The first real FantasyPros fixture contained 100 ranked players and normalized all 100 with zero import warnings. The actual user ranking export is intentionally not committed to this public repository; regression tests use synthetic rows with the same schema.
+The latest real FantasyPros fixture contains 861 ranked players and normalizes all 861 with zero import warnings after identity normalization. The raw user ranking export is intentionally not committed to this public repository; regression tests use synthetic rows with the same schema.
 
 See `docs/RANKING_IMPORT_FORMATS.md` for the provider mapping and validation details.
 
-## Status
+## Recommendation Engine V2
 
-This is the first implementation slice, not the final recommendation model. Next milestones are documented in `docs/DRAFT_COMPANION_IMPLEMENTATION_PLAN.md`.
+The Top 3 expose one percentage each. These values are relative preference shares, not outcome probabilities, and always sum to 100%.
+
+Future Availability V1 estimates whether a candidate is likely to survive until the user's following selection by combining ranking pressure, opponent roster needs between turns, snake-turn opportunities, positional runs, and tier scarcity. Strategy is applied as a bounded preference rather than an override of rankings or roster legality.
+
+See `docs/RECOMMENDATION_ENGINE_V2.md` for weights, heuristics, validation, and strategy behavior.

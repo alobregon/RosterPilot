@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { buildDraftBoard, isDraftComplete, rosterForSlot, rosterSize, totalDraftPicks } from '@/lib/board';
 import {
   draftSlotForOverallPick,
@@ -8,9 +8,21 @@ import {
   pickInRound,
   roundForOverallPick,
 } from '@/lib/draft';
+import {
+  DRAFT_STORAGE_KEY,
+  parseDraftSnapshot,
+  serializeDraftSnapshot,
+} from '@/lib/persistence';
 import { recommendPlayers } from '@/lib/recommendation';
 import { parseRankingFile } from '@/lib/spreadsheet';
-import type { DraftConfig, DraftPick, PlayerRanking, Position } from '@/lib/types';
+import { defaultStrategyForDraftSlot } from '@/lib/strategy';
+import type {
+  DraftConfig,
+  DraftPick,
+  DraftStrategy,
+  PlayerRanking,
+  Position,
+} from '@/lib/types';
 
 const DEFAULT_CONFIG: DraftConfig = {
   teamCount: 10,
@@ -24,9 +36,20 @@ const DEFAULT_CONFIG: DraftConfig = {
   dstStarters: 1,
   kStarters: 1,
   benchSpots: 6,
+  draftStrategy: 'BALANCED',
 };
 
 const POSITION_FILTERS: Array<'ALL' | Position> = ['ALL', 'QB', 'RB', 'WR', 'TE', 'K', 'DST'];
+const STRATEGY_OPTIONS: Array<{ value: DraftStrategy; label: string }> = [
+  { value: 'BALANCED', label: 'Balanced' },
+  { value: 'HERO_RB', label: 'Hero RB' },
+  { value: 'ZERO_RB', label: 'Zero RB' },
+  { value: 'ROBUST_RB', label: 'Robust RB' },
+  { value: 'WR_HEAVY', label: 'WR Heavy' },
+  { value: 'LATE_QB', label: 'Late QB' },
+  { value: 'ELITE_TE', label: 'Elite TE' },
+  { value: 'UPSIDE_HEAVY', label: 'Upside Heavy' },
+];
 
 export default function DraftCompanionPage() {
   const [config, setConfig] = useState<DraftConfig>(DEFAULT_CONFIG);
@@ -36,6 +59,7 @@ export default function DraftCompanionPage() {
   const [positionFilter, setPositionFilter] = useState<'ALL' | Position>('ALL');
   const [importMessage, setImportMessage] = useState('Upload your rankings to begin.');
   const [error, setError] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   const totalPicks = totalDraftPicks(config);
   const complete = isDraftComplete(picks, config);
@@ -45,6 +69,30 @@ export default function DraftCompanionPage() {
   const currentPickInRound = pickInRound(currentOverallPick, config.teamCount);
   const nextUserPick = complete ? null : nextUserOverallPick(currentOverallPick, config);
   const isUserOnClock = currentSlot === config.userDraftSlot;
+
+  useEffect(() => {
+    const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+    const snapshot = raw ? parseDraftSnapshot(raw) : null;
+
+    if (snapshot) {
+      setConfig(snapshot.config);
+      setPlayers(snapshot.players);
+      setPicks(snapshot.picks);
+      setImportMessage(
+        `Restored ${snapshot.players.length} players • ${snapshot.picks.length} picks saved`,
+      );
+    }
+
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      serializeDraftSnapshot({ config, players, picks }),
+    );
+  }, [hydrated, config, players, picks]);
 
   const draftedIds = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
   const board = useMemo(() => buildDraftBoard(config, picks, players), [config, picks, players]);
@@ -115,6 +163,11 @@ export default function DraftCompanionPage() {
     setPicks((existing) => existing.slice(0, -1));
   }
 
+  function restartDraft() {
+    if (picks.length > 0 && !window.confirm('Restart the draft and clear all entered picks?')) return;
+    setPicks([]);
+  }
+
   return (
     <main className="shell">
       <header className="hero">
@@ -143,9 +196,14 @@ export default function DraftCompanionPage() {
           emphasis={isUserOnClock}
         />
         <Status label="Your next pick" value={nextUserPick ? `#${nextUserPick}` : '—'} />
-        <button className="secondaryButton" onClick={undoLastPick} disabled={picks.length === 0}>
-          Undo last pick
-        </button>
+        <div className="statusActions">
+          <button className="secondaryButton" onClick={undoLastPick} disabled={picks.length === 0}>
+            Undo last pick
+          </button>
+          <button className="secondaryButton" onClick={restartDraft} disabled={picks.length === 0}>
+            Restart draft
+          </button>
+        </div>
       </section>
 
       <section className="setupCard">
@@ -178,13 +236,33 @@ export default function DraftCompanionPage() {
               max={config.teamCount}
               value={config.userDraftSlot}
               disabled={picks.length > 0}
+              onChange={(event) => {
+                const slot = Math.min(config.teamCount, Math.max(1, Number(event.target.value) || 1));
+                setConfig((current) => ({
+                  ...current,
+                  userDraftSlot: slot,
+                  draftStrategy: defaultStrategyForDraftSlot(slot),
+                }));
+              }}
+            />
+          </label>
+          <label>
+            Strategy
+            <select
+              value={config.draftStrategy ?? 'BALANCED'}
               onChange={(event) =>
                 setConfig((current) => ({
                   ...current,
-                  userDraftSlot: Math.min(config.teamCount, Math.max(1, Number(event.target.value) || 1)),
+                  draftStrategy: event.target.value as DraftStrategy,
                 }))
               }
-            />
+            >
+              {STRATEGY_OPTIONS.map((strategy) => (
+                <option value={strategy.value} key={strategy.value}>
+                  {strategy.label}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
       </section>
@@ -306,7 +384,7 @@ export default function DraftCompanionPage() {
                 <span className="eyebrow">Decision engine</span>
                 <h2>Top 3</h2>
               </div>
-              <span className="countPill">Recommendation strength</span>
+              <span className="countPill">Recommendation %</span>
             </div>
             {recommendations.length ? (
               <div className="recommendationList">
@@ -321,10 +399,10 @@ export default function DraftCompanionPage() {
                           {recommendation.player.byeWeek != null ? ` • Bye ${recommendation.player.byeWeek}` : ''}
                         </small>
                       </div>
-                      <span className="score">{recommendation.strength}%</span>
+                      <span className="score">{recommendation.recommendationPercent}%</span>
                     </div>
                     <div className="scoreTrack">
-                      <span style={{ width: `${recommendation.strength}%` }} />
+                      <span style={{ width: `${recommendation.recommendationPercent}%` }} />
                     </div>
                     <ul>
                       {recommendation.reasons.map((reason) => (

@@ -17,19 +17,11 @@ export function draftSlotForOverallPick(overallPick: number, teamCount: number):
   return round % 2 === 1 ? indexInRound : teamCount - indexInRound + 1;
 }
 
-export function overallPickForRoundAndSlot(
-  round: number,
-  draftSlot: number,
-  teamCount: number,
-): number {
+export function overallPickForRoundAndSlot(round: number, draftSlot: number, teamCount: number): number {
   assertPositiveInteger(round, 'round');
   assertPositiveInteger(draftSlot, 'draftSlot');
   assertPositiveInteger(teamCount, 'teamCount');
-
-  if (draftSlot > teamCount) {
-    throw new Error('draftSlot cannot exceed teamCount');
-  }
-
+  if (draftSlot > teamCount) throw new Error('draftSlot cannot exceed teamCount');
   const indexInRound = round % 2 === 1 ? draftSlot : teamCount - draftSlot + 1;
   return (round - 1) * teamCount + indexInRound;
 }
@@ -39,13 +31,19 @@ export function nextUserOverallPick(
   config: Pick<DraftConfig, 'teamCount' | 'userDraftSlot'>,
 ): number {
   const currentRound = roundForOverallPick(Math.max(1, currentOverallPick), config.teamCount);
-
   for (let round = currentRound; round <= currentRound + 2; round += 1) {
     const candidate = overallPickForRoundAndSlot(round, config.userDraftSlot, config.teamCount);
     if (candidate >= currentOverallPick) return candidate;
   }
-
   throw new Error('Unable to determine next user pick');
+}
+
+export function followingUserOverallPick(
+  currentOverallPick: number,
+  config: Pick<DraftConfig, 'teamCount' | 'userDraftSlot'>,
+): number {
+  const selectionPick = nextUserOverallPick(currentOverallPick, config);
+  return nextUserOverallPick(selectionPick + 1, config);
 }
 
 export function picksForSlot(picks: DraftPick[], draftSlot: number): DraftPick[] {
@@ -53,7 +51,5 @@ export function picksForSlot(picks: DraftPick[], draftSlot: number): DraftPick[]
 }
 
 function assertPositiveInteger(value: number, field: string): void {
-  if (!Number.isInteger(value) || value < 1) {
-    throw new Error(`${field} must be a positive integer`);
-  }
+  if (!Number.isInteger(value) || value < 1) throw new Error(`${field} must be a positive integer`);
 }
