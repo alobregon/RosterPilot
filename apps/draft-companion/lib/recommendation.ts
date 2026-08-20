@@ -15,6 +15,8 @@ const WEIGHTS = {
   valueAtPick: 0.15,
 } as const;
 
+const POSITION_RUN_WINDOW = 8;
+
 export function recommendPlayers(args: {
   players: PlayerRanking[];
   picks: DraftPick[];
@@ -38,7 +40,11 @@ export function recommendPlayers(args: {
     .map((player) => {
       const breakdown: RecommendationBreakdown = {
         rankingValue: rankingValue(player.overallRank, maxRank),
-        rosterFit: rosterFit(player.position, userRoster, config),
+        rosterFit: rosterFit(player.position, userRoster, config, {
+          picks,
+          players,
+          currentOverallPick,
+        }),
         tierUrgency: tierUrgency(player, available),
         valueAtPick: valueAtPick(player, nextPick),
       };
@@ -57,7 +63,11 @@ export function recommendPlayers(args: {
         rawScore,
         strength: Math.round(55 + rawScore * 0.44),
         breakdown,
-        reasons: buildReasons(player, breakdown, available, nextPick),
+        reasons: buildReasons(player, breakdown, available, nextPick, {
+          picks,
+          players,
+          currentOverallPick,
+        }),
       } satisfies Recommendation;
     })
     .sort((a, b) => b.rawScore - a.rawScore || a.player.overallRank - b.player.overallRank)
@@ -69,7 +79,12 @@ function rankingValue(rank: number, maxRank: number): number {
   return clamp(100 * (1 - (rank - 1) / maxRank), 0, 100);
 }
 
-function rosterFit(position: Position, roster: PlayerRanking[], config: DraftConfig): number {
+function rosterFit(
+  position: Position,
+  roster: PlayerRanking[],
+  config: DraftConfig,
+  draftContext: DraftTrendContext,
+): number {
   const counts = roster.reduce<Record<Position, number>>(
     (acc, player) => {
       acc[player.position] += 1;
@@ -83,8 +98,6 @@ function rosterFit(position: Position, roster: PlayerRanking[], config: DraftCon
     if (target <= 0) return 0;
     if (counts[position] >= target) return 5;
 
-    // The default league has 16 roster spots and one K + one DST. Treat those as
-    // final-round needs rather than allowing them to displace RB/WR/TE bench upside.
     const totalRosterSlots =
       config.qbStarters +
       config.rbStarters +
@@ -97,7 +110,19 @@ function rosterFit(position: Position, roster: PlayerRanking[], config: DraftCon
     const specialStarterSlots = config.dstStarters + config.kStarters;
     const lateSpecialTeamsThreshold = Math.max(0, totalRosterSlots - specialStarterSlots);
 
-    return roster.length >= lateSpecialTeamsThreshold ? 88 : 10;
+    if (roster.length >= lateSpecialTeamsThreshold) return 88;
+
+    // Kicker remains a deliberate final-round preference. DST is different:
+    // if the room begins a genuine defense run, increase urgency without blindly
+    // chasing a single early selection. Tier scarcity remains a separate factor.
+    if (position === 'DST') {
+      const run = recentPositionRun('DST', draftContext);
+      if (run.count >= 4) return 72;
+      if (run.count === 3) return 58;
+      if (run.count === 2) return 36;
+    }
+
+    return 10;
   }
 
   const target: Partial<Record<Position, number>> = {
@@ -146,6 +171,7 @@ function buildReasons(
   breakdown: RecommendationBreakdown,
   available: PlayerRanking[],
   nextPick: number,
+  draftContext: DraftTrendContext,
 ): string[] {
   const reasons: string[] = [];
   const valueGap = nextPick - player.overallRank;
@@ -154,6 +180,13 @@ function buildReasons(
   if (breakdown.rosterFit >= 90) reasons.push(`Fills a priority ${player.position} starter slot`);
   if ((player.position === 'K' || player.position === 'DST') && breakdown.rosterFit >= 80) {
     reasons.push(`Late-round ${player.position} starter slot is still open`);
+  }
+
+  if (player.position === 'DST') {
+    const run = recentPositionRun('DST', draftContext);
+    if (run.count >= 2 && breakdown.rosterFit < 80) {
+      reasons.push(`${run.count} DSTs selected in the last ${run.windowSize} picks; defense run is developing`);
+    }
   }
 
   if (player.tier != null) {
@@ -168,6 +201,25 @@ function buildReasons(
   if (reasons.length === 0) reasons.push('Balanced combination of ranking value and roster fit');
 
   return reasons.slice(0, 3);
+}
+
+interface DraftTrendContext {
+  picks: DraftPick[];
+  players: PlayerRanking[];
+  currentOverallPick: number;
+}
+
+function recentPositionRun(position: Position, context: DraftTrendContext): { count: number; windowSize: number } {
+  const recentPicks = context.picks
+    .filter((pick) => pick.overallPick < context.currentOverallPick)
+    .slice(-POSITION_RUN_WINDOW);
+  const playerById = new Map(context.players.map((player) => [player.id, player]));
+  const count = recentPicks.reduce(
+    (total, pick) => total + (playerById.get(pick.playerId)?.position === position ? 1 : 0),
+    0,
+  );
+
+  return { count, windowSize: recentPicks.length };
 }
 
 function clamp(value: number, min: number, max: number): number {
