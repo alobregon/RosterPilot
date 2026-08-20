@@ -68,21 +68,30 @@ export function parseRankingRows(rows: Record<string, unknown>[]): RankingImport
 
   const optional = (field: keyof typeof HEADER_ALIASES) =>
     resolveHeader(normalizedHeaders, HEADER_ALIASES[field]);
+  const teamHeader = optional('nflTeam');
 
   rows.forEach((row, index) => {
     const rowNumber = index + 2;
     const name = cleanString(row[nameHeader]);
     const parsedPosition = parsePosition(cleanString(row[positionHeader]));
     const rank = toNumber(row[rankHeader]);
+    const nflTeam = teamHeader ? cleanString(row[teamHeader]) || undefined : undefined;
 
     if (!name || !parsedPosition || rank == null) {
       warnings.push(`Skipped row ${rowNumber}: missing/invalid player, position, or rank.`);
       return;
     }
 
-    const duplicateKey = `${normalizeHeader(name)}|${parsedPosition.position}`;
+    // FantasyPros abbreviates first names, so name + position alone is not unique
+    // in deep ranking exports. Team is part of the import identity until provider
+    // player IDs are available. This keeps distinct J. Taylor-style collisions.
+    const duplicateKey = identityKey(name, parsedPosition.position, nflTeam);
     if (seen.has(duplicateKey)) {
-      warnings.push(`Skipped row ${rowNumber}: duplicate ${name} (${parsedPosition.position}).`);
+      warnings.push(
+        `Skipped row ${rowNumber}: duplicate ${name} (${parsedPosition.position}${
+          nflTeam ? `, ${nflTeam}` : ''
+        }).`,
+      );
       return;
     }
     seen.add(duplicateKey);
@@ -91,11 +100,11 @@ export function parseRankingRows(rows: Record<string, unknown>[]): RankingImport
     const sourceMetadata = buildSourceMetadata(row, normalizedHeaders, detectedSource);
 
     players.push({
-      id: stableId(name, parsedPosition.position),
+      id: stableId(name, parsedPosition.position, nflTeam),
       name,
       position: parsedPosition.position,
       overallRank: rank,
-      nflTeam: optional('nflTeam') ? cleanString(row[optional('nflTeam')!]) || undefined : undefined,
+      nflTeam,
       positionRank: explicitPositionRankHeader
         ? toNumber(row[explicitPositionRankHeader]) ?? parsedPosition.positionRank
         : parsedPosition.positionRank,
@@ -228,6 +237,11 @@ function buildSourceMetadata(
   return metadata;
 }
 
-function stableId(name: string, position: string): string {
-  return `${normalizeHeader(name).replace(/\s/g, '-')}-${position.toLowerCase()}`;
+function identityKey(name: string, position: Position, nflTeam?: string): string {
+  return [normalizeHeader(name), position.toLowerCase(), normalizeHeader(nflTeam ?? '')].join('|');
+}
+
+function stableId(name: string, position: Position, nflTeam?: string): string {
+  const teamSuffix = nflTeam ? `-${normalizeHeader(nflTeam).replace(/\s/g, '-')}` : '';
+  return `${normalizeHeader(name).replace(/\s/g, '-')}-${position.toLowerCase()}${teamSuffix}`;
 }
