@@ -143,12 +143,6 @@ Strategy is a bounded preference, not an override of legality or a replacement f
 - WR Heavy can open WR/WR/WR in this 3-WR league.
 - Upside Heavy uses the imported FantasyPros upside rating when present.
 
-## Opening strategy preference for the current validation preset
-
-For the current league/user validation preset, draft slots **1 or 2** start with **Hero RB** selected so the opening plan can anchor around an elite RB such as Jahmyr Gibbs or Bijan Robinson. Slots 3-10 start Balanced.
-
-This is a user-specific opening preference, not a universal recommendation-engine rule. The live strategy selector remains editable throughout the draft, and a future profile/settings layer should own personalized default strategy rules.
-
 ## Validation
 
 The extended FantasyPros pool contains 861 players. A deterministic 160-pick smoke simulation was run for every draft slot from 1 through 10 using the default league configuration.
@@ -173,3 +167,51 @@ K   1
 ```
 
 The opponent simulation is intentionally simple (non-user teams choose the highest remaining overall rank). It is a regression/sanity harness, not a prediction of real league behavior.
+
+## Recommendation explanation UI
+
+The UI continues to expose exactly one percentage per candidate. Supporting decision context is shown as non-numeric labels rather than additional confidence values.
+
+Current signal chips include:
+
+- Likely / Uncertain / Unlikely to return by the user's following pick;
+- Starter need;
+- Tier cliff;
+- Favorite / My Guy;
+- selected strategy fit when the strategy materially boosts the candidate.
+
+These labels are derived from the same deterministic V2 breakdown and do not create additional scoring inputs.
+
+## Opponent demand hardening
+
+Opponent positional demand now diminishes as a roster becomes saturated. Missing RB/WR starters remain high urgency, but teams carrying multiple bench players at the position no longer contribute the same demand signal indefinitely. QB and TE demand similarly drops sharply after starter needs are satisfied.
+
+This improves turn modeling because a team with five RBs should not exert the same pressure on an available RB as a team still missing RB2.
+
+## Future Availability V2 market signal
+
+When ADP is present in the imported rankings, Future Availability uses it as a bounded market-timing signal. It affects only the estimate of whether a player is likely to survive until the user's following selection; it does not replace the user's overall ranking as the player-value anchor.
+
+The availability pressure split is currently:
+
+- user overall-rank pressure: 35%
+- market ADP pressure: 15%
+- opponent positional demand: 30%
+- recent positional run: 12%
+- tier scarcity: 8%
+
+If ADP is absent, the ADP component falls back to the user-rank pressure, preserving the previous rank-only behavior.
+
+## Full-draft simulation harness
+
+A reusable deterministic simulation harness now runs the recommendation engine through complete drafts. Opponent teams choose the highest-ranked remaining player; the user's slot takes the engine's top recommendation.
+
+The harness validates:
+
+- full draft completion;
+- user roster length;
+- legal fixed starter and FLEX coverage;
+- required DST/K completion;
+- Recommendation % normalization at every user pick.
+
+The real 861-player pool was re-run through all ten draft slots with Josh Allen and Ladd McConkey marked as Favorites. Slots 1 and 2 used the current Hero RB opening default. All ten user rosters completed legally.

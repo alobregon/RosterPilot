@@ -71,10 +71,14 @@ export interface RecommendationBreakdown {
   favoriteFit: number;
 }
 
+export type AvailabilityLabel = 'LIKELY' | 'UNCERTAIN' | 'UNLIKELY' | 'FINAL_PICK';
+
 export interface Recommendation {
   player: PlayerRanking;
   rawScore: number;
   recommendationPercent: number;
+  availabilityLabel: AvailabilityLabel;
+  returnPick?: number;
   breakdown: RecommendationBreakdown;
   reasons: string[];
 }

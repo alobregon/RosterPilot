@@ -43,7 +43,7 @@ interface FutureAvailabilityResult {
   label: 'LIKELY' | 'UNCERTAIN' | 'UNLIKELY' | 'FINAL_PICK';
 }
 
-type ScoredRecommendation = Omit<Recommendation, 'recommendationPercent'> & {
+type ScoredRecommendation = Omit<Recommendation, 'recommendationPercent' | 'availabilityLabel' | 'returnPick'> & {
   availability: FutureAvailabilityResult;
 };
 
@@ -119,9 +119,11 @@ export function recommendPlayers(args: {
     .slice(0, limit);
 
   const shares = relativeRecommendationPercents(top.map((item) => item.rawScore));
-  return top.map(({ availability: _availability, ...item }, index) => ({
+  return top.map(({ availability, ...item }, index) => ({
     ...item,
     recommendationPercent: shares[index] ?? 0,
+    availabilityLabel: availability.label,
+    returnPick: availability.returnPick ?? undefined,
   }));
 }
 
@@ -175,11 +177,16 @@ export function futureAvailabilityForPlayer(
 
   const demandScore = uniqueSlots.length ? totalNeed / uniqueSlots.length : 0;
   const rankPressure = clamp(50 + (returnPick - player.overallRank) * 4, 5, 95);
+  // ADP is used only as a market-availability signal. User rankings still own
+  // player value; when ADP is unavailable this collapses to the previous rank-only model.
+  const adpPressure = player.adp == null
+    ? rankPressure
+    : clamp(50 + (returnPick - player.adp) * 4, 5, 95);
   const recentRunCount = recentPositionRun(player.position, { picks, players, currentOverallPick, config }).count;
   const runPressure = positionRunPressure(player.position, recentRunCount);
   const tierPressure = tierUrgency(player, available);
   const urgency = clamp(
-    rankPressure * 0.5 + demandScore * 0.3 + runPressure * 0.12 + tierPressure * 0.08,
+    rankPressure * 0.35 + adpPressure * 0.15 + demandScore * 0.3 + runPressure * 0.12 + tierPressure * 0.08,
     0,
     100,
   );
@@ -302,7 +309,10 @@ function positionNeedScore(position: Position, roster: PlayerRanking[], config: 
   const rosterLength = roster.length;
   const lateThreshold = totalRosterSlots(config) - config.dstStarters - config.kStarters;
 
-  if (position === 'QB') return counts.QB < config.qbStarters ? 65 : 15;
+  if (position === 'QB') {
+    if (counts.QB < config.qbStarters) return 65;
+    return counts.QB === config.qbStarters ? 12 : 2;
+  }
   if (position === 'DST') return counts.DST < config.dstStarters && rosterLength >= lateThreshold - 2 ? 82 : 8;
   if (position === 'K') return counts.K < config.kStarters && rosterLength >= lateThreshold - 1 ? 82 : 5;
 
@@ -312,11 +322,23 @@ function positionNeedScore(position: Position, roster: PlayerRanking[], config: 
   const flexEligible = counts.RB + counts.WR + counts.TE;
   const flexTarget = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
   if (baseSkillStarterDeficit(counts, config) === 0 && flexEligible < flexTarget) {
-    return position === 'TE' ? 68 : 82;
+    return position === 'TE' ? 68 : position === 'WR' ? 84 : 82;
   }
-  if (position === 'WR') return 52;
-  if (position === 'RB') return 50;
-  return 20;
+
+  const depth = Math.max(0, counts[position] - starterTarget);
+  if (position === 'WR') {
+    if (depth === 0) return 60;
+    if (depth === 1) return 46;
+    if (depth === 2) return 32;
+    return 15;
+  }
+  if (position === 'RB') {
+    if (depth === 0) return 56;
+    if (depth === 1) return 42;
+    if (depth === 2) return 28;
+    return 12;
+  }
+  return depth === 0 ? 24 : 8;
 }
 
 function positionCounts(roster: PlayerRanking[]): Record<Position, number> {

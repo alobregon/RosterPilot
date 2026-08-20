@@ -26,8 +26,17 @@ export function totalDraftPicks(config: DraftConfig): number {
   return config.teamCount * rosterSize(config);
 }
 
+export function nextOpenOverallPick(picks: DraftPick[], config: DraftConfig): number | null {
+  const occupied = new Set(picks.map((pick) => pick.overallPick));
+  const total = totalDraftPicks(config);
+  for (let overallPick = 1; overallPick <= total; overallPick += 1) {
+    if (!occupied.has(overallPick)) return overallPick;
+  }
+  return null;
+}
+
 export function isDraftComplete(picks: DraftPick[], config: DraftConfig): boolean {
-  return picks.length >= totalDraftPicks(config);
+  return nextOpenOverallPick(picks, config) == null;
 }
 
 export function buildDraftBoard(

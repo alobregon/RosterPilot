@@ -10,6 +10,8 @@ export interface DraftSnapshot {
   players: PlayerRanking[];
   picks: DraftPick[];
   favoritePlayerIds: string[];
+  teamNames: string[];
+  draftStarted: boolean;
 }
 
 export function serializeDraftSnapshot(args: {
@@ -17,6 +19,8 @@ export function serializeDraftSnapshot(args: {
   players: PlayerRanking[];
   picks: DraftPick[];
   favoritePlayerIds?: string[];
+  teamNames?: string[];
+  draftStarted?: boolean;
   savedAt?: Date;
 }): string {
   const snapshot: DraftSnapshot = {
@@ -26,6 +30,8 @@ export function serializeDraftSnapshot(args: {
     players: args.players,
     picks: args.picks,
     favoritePlayerIds: [...new Set(args.favoritePlayerIds ?? [])],
+    teamNames: Array.from({ length: args.config.teamCount }, (_, index) => args.teamNames?.[index] ?? ''),
+    draftStarted: args.draftStarted ?? args.picks.length > 0,
   };
   return JSON.stringify(snapshot);
 }
@@ -51,6 +57,18 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
       favoritePlayerIds = [...new Set(value.favoritePlayerIds.filter((id) => playerIds.has(id)))];
     }
 
+    let teamNames: string[] = [];
+    if (value.teamNames != null) {
+      if (!Array.isArray(value.teamNames) || !value.teamNames.every((name) => typeof name === 'string')) return null;
+      const savedTeamNames = value.teamNames as string[];
+      teamNames = Array.from({ length: value.config.teamCount }, (_, index) => savedTeamNames[index] ?? '');
+    } else {
+      teamNames = Array.from({ length: value.config.teamCount }, () => '');
+    }
+
+    const draftStarted =
+      typeof value.draftStarted === 'boolean' ? value.draftStarted : value.picks.length > 0;
+
     return {
       version: value.version,
       savedAt: value.savedAt,
@@ -58,6 +76,8 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
       players: value.players,
       picks: value.picks,
       favoritePlayerIds,
+      teamNames,
+      draftStarted,
     } as DraftSnapshot;
   } catch {
     return null;

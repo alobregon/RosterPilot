@@ -56,6 +56,33 @@ describe('future availability', () => {
     expect(result.label).toBe('UNLIKELY');
   });
 
+  it('reduces opponent demand when teams are already saturated at a position', () => {
+    const candidate: PlayerRanking = { id: 'candidate', name: 'Candidate RB', position: 'RB', overallRank: 45, tier: 5 };
+    const players: PlayerRanking[] = [candidate];
+    const picks: DraftPick[] = [];
+    let overallPick = 1;
+    for (const slot of [8, 9, 10]) {
+      for (let index = 0; index < 5; index += 1) {
+        const id = `rb-${slot}-${index}`;
+        players.push({ id, name: id, position: 'RB', overallRank: 100 + overallPick });
+        picks.push({ overallPick, round: 1, pickInRound: overallPick, draftSlot: slot, playerId: id });
+        overallPick += 1;
+      }
+    }
+
+    const result = futureAvailabilityForPlayer(candidate, [candidate], picks, players, config, 27);
+    expect(result.strongNeedTeams).toBe(0);
+    expect(result.demandScore).toBeLessThan(30);
+  });
+
+  it('uses ADP as a market availability signal when it is present', () => {
+    const earlyMarket: PlayerRanking = { id: 'early', name: 'Early Market WR', position: 'WR', overallRank: 40, adp: 24, tier: 4 };
+    const lateMarket: PlayerRanking = { id: 'late', name: 'Late Market WR', position: 'WR', overallRank: 40, adp: 60, tier: 4 };
+    const early = futureAvailabilityForPlayer(earlyMarket, [earlyMarket, lateMarket], [], [earlyMarket, lateMarket], config, 27);
+    const late = futureAvailabilityForPlayer(lateMarket, [earlyMarket, lateMarket], [], [earlyMarket, lateMarket], config, 27);
+    expect(early.urgency).toBeGreaterThan(late.urgency);
+  });
+
   it('does not invent a return pick after the draft ends', () => {
     const player: PlayerRanking = { id: 'wr', name: 'Final WR', position: 'WR', overallRank: 150 };
     const result = futureAvailabilityForPlayer(player, [player], [], [player], config, 154);
