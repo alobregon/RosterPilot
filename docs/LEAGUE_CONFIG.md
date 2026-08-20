@@ -45,13 +45,26 @@ QB, DST, and K are not FLEX eligible.
 
 ### DST and kicker timing
 
-The default recommendation strategy intentionally suppresses DST and kicker roster-fit value until the final two roster spots. With a 16-player roster, this means the engine should generally prefer skill-position bench upside through the first 14 selections unless a future strategy override says otherwise.
+The default recommendation strategy prefers to fill DST and kicker in the final two roster spots so higher-upside RB/WR/TE bench options are not displaced unnecessarily.
 
-This is a recommendation heuristic, not a league legality rule. Users may still manually draft DST or K at any time.
+DST suppression is **run-aware rather than absolute**. The engine monitors the most recent eight selections:
+
+- one early DST selection does not change the recommendation;
+- two DST selections in the recent window create a modest urgency increase;
+- three DST selections create a stronger urgency increase;
+- four or more DST selections create a substantial urgency increase.
+
+This does not automatically make DST the recommended pick. Overall player ranking, tier scarcity, roster fit, and value at the upcoming user selection still compete with the run signal. The intent is to recognize that the cost of waiting on defense changes when the room begins taking defenses earlier than expected.
+
+Tier urgency remains independent, so an active DST run combined with only one or two defenses remaining in a preferred tier can move a DST meaningfully higher than either signal would on its own.
+
+Kicker remains a deliberate late-round preference for now; it does not yet react to kicker runs.
+
+These are recommendation heuristics, not league legality rules. Users may manually draft DST or K at any time.
 
 ### Half-PPR scoring
 
-`HALF_PPR` is now represented directly in `DraftConfig`.
+`HALF_PPR` is represented directly in `DraftConfig`.
 
 For Recommendation Engine V1, the uploaded ranking sheet remains the authoritative player-value source. The scoring-format field is therefore primarily configuration metadata today; future recommendation versions may use it for position-value adjustments, projections, replacement-level calculations, and simulation.
 
