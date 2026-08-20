@@ -68,6 +68,7 @@ export interface RecommendationBreakdown {
   byeWeekFit: number;
   futureAvailability: number;
   strategyFit: number;
+  favoriteFit: number;
 }
 
 export interface Recommendation {
