@@ -39,7 +39,8 @@ const DEFAULT_CONFIG: DraftConfig = {
   draftStrategy: 'BALANCED',
 };
 
-const POSITION_FILTERS: Array<'ALL' | Position> = ['ALL', 'QB', 'RB', 'WR', 'TE', 'K', 'DST'];
+type PlayerFilter = 'ALL' | 'FAVORITES' | Position;
+const PLAYER_FILTERS: Array<PlayerFilter> = ['ALL', 'FAVORITES', 'QB', 'RB', 'WR', 'TE', 'K', 'DST'];
 const STRATEGY_OPTIONS: Array<{ value: DraftStrategy; label: string }> = [
   { value: 'BALANCED', label: 'Balanced' },
   { value: 'HERO_RB', label: 'Hero RB' },
@@ -55,8 +56,9 @@ export default function DraftCompanionPage() {
   const [config, setConfig] = useState<DraftConfig>(DEFAULT_CONFIG);
   const [players, setPlayers] = useState<PlayerRanking[]>([]);
   const [picks, setPicks] = useState<DraftPick[]>([]);
+  const [favoritePlayerIds, setFavoritePlayerIds] = useState<string[]>([]);
   const [search, setSearch] = useState('');
-  const [positionFilter, setPositionFilter] = useState<'ALL' | Position>('ALL');
+  const [playerFilter, setPlayerFilter] = useState<PlayerFilter>('ALL');
   const [importMessage, setImportMessage] = useState('Upload your rankings to begin.');
   const [error, setError] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -78,6 +80,7 @@ export default function DraftCompanionPage() {
       setConfig(snapshot.config);
       setPlayers(snapshot.players);
       setPicks(snapshot.picks);
+      setFavoritePlayerIds(snapshot.favoritePlayerIds);
       setImportMessage(
         `Restored ${snapshot.players.length} players • ${snapshot.picks.length} picks saved`,
       );
@@ -90,17 +93,19 @@ export default function DraftCompanionPage() {
     if (!hydrated) return;
     window.localStorage.setItem(
       DRAFT_STORAGE_KEY,
-      serializeDraftSnapshot({ config, players, picks }),
+      serializeDraftSnapshot({ config, players, picks, favoritePlayerIds }),
     );
-  }, [hydrated, config, players, picks]);
+  }, [hydrated, config, players, picks, favoritePlayerIds]);
 
+  const favoriteIds = useMemo(() => new Set(favoritePlayerIds), [favoritePlayerIds]);
   const draftedIds = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
   const board = useMemo(() => buildDraftBoard(config, picks, players), [config, picks, players]);
   const availablePlayers = useMemo(
     () =>
       players.filter((player) => {
         if (draftedIds.has(player.id)) return false;
-        if (positionFilter !== 'ALL' && player.position !== positionFilter) return false;
+        if (playerFilter === 'FAVORITES' && !favoriteIds.has(player.id)) return false;
+        if (playerFilter !== 'ALL' && playerFilter !== 'FAVORITES' && player.position !== playerFilter) return false;
         const query = search.trim().toLowerCase();
         if (!query) return true;
         return (
@@ -109,12 +114,15 @@ export default function DraftCompanionPage() {
           player.nflTeam?.toLowerCase().includes(query)
         );
       }),
-    [players, draftedIds, positionFilter, search],
+    [players, draftedIds, playerFilter, favoriteIds, search],
   );
 
   const recommendations = useMemo(
-    () => (complete ? [] : recommendPlayers({ players, picks, config, currentOverallPick, limit: 3 })),
-    [players, picks, config, currentOverallPick, complete],
+    () =>
+      complete
+        ? []
+        : recommendPlayers({ players, picks, config, currentOverallPick, favoritePlayerIds, limit: 3 }),
+    [players, picks, config, currentOverallPick, favoritePlayerIds, complete],
   );
 
   const userRoster = useMemo(
@@ -131,6 +139,8 @@ export default function DraftCompanionPage() {
       const result = await parseRankingFile(file);
       setPlayers(result.players);
       setPicks([]);
+      const importedIds = new Set(result.players.map((player) => player.id));
+      setFavoritePlayerIds((existing) => existing.filter((id) => importedIds.has(id)));
       setImportMessage(
         `${result.players.length} players imported${result.detectedSource ? ` from ${result.detectedSource}` : ''}${
           result.warnings.length ? ` • ${result.warnings.length} warning(s)` : ''
@@ -157,6 +167,14 @@ export default function DraftCompanionPage() {
       },
     ]);
     setSearch('');
+  }
+
+  function toggleFavorite(playerId: string) {
+    setFavoritePlayerIds((existing) =>
+      existing.includes(playerId)
+        ? existing.filter((id) => id !== playerId)
+        : [...existing, playerId],
+    );
   }
 
   function undoLastPick() {
@@ -341,32 +359,49 @@ export default function DraftCompanionPage() {
           />
 
           <div className="filters">
-            {POSITION_FILTERS.map((position) => (
+            {PLAYER_FILTERS.map((filter) => (
               <button
-                key={position}
-                className={positionFilter === position ? 'filter active' : 'filter'}
-                onClick={() => setPositionFilter(position)}
+                key={filter}
+                className={playerFilter === filter ? 'filter active' : 'filter'}
+                onClick={() => setPlayerFilter(filter)}
               >
-                {position}
+                {filter === 'FAVORITES' ? '★ Favorites' : filter}
               </button>
             ))}
           </div>
 
           <div className="playerList">
-            {availablePlayers.slice(0, 100).map((player) => (
-              <button className="playerRow" key={player.id} onClick={() => draftPlayer(player)} disabled={complete}>
-                <span className="rank">{player.overallRank}</span>
-                <span className="playerIdentity">
-                  <strong>{player.name}</strong>
-                  <small>
-                    {player.position} {player.nflTeam ? `• ${player.nflTeam}` : ''}
-                    {player.tier != null ? ` • Tier ${player.tier}` : ''}
-                    {player.byeWeek != null ? ` • Bye ${player.byeWeek}` : ''}
-                  </small>
-                </span>
-                <span className="draftAction">{complete ? 'Complete' : 'Draft'}</span>
-              </button>
-            ))}
+            {availablePlayers.slice(0, 100).map((player) => {
+              const favorite = favoriteIds.has(player.id);
+              return (
+                <div className="playerRow" key={player.id}>
+                  <button
+                    className={favorite ? 'favoriteButton active' : 'favoriteButton'}
+                    onClick={() => toggleFavorite(player.id)}
+                    aria-label={favorite ? `Remove ${player.name} from favorites` : `Add ${player.name} to favorites`}
+                    title={favorite ? 'Remove from My Guys' : 'Add to My Guys'}
+                  >
+                    {favorite ? '★' : '☆'}
+                  </button>
+                  <span className="rank">{player.overallRank}</span>
+                  <span className="playerIdentity">
+                    <strong>{player.name}</strong>
+                    <small>
+                      {player.position} {player.nflTeam ? `• ${player.nflTeam}` : ''}
+                      {player.tier != null ? ` • Tier ${player.tier}` : ''}
+                      {player.byeWeek != null ? ` • Bye ${player.byeWeek}` : ''}
+                    </small>
+                  </span>
+                  <button
+                    className="draftPlayerButton"
+                    onClick={() => draftPlayer(player)}
+                    disabled={complete}
+                  >
+                    {complete ? 'Complete' : 'Draft'}
+                  </button>
+                </div>
+              );
+            })}
             {players.length === 0 ? (
               <EmptyState text="Import an .xlsx, .xls, or .csv rankings file. Required columns: Player, Position, Rank." />
             ) : complete ? (
@@ -393,7 +428,10 @@ export default function DraftCompanionPage() {
                     <div className="recommendationTopline">
                       <span className="medal">#{index + 1}</span>
                       <div>
-                        <strong>{recommendation.player.name}</strong>
+                        <strong>
+                          {favoriteIds.has(recommendation.player.id) ? '★ ' : ''}
+                          {recommendation.player.name}
+                        </strong>
                         <small>
                           {recommendation.player.position} • Rank {recommendation.player.overallRank}
                           {recommendation.player.byeWeek != null ? ` • Bye ${recommendation.player.byeWeek}` : ''}
