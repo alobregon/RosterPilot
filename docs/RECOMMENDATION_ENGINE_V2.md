@@ -17,6 +17,7 @@ V2 considers:
 - opponent roster needs before the user's following turn
 - heuristic future availability
 - selected draft strategy
+- user-selected favorite players (My Guys)
 
 ## Base score
 
@@ -32,6 +33,8 @@ The current base score uses:
 | Bye-week fit | 3% |
 
 Draft strategy is applied as a bounded adjustment of up to +/- 6 raw-score points after the base score. Balanced strategy applies no adjustment.
+
+Favorites are a separate bounded adjustment of up to +5 raw-score points. The boost is price-sensitive: it is strongest when a favorite has fallen at least 10 picks past the user's ranking, meaningful around fair value, and nearly neutral for a major reach. Favorites never override mandatory roster-position constraints.
 
 ## Recommendation %
 
@@ -100,6 +103,23 @@ Balanced V2 gives diminishing bench-depth credit as a position becomes saturated
 FLEX fit is considered only after base RB, WR, and TE starters are filled.
 
 When remaining roster slots equal the minimum number of unfilled legal lineup requirements, recommendations are constrained to positions that can satisfy those requirements. This guarantees that a user who has delayed DST/K can still finish with a legal roster.
+
+## Favorites / My Guys
+
+Any player can be starred as a favorite in the player pool. Favorites are user-controlled, persisted with the local draft snapshot, and can be viewed with a dedicated Favorites filter.
+
+Favorite preference is deliberately asymmetric: it can break a close decision or encourage the user to capitalize when a favorite falls, but it does not force a reach. Current favorite-fit levels are based on the user's upcoming selection relative to the player's imported overall rank:
+
+- 10+ picks of value: maximum favorite boost
+- 5-9 picks of value: strong boost
+- at/after ranking: meaningful boost
+- within 5 picks ahead of ranking: modest boost
+- 6-10 picks ahead of ranking: small boost
+- more than 10 picks ahead: nearly neutral
+
+When a favorite materially contributes to a Top-3 recommendation, explanation text calls it out explicitly, for example `Favorite who has fallen 8 picks past your ranking`.
+
+The current FantasyPros export does not contain raw ADP, so V2 measures favorite value against the user's imported overall rank. A future market/ADP integration can add a second price reference without changing the user-facing Favorite feature.
 
 ## Draft strategies
 
