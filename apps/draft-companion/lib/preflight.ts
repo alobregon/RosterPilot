@@ -21,18 +21,23 @@ export function validateRankingPool(players: PlayerRanking[], config: DraftConfi
 
   const counts = countPositions(players);
   const fixedTargets: Array<[Position, number]> = [
-    ['QB', config.qbStarters], ['RB', config.rbStarters], ['WR', config.wrStarters],
-    ['TE', config.teStarters], ['DST', config.dstStarters], ['K', config.kStarters],
+    ['QB', config.qbStarters * config.teamCount],
+    ['RB', config.rbStarters * config.teamCount],
+    ['WR', config.wrStarters * config.teamCount],
+    ['TE', config.teStarters * config.teamCount],
+    ['DST', config.dstStarters * config.teamCount],
+    ['K', config.kStarters * config.teamCount],
   ];
   for (const [position, target] of fixedTargets) {
     if (target > 0 && counts[position] < target) {
-      errors.push(`Rankings need at least ${target} ${position}${target === 1 ? '' : 's'} to fill your required roster.`);
+      errors.push(`Rankings need at least ${target} ${position}${target === 1 ? '' : 's'} to fill league-wide required starters.`);
     }
   }
 
-  const skillTarget = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
-  if (counts.RB + counts.WR + counts.TE < skillTarget) {
-    errors.push(`Rankings need at least ${skillTarget} FLEX-eligible RB/WR/TE players.`);
+  const leagueSkillTarget =
+    config.teamCount * (config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters);
+  if (counts.RB + counts.WR + counts.TE < leagueSkillTarget) {
+    errors.push(`Rankings need at least ${leagueSkillTarget} FLEX-eligible RB/WR/TE players for league-wide starters.`);
   }
 
   if (players.some((player) => player.overallRank > players.length * 2)) {

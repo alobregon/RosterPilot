@@ -23,19 +23,32 @@ describe('release readiness', () => {
     expect(validateRankingPool(syntheticPool(200), config).valid).toBe(true);
   });
 
+  it('requires enough position depth for league-wide starters', () => {
+    const pool = syntheticPool(200).filter((player) => player.position !== 'QB');
+    pool.push({ id: 'only-qb', name: 'Only QB', position: 'QB', overallRank: 999 });
+    const result = validateRankingPool(pool, config);
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((error) => error.includes('10 QBs'))).toBe(true);
+  });
+
   it('resumes at the earliest correction gap', () => {
     const picks = [draftPickAtOverall(1, 'p-1', 10), draftPickAtOverall(3, 'p-3', 10)];
     const state = deriveDraftSession(picks, config, true);
     expect(state.currentOverallPick).toBe(2); expect(state.historicalGap).toBe(true);
   });
 
-  it('rejects contradictory or duplicate backup data', () => {
+  it('rejects contradictory, duplicate, and out-of-range backup data', () => {
     const players = syntheticPool(200);
     const raw = serializeDraftSnapshot({ config, players, picks: [draftPickAtOverall(1, players[0].id, 10)], draftStarted: true });
     const unlocked = JSON.parse(raw); unlocked.draftStarted = false;
     expect(parseDraftSnapshot(JSON.stringify(unlocked))).toBeNull();
     const dup = JSON.parse(raw); dup.players.push({ ...dup.players[0] });
     expect(parseDraftSnapshot(JSON.stringify(dup))).toBeNull();
+    const outOfRange = JSON.parse(raw);
+    outOfRange.picks = [draftPickAtOverall(161, players[1].id, 10)];
+    expect(parseDraftSnapshot(JSON.stringify(outOfRange))).toBeNull();
+    const badAdp = JSON.parse(raw); badAdp.players[0].adp = 'twenty';
+    expect(parseDraftSnapshot(JSON.stringify(badAdp))).toBeNull();
   });
 
   it('detects a hot accelerated position run', () => {

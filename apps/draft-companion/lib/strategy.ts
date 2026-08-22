@@ -8,3 +8,19 @@ import type { DraftStrategy } from './types';
 export function defaultStrategyForDraftSlot(draftSlot: number): DraftStrategy {
   return draftSlot <= 2 ? 'HERO_RB' : 'BALANCED';
 }
+
+/**
+ * Follow automatic slot defaults only while the current strategy still matches
+ * the previous slot's default. Explicit user-selected strategies are preserved.
+ */
+export function strategyAfterSlotChange(
+  currentStrategy: DraftStrategy | undefined,
+  previousSlot: number,
+  nextSlot: number,
+): DraftStrategy {
+  const previousDefault = defaultStrategyForDraftSlot(previousSlot);
+  if (currentStrategy == null || currentStrategy === previousDefault) {
+    return defaultStrategyForDraftSlot(nextSlot);
+  }
+  return currentStrategy;
+}

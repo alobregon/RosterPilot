@@ -1,11 +1,13 @@
 name: Draft Companion CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [master, agent/draft-companion-foundation]
     paths:
       - 'apps/draft-companion/**'
       - 'docs/DRAFT_NIGHT_RUNBOOK.md'
+      - 'docs/DRAFT_NIGHT_QA.md'
       - 'docs/RELEASE_READINESS.md'
       - 'package.json'
       - 'vitest.config.ts'
@@ -25,8 +27,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm install
+      - run: npm install --no-audit --no-fund
       - run: npm run typecheck:draft
       - run: npm run test:draft
       - run: npm run build:draft

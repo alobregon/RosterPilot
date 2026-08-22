@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { recommendPlayers } from '../lib/recommendation';
-import { defaultStrategyForDraftSlot } from '../lib/strategy';
+import { defaultStrategyForDraftSlot, strategyAfterSlotChange } from '../lib/strategy';
 import type { DraftConfig, PlayerRanking } from '../lib/types';
 
 const base: DraftConfig = {
@@ -30,6 +30,16 @@ describe('draft strategies', () => {
     expect(defaultStrategyForDraftSlot(2)).toBe('HERO_RB');
     expect(defaultStrategyForDraftSlot(3)).toBe('BALANCED');
     expect(defaultStrategyForDraftSlot(10)).toBe('BALANCED');
+  });
+
+  it('updates automatic defaults when the draft slot changes', () => {
+    expect(strategyAfterSlotChange('BALANCED', 7, 1)).toBe('HERO_RB');
+    expect(strategyAfterSlotChange('HERO_RB', 1, 7)).toBe('BALANCED');
+  });
+
+  it('preserves deliberate non-default strategies when the slot changes', () => {
+    expect(strategyAfterSlotChange('ZERO_RB', 7, 1)).toBe('ZERO_RB');
+    expect(strategyAfterSlotChange('LATE_QB', 1, 7)).toBe('LATE_QB');
   });
 
   it('Zero RB favors WR over an equivalent RB in early rounds', () => {
