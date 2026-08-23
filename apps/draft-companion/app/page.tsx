@@ -6,12 +6,14 @@ import { replaceDraftPick, removeDraftPick } from '@/lib/corrections';
 import { nextUserOverallPick } from '@/lib/draft';
 import { DRAFT_STORAGE_KEY, parseDraftSnapshot, serializeDraftSnapshot } from '@/lib/persistence';
 import { validateRankingPool } from '@/lib/preflight';
-import { recommendPlayers } from '@/lib/recommendation';
+import { recommendForCurrentPick } from '@/lib/decision';
 import { deriveDraftSession } from '@/lib/session';
 import { defaultTeamNames, resizeTeamNames, validateDraftSetup } from '@/lib/setup';
 import { parseRankingFile } from '@/lib/spreadsheet';
 import { strategyAfterSlotChange } from '@/lib/strategy';
-import { DraftUi, STRATEGIES, type Correction, type PlayerFilter, type PlayerSort } from './draft-ui';
+import { projectUpcomingTargets } from '@/lib/targets';
+import { STRATEGIES, type Correction, type PlayerFilter, type PlayerSort } from './draft-ui';
+import { DraftUiWithTargets } from './draft-target-ui';
 import type { DraftConfig, DraftPick, DraftStrategy, PlayerRanking, ScoringFormat } from '@/lib/types';
 
 const DEFAULT: DraftConfig = {
@@ -50,6 +52,7 @@ export default function Page() {
   const session = useMemo(() => deriveDraftSession(picks, config, started), [picks, config, started]);
   const correcting = Boolean(correction) || session.historicalGap;
   const nextUserPick = !started || session.complete ? null : nextUserOverallPick(session.currentOverallPick, config);
+  const onClock = started && !correcting && session.currentSlot === config.userDraftSlot;
   const favorites = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const drafted = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
   const board = useMemo(() => buildDraftBoard(config, picks, players), [config, picks, players]);
@@ -59,9 +62,9 @@ export default function Page() {
   );
   const recs = useMemo(
     () =>
-      !started || session.complete || correcting
+      !onClock || session.complete || correcting
         ? []
-        : recommendPlayers({
+        : recommendForCurrentPick({
             players,
             picks,
             config,
@@ -69,7 +72,21 @@ export default function Page() {
             favoritePlayerIds: favoriteIds,
             limit: 3,
           }),
-    [started, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds],
+    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds],
+  );
+  const targets = useMemo(
+    () =>
+      !started || session.complete || correcting || onClock || nextUserPick == null
+        ? []
+        : projectUpcomingTargets({
+            players,
+            picks,
+            config,
+            currentOverallPick: session.currentOverallPick,
+            targetPick: nextUserPick,
+            limit: 3,
+          }),
+    [started, session.complete, session.currentOverallPick, correcting, onClock, nextUserPick, players, picks, config],
   );
 
   const visible = useMemo(
@@ -219,7 +236,7 @@ export default function Page() {
     STRATEGIES.find(([value]) => value === (config.draftStrategy ?? 'BALANCED'))?.[1] ?? 'Balanced';
 
   return (
-    <DraftUi
+    <DraftUiWithTargets
       config={config}
       players={players}
       picks={picks}
@@ -230,7 +247,7 @@ export default function Page() {
       correcting={correcting}
       {...session}
       nextUserPick={nextUserPick}
-      onClock={started && !correcting && session.currentSlot === config.userDraftSlot}
+      onClock={onClock}
       message={message}
       error={error}
       storage={storage}
@@ -241,6 +258,7 @@ export default function Page() {
       search={search}
       board={board}
       recs={recs}
+      targets={targets}
       userRoster={userRoster}
       strategyLabel={strategyLabel}
       onImport={importRankings}
