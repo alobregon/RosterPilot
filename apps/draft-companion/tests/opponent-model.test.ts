@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { recommendForCurrentPick } from '../lib/decision';
 import {
+  HISTORICAL_ADP_REACH_ENABLED,
   historicalAdpShift,
   managerProfileOptions,
   opponentHistoryAvailabilitySignal,
@@ -79,18 +80,20 @@ describe('league-specific opponent model', () => {
     });
 
     expect(signal.matchedManagers).toBe(1);
+    expect(signal.positionAdjustment).toBeGreaterThan(0);
     expect(signal.adjustment).toBeGreaterThan(0);
     expect(signal.adjustment).toBeLessThanOrEqual(14);
     expect(signal.reasons.some((reason) => reason.includes('Armando'))).toBe(true);
   });
 
-  it('learns manager-specific reach and wait behavior from historical ADP', () => {
+  it('retains historical ADP reach research without applying it live', () => {
+    expect(HISTORICAL_ADP_REACH_ENABLED).toBe(false);
     expect(historicalAdpShift('Juan', 'TE', 5)).toBeLessThan(-2);
     expect(historicalAdpShift('Ryan', 'TE', 5)).toBeGreaterThan(2);
     expect(historicalAdpShift('Juan', 'DST', 5)).toBe(0);
   });
 
-  it('adds reach pressure only when current player ADP is available', () => {
+  it('keeps the live reach adjustment at zero after walk-forward validation', () => {
     const managerIds = Array.from({ length: 10 }, () => '');
     managerIds[7] = 'Juan';
 
@@ -107,22 +110,9 @@ describe('league-specific opponent model', () => {
       managerIds,
     });
 
-    expect(withAdp.reachAdjustment).toBeGreaterThan(0);
+    expect(withAdp.reachAdjustment).toBe(0);
     expect(withoutAdp.reachAdjustment).toBe(0);
     expect(Math.abs(withAdp.adjustment)).toBeLessThanOrEqual(14);
-  });
-
-  it('can modestly reduce urgency for a manager who historically waits relative to ADP', () => {
-    const managerIds = Array.from({ length: 10 }, () => '');
-    managerIds[7] = 'Ryan';
-    const signal = opponentHistoryAvailabilitySignal({
-      player: tightEnd,
-      config,
-      currentOverallPick: 7,
-      managerIds,
-    });
-
-    expect(signal.reachAdjustment).toBeLessThan(0);
   });
 
   it('leaves recommendations unchanged when opponent labels do not match history', () => {
