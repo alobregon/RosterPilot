@@ -15,10 +15,11 @@ export function recommendForCurrentPick(args: {
   config: DraftConfig;
   currentOverallPick: number;
   favoritePlayerIds?: readonly string[];
+  managerIds?: readonly string[];
   teamNames?: readonly string[];
   limit?: number;
 }): Recommendation[] {
-  const { players, picks, config, currentOverallPick, favoritePlayerIds = [], teamNames = [], limit = 3 } = args;
+  const { players, picks, config, currentOverallPick, favoritePlayerIds = [], managerIds = [], teamNames = [], limit = 3 } = args;
   const favoriteIds = new Set(favoritePlayerIds);
   const candidates = recommendPlayers({
     players,
@@ -41,6 +42,7 @@ export function recommendForCurrentPick(args: {
       player: item.player,
       config,
       currentOverallPick,
+      managerIds,
       teamNames,
     });
     const futureAvailability = clamp(item.breakdown.futureAvailability + history.adjustment, 0, 100);
