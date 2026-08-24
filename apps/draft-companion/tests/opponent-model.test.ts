@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { recommendForCurrentPick } from '../lib/decision';
 import {
+  historicalAdpShift,
   managerProfileOptions,
   opponentHistoryAvailabilitySignal,
   resolveManagerProfile,
@@ -81,6 +82,47 @@ describe('league-specific opponent model', () => {
     expect(signal.adjustment).toBeGreaterThan(0);
     expect(signal.adjustment).toBeLessThanOrEqual(14);
     expect(signal.reasons.some((reason) => reason.includes('Armando'))).toBe(true);
+  });
+
+  it('learns manager-specific reach and wait behavior from historical ADP', () => {
+    expect(historicalAdpShift('Juan', 'TE', 5)).toBeLessThan(-2);
+    expect(historicalAdpShift('Ryan', 'TE', 5)).toBeGreaterThan(2);
+    expect(historicalAdpShift('Juan', 'DST', 5)).toBe(0);
+  });
+
+  it('adds reach pressure only when current player ADP is available', () => {
+    const managerIds = Array.from({ length: 10 }, () => '');
+    managerIds[7] = 'Juan';
+
+    const withAdp = opponentHistoryAvailabilitySignal({
+      player: tightEnd,
+      config,
+      currentOverallPick: 7,
+      managerIds,
+    });
+    const withoutAdp = opponentHistoryAvailabilitySignal({
+      player: { ...tightEnd, adp: undefined },
+      config,
+      currentOverallPick: 7,
+      managerIds,
+    });
+
+    expect(withAdp.reachAdjustment).toBeGreaterThan(0);
+    expect(withoutAdp.reachAdjustment).toBe(0);
+    expect(Math.abs(withAdp.adjustment)).toBeLessThanOrEqual(14);
+  });
+
+  it('can modestly reduce urgency for a manager who historically waits relative to ADP', () => {
+    const managerIds = Array.from({ length: 10 }, () => '');
+    managerIds[7] = 'Ryan';
+    const signal = opponentHistoryAvailabilitySignal({
+      player: tightEnd,
+      config,
+      currentOverallPick: 7,
+      managerIds,
+    });
+
+    expect(signal.reachAdjustment).toBeLessThan(0);
   });
 
   it('leaves recommendations unchanged when opponent labels do not match history', () => {
