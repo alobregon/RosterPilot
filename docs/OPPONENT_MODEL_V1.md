@@ -22,7 +22,7 @@ The profile data includes:
 - same-position repeat behavior;
 - positional-run response behavior.
 
-Historical ADP/ECR is not yet joined to the manager history, so V1 deliberately avoids claims such as "this manager reaches 12 picks for players they like."
+Historical ADP research now exists separately in `research/league_manager_adp_profiles_2018_2025.json`, but the reach/wait component failed its independent release criterion and is disabled in live recommendations. V1 remains strictly positional and phase-relative.
 
 ## Manager selection and matching
 
@@ -74,6 +74,40 @@ An individual manager contribution is capped at ±8 Future Availability points.
 
 The resulting Future Availability change is still subject to the existing 5% Future Availability weight in the recommendation engine. Therefore even the maximum historical adjustment changes the raw recommendation score by less than one point.
 
+## Direct survival validation
+
+V1 has now been evaluated against the product question directly rather than only as descriptive historical research.
+
+A chronological walk-forward backtest used 2018–2025 Purple League drafts and historical FantasyPros ADP. At every historical draft decision, available candidates were labeled according to whether they survived through the actual opponents before the focal manager's next pick.
+
+The main top-12 candidate analysis produced 12,600 out-of-sample predictions across 1,050 historical draft decisions.
+
+Key Brier scores:
+
+```text
+ADP + return distance                  0.17125
++ opponent roster need                0.15019
++ V1 phase-relative positional history 0.14943
+```
+
+Opponent roster need is the dominant incremental signal, improving Brier by 12.29% relative to the ADP + distance baseline.
+
+V1 adds only a **0.51% relative Brier improvement** beyond roster need. Log loss and calibration also improve modestly, while ROC AUC is nearly unchanged.
+
+The V1 gain is small but directionally robust across candidate-pool sensitivity checks:
+
+```text
+Top 8:  +0.59% relative Brier improvement
+Top 12: +0.51%
+Top 20: +0.35%
+```
+
+On the main top-12 test, V1 improves Brier in five of seven test seasons. A paired decision-block bootstrap produced a mean V1-minus-roster Brier difference of `-0.000767` with a 95% interval of `[-0.00136, -0.00018]`.
+
+The correct release interpretation is that V1 contains a **small tie-breaker signal**, not that manager history is a strong predictor.
+
+See `docs/OPPONENT_SURVIVAL_BACKTEST.md` for the full protocol, metrics, ablations, and limitations.
+
 ## Explainability
 
 When a matched manager creates meaningful positive pressure, the recommendation explanation can surface text such as:
@@ -95,18 +129,21 @@ Opponent Model V1 is intentionally bounded:
 - recommendation strategy is unchanged;
 - roster legality is unchanged;
 - maximum Future Availability adjustment is ±14;
-- maximum raw recommendation-score effect is <1 point.
+- maximum raw recommendation-score effect is <1 point;
+- historical ADP reach/wait scoring is disabled after failing walk-forward validation.
 
 ## Current limitation
 
-Manager history is currently positional and phase-based. Historical ADP/ECR has not yet been joined to the pick history, so the model cannot estimate manager-specific player reaches or value tolerance.
+V1 remains a coarse phase/position model. It does not estimate a manager-specific probability of selecting an individual player, and it does not condition historical tendencies on the opponent's current roster state.
+
+The direct survival backtest shows that roster state is materially more predictive than manager history, so any future opponent-model work should preserve that ordering of importance.
 
 ## Next evolution
 
-V2 should consider:
+Future work should prioritize:
 
-- historical ADP/ECR joins for true manager-specific reach/value behavior;
-- roster-state-conditioned historical tendencies;
-- QB/TE timing priors beyond generic phase probabilities;
-- response-to-run tendencies when sample size is sufficient;
-- calibrated opponent pick probabilities suitable for Monte Carlo draft simulation.
+- calibrated direct `P(player survives to next pick)` estimates;
+- roster-state-conditioned opponent behavior;
+- validation of recent positional-run signals;
+- uncertainty-aware historical priors;
+- manager-specific features only after they beat the roster + V1 baseline on chronological out-of-sample data.
