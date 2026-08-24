@@ -70,9 +70,10 @@ export default function Page() {
             config,
             currentOverallPick: session.currentOverallPick,
             favoritePlayerIds: favoriteIds,
+            teamNames,
             limit: 3,
           }),
-    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds],
+    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, teamNames],
   );
   const targets = useMemo(
     () =>
