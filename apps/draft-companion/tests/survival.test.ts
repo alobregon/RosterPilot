@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { recommendForCurrentPick } from '../lib/decision';
 import { survivalProbabilityForPlayer } from '../lib/survival';
 import type { DraftConfig, DraftPick, PlayerRanking } from '../lib/types';
 
@@ -36,6 +37,21 @@ describe('calibrated survival probability', () => {
     expect(result?.returnPick).toBe(14);
     expect(result?.interveningPicks).toBe(6);
     expect(result?.probability).toBeCloseTo(0.32855, 4);
+  });
+
+  it('uses calibrated survival as the on-clock Future Availability input', () => {
+    const target = player('target-rb', 'RB', 8, 8);
+    const recommendation = recommendForCurrentPick({
+      players: [target],
+      picks: [],
+      config,
+      currentOverallPick: 7,
+      limit: 1,
+    })[0];
+
+    expect(recommendation.survivalProbability).toBeCloseTo(0.32855, 4);
+    expect(recommendation.breakdown.futureAvailability).toBeCloseTo(67.1447, 3);
+    expect(recommendation.availabilityLabel).toBe('UNCERTAIN');
   });
 
   it('raises survival probability when intervening opponents have already filled the position', () => {
