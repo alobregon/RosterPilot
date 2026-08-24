@@ -80,6 +80,7 @@ export interface Recommendation {
   recommendationPercent: number;
   availabilityLabel: AvailabilityLabel;
   returnPick?: number;
+  survivalProbability?: number;
   positionTrend: PositionTrendStatus;
   marketFall?: number;
   breakdown: RecommendationBreakdown;
