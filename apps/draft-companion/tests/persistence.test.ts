@@ -31,6 +31,7 @@ describe('draft persistence', () => {
       picks,
       favoritePlayerIds: ['wr-dal'],
       teamNames: ['Alpha', 'Bravo', '', '', '', '', 'Purple Reign'],
+      managerIds: ['Dixie', 'Armando', '', '', '', '', 'Alvaro Obregon'],
       draftStarted: true,
       savedAt: new Date('2026-08-19T22:00:00-05:00'),
     });
@@ -42,6 +43,10 @@ describe('draft persistence', () => {
     expect(parsed?.teamNames[0]).toBe('Alpha');
     expect(parsed?.teamNames[6]).toBe('Purple Reign');
     expect(parsed?.teamNames).toHaveLength(10);
+    expect(parsed?.managerIds[0]).toBe('Dixie');
+    expect(parsed?.managerIds[1]).toBe('Armando');
+    expect(parsed?.managerIds[6]).toBe('Alvaro Obregon');
+    expect(parsed?.managerIds).toHaveLength(10);
     expect(parsed?.draftStarted).toBe(true);
   });
 
@@ -57,15 +62,17 @@ describe('draft persistence', () => {
     expect(parseDraftSnapshot(JSON.stringify(broken))).toBeNull();
   });
 
-  it('restores older snapshots without favorites or setup-lock state', () => {
+  it('restores older snapshots without favorites, manager bindings, or setup-lock state', () => {
     const raw = serializeDraftSnapshot({ config, players, picks, savedAt: new Date() });
     const legacy = JSON.parse(raw);
     delete legacy.favoritePlayerIds;
     delete legacy.teamNames;
+    delete legacy.managerIds;
     delete legacy.draftStarted;
     const parsed = parseDraftSnapshot(JSON.stringify(legacy));
     expect(parsed?.favoritePlayerIds).toEqual([]);
     expect(parsed?.teamNames).toEqual(Array.from({ length: 10 }, () => ''));
+    expect(parsed?.managerIds).toEqual(Array.from({ length: 10 }, () => ''));
     expect(parsed?.draftStarted).toBe(true);
   });
 
