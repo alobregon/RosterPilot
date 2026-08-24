@@ -9,8 +9,17 @@ interface ManagerProfile {
   manager_id: string;
   display_name: string;
   current_team_2025?: string;
+  seasons?: number[];
   draft_count: number;
   phase_position_probabilities_recency_weighted: Record<DraftPhase, Record<HistoricalPosition, number>>;
+}
+
+export interface ManagerProfileOption {
+  id: string;
+  displayName: string;
+  currentTeam?: string;
+  draftCount: number;
+  seasons: number[];
 }
 
 export interface OpponentHistorySignal {
@@ -24,6 +33,16 @@ const profiles = managerProfilesData.profiles as unknown as ManagerProfile[];
 const MAX_AVAILABILITY_ADJUSTMENT = 14;
 const MAX_MANAGER_ADJUSTMENT = 8;
 
+export const managerProfileOptions: ManagerProfileOption[] = profiles
+  .map((profile) => ({
+    id: profile.manager_id,
+    displayName: profile.display_name,
+    currentTeam: profile.current_team_2025,
+    draftCount: profile.draft_count,
+    seasons: [...(profile.seasons ?? [])],
+  }))
+  .sort((a, b) => a.displayName.localeCompare(b.displayName));
+
 /**
  * Returns a bounded adjustment to Future Availability urgency based on the
  * historical positional tendencies of the managers drafting before the user's
@@ -31,6 +50,8 @@ const MAX_MANAGER_ADJUSTMENT = 8;
  * back; negative values mean the historical room tendencies are slightly more
  * favorable.
  *
+ * Explicit manager IDs are authoritative. Team-name matching remains as a
+ * backward-compatible fallback for older saved drafts and manual labels.
  * This signal is intentionally relative to the Purple League average for the
  * same draft phase. It never changes the player's imported ranking/value.
  */
@@ -38,10 +59,11 @@ export function opponentHistoryAvailabilitySignal(args: {
   player: PlayerRanking;
   config: DraftConfig;
   currentOverallPick: number;
+  managerIds?: readonly string[];
   teamNames?: readonly string[];
 }): OpponentHistorySignal {
-  const { player, config, currentOverallPick, teamNames = [] } = args;
-  if (!teamNames.length) return emptySignal();
+  const { player, config, currentOverallPick, managerIds = [], teamNames = [] } = args;
+  if (!managerIds.length && !teamNames.length) return emptySignal();
 
   const selectionPick = nextUserOverallPick(currentOverallPick, config);
   const returnPick = followingUserOverallPick(currentOverallPick, config);
@@ -63,7 +85,7 @@ export function opponentHistoryAvailabilitySignal(args: {
   const reasons: string[] = [];
 
   for (const [slot, picks] of opportunities) {
-    const profile = resolveManagerProfile(teamNames[slot - 1]);
+    const profile = resolveManagerProfileById(managerIds[slot - 1]) ?? resolveManagerProfile(teamNames[slot - 1]);
     if (!profile) continue;
     matchedManagers += 1;
 
@@ -84,6 +106,11 @@ export function opponentHistoryAvailabilitySignal(args: {
     pressureManagers,
     reasons: [...new Set(reasons)].slice(0, 2),
   };
+}
+
+export function resolveManagerProfileById(managerId: string | undefined): ManagerProfile | null {
+  if (!managerId) return null;
+  return profiles.find((profile) => profile.manager_id === managerId) ?? null;
 }
 
 export function resolveManagerProfile(label: string | undefined): ManagerProfile | null {
