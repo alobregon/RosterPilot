@@ -8,6 +8,8 @@ The first walk-forward validation did not show enough out-of-sample predictive v
 
 V1 phase-relative positional tendencies remain active. This report evaluates only the additional V2 manager-relative ADP reach/wait signal.
 
+A later direct survival backtest reached the same conclusion for V2 reach history while finding a small incremental benefit from V1 positional history. See `docs/OPPONENT_SURVIVAL_BACKTEST.md`.
+
 ## Question
 
 Does knowing a manager's prior reach/wait behavior relative to FantasyPros ADP improve prediction of that manager's future deviation from the Purple League?
@@ -162,6 +164,21 @@ Accordingly, `HISTORICAL_ADP_REACH_ENABLED` is `false` in the live opponent mode
 
 The derived ADP profiles and `historicalAdpShift()` scorer remain in the codebase for research and future calibration, but `reachAdjustment` is forced to zero in live recommendations.
 
+## Confirmation from direct survival prediction
+
+A second chronological experiment tested the actual product target: whether an available player survives through the opponents before the focal manager's next pick.
+
+Starting from a model that already included ADP, return distance, opponent roster need, and V1 positional history:
+
+```text
+V1 model Brier:             0.14943
++ historical reach Brier:  0.15052
+```
+
+Historical reach again made predictions worse. Adding raw manager identity was worse still.
+
+This independent target reinforces the decision to keep V2 reach scoring disabled.
+
 ## What remains active
 
 Opponent Model V1 remains active and continues to use bounded phase-relative positional tendencies for Future Availability.
@@ -172,11 +189,11 @@ The historical-manager selector remains useful because it supplies stable identi
 
 Before reconsidering the reach signal, test one or more materially different formulations rather than tuning the current coefficients against the same holdout results:
 
-1. **Direct survival classification** — predict whether a candidate is selected before the user's next pick, which matches the product question more closely than ADP residual regression.
-2. **Roster-state conditioning** — model reach behavior only when the manager still needs the candidate's position.
+1. **Calibrated direct survival probability** — build on the validated roster + V1 survival model.
+2. **Roster-state-conditioned tendencies** — historical manager behavior only when the manager currently needs the candidate's position.
 3. **Recent-window behavior** — test whether only the last two or three seasons are predictive.
 4. **Player archetypes** — rookie, veteran, elite TE, QB tier, handcuff, etc., if sample sizes support them.
 5. **Hierarchical uncertainty** — explicitly shrink manager/position effects based on sample size rather than treating all profile shifts as equally reliable.
 6. **Predeclared per-manager validation** — only after a separate validation period exists; do not enable manager-specific exceptions from this backtest alone.
 
-Any future V2 candidate should beat the neutral-manager baseline on chronological out-of-sample data before affecting live recommendations.
+Any future manager-history candidate should beat the roster + V1 survival baseline on chronological out-of-sample data before affecting live recommendations.
