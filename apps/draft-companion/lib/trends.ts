@@ -50,7 +50,10 @@ export function trendPressure(trend: PositionTrend): number {
 function classifyTrend(position: Position, recentCount: number, previousCount: number): PositionTrendStatus {
   const hotFloor = position === 'DST' ? 2 : position === 'RB' || position === 'WR' ? 3 : 2;
   if (recentCount >= hotFloor && recentCount >= previousCount + 2) return 'HOT';
-  if (recentCount >= Math.max(1, hotFloor - 1) && recentCount > previousCount) return 'DEVELOPING';
+  // A single selection is normal draft activity, not a positional run. Require
+  // at least two recent selections before escalating to DEVELOPING.
+  const developingFloor = Math.max(2, hotFloor - 1);
+  if (recentCount >= developingFloor && recentCount > previousCount) return 'DEVELOPING';
   return 'QUIET';
 }
 
