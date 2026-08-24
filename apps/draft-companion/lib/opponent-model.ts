@@ -186,12 +186,13 @@ function managerPositionAdjustment(profile: ManagerProfile, position: Position, 
 }
 
 function managerReachAvailabilityAdjustment(managerId: string, player: PlayerRanking, picks: number[], teamCount: number): number {
-  if (player.adp == null || !isSkillPosition(player.position) || !picks.length) return 0;
+  const adp = player.adp;
+  if (adp == null || !isSkillPosition(player.position) || !picks.length) return 0;
   const adjustments = picks.map((pick) => {
     const shift = historicalAdpShift(managerId, player.position, roundForOverallPick(pick, teamCount));
     if (Math.abs(shift) < 0.05) return 0;
-    const baseline = marketSelectionPressure(pick, player.adp);
-    const personalized = marketSelectionPressure(pick, player.adp + shift);
+    const baseline = marketSelectionPressure(pick, adp);
+    const personalized = marketSelectionPressure(pick, adp + shift);
     return (personalized - baseline) * 0.38;
   });
   return clamp(average(adjustments), -MAX_MANAGER_REACH_ADJUSTMENT, MAX_MANAGER_REACH_ADJUSTMENT);
