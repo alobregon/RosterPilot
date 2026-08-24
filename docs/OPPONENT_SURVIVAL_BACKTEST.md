@@ -2,7 +2,7 @@
 
 ## Decision
 
-The direct survival backtest supports three release decisions:
+The direct survival backtest supports four release decisions:
 
 1. **Market position plus distance to the user's next pick is the essential baseline.**
 2. **Opponent roster need adds substantial predictive value and should remain a primary Future Availability input.**
@@ -233,14 +233,30 @@ Manager reach history and raw identity should contribute zero live weight.
 
 V1 should **not** be promoted to a large scoring component. Its current design is appropriate only because the live recommendation engine already constrains historical influence to Future Availability and caps the maximum recommendation-score impact below one raw point.
 
-## Next modeling step
+## Implemented calibration step
 
-The next useful improvement is calibration of the direct survival probability itself rather than adding more manager-history features.
+The direct survival model has now been promoted from research to a browser-local, deterministic probability estimate for the validated domain.
 
-Potential work:
+The released percentage uses the conservative Model C feature set — ADP, return distance, candidate position, and opponent roster need — rather than folding manager identity into the displayed probability.
 
-1. expose a calibrated `P(player survives to next pick)` estimate;
-2. compare logistic, isotonic, and simple empirical calibration;
-3. test roster need by position and round without increasing manager-specific complexity;
-4. validate whether recent live draft trends add incremental out-of-sample value;
-5. reserve manager-specific features for future tests only when they beat the roster + V1 baseline chronologically.
+Raw logistic, Platt, and isotonic calibration were compared on chronological out-of-fold predictions. Platt scaling was selected because it reduced calibration error while avoiding isotonic 0%/100% extremes.
+
+The live model:
+
+- is fit on 2018–2025 survival samples;
+- applies Platt scaling learned from 2019–2025 chronological out-of-fold predictions;
+- returns a probability only for QB/RB/WR/TE candidates with ADP inside the top 20 currently available market candidates;
+- converts the probability to base Future Availability urgency as `(1 - P(survive)) * 100`;
+- keeps V1 as a separate bounded tie-breaker;
+- does not use historical reach or raw manager identity in the displayed probability.
+
+See `docs/SURVIVAL_PROBABILITY.md` for the deployment contract and calibration details.
+
+## Future modeling work
+
+Potential follow-up work should focus on improving the direct survival model rather than adding unsupported manager-specific features:
+
+1. validate whether recent live positional-run features add incremental out-of-sample value;
+2. test position/round interactions only with chronological validation;
+3. add uncertainty or calibration monitoring after the 2026 draft becomes a new holdout season;
+4. revisit manager-specific features only if they beat the roster-need baseline on future data.
