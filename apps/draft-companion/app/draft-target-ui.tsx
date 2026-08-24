@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DraftUi, type DraftUiProps } from './draft-ui';
 import { managerProfileOptions } from '@/lib/opponent-model';
+import type { AvailabilityLabel } from '@/lib/types';
 import type { UpcomingTarget } from '@/lib/targets';
 
 const ROUND_COLUMN_WIDTH = 64;
@@ -22,15 +23,15 @@ export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
   const boardMinWidth = ROUND_COLUMN_WIDTH + props.config.teamCount * MIN_TEAM_COLUMN_WIDTH;
 
   useEffect(() => {
-    setHost(targetMode ? document.querySelector('.sideStack') : null);
+    setHost(targetMode || props.onClock ? document.querySelector('.sideStack') : null);
     setSetupHost(document.querySelector('.teamNamesSection'));
-  }, [targetMode, props.currentOverallPick, props.config.teamCount, props.started]);
+  }, [targetMode, props.onClock, props.currentOverallPick, props.config.teamCount, props.started]);
 
   const { targets, managerIds, onManagerId, ...draftUiProps } = props;
 
   return <>
     <style>{`.draftBoardHeader,.draftBoardRow{min-width:${boardMinWidth}px;width:max(100%,${boardMinWidth}px)}`}</style>
-    {targetMode ? <style>{'.recommendationPanel{display:none}'}</style> : null}
+    {targetMode || props.onClock ? <style>{'.recommendationPanel{display:none}'}</style> : null}
     <DraftUi {...draftUiProps} recs={props.onClock ? props.recs : []} />
     {setupHost ? createPortal(
       <ManagerSelector
@@ -42,6 +43,7 @@ export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
       />,
       setupHost,
     ) : null}
+    {props.onClock && host ? createPortal(<CalibratedRecommendations props={props} />, host) : null}
     {targetMode && host ? createPortal(<TargetsPanel targets={targets} nextPick={props.nextUserPick} />, host) : null}
   </>;
 }
@@ -105,6 +107,41 @@ function ManagerSelector({
   </div>;
 }
 
+function CalibratedRecommendations({ props }: { props: DraftUiWithTargetsProps }) {
+  return <section className="panel recommendationPanel calibratedRecommendationPanel" style={{ display: 'block', order: -1 }}>
+    <div className="panelHeader">
+      <div><span className="eyebrow">Decision engine</span><h2>Top 3</h2></div>
+      <span className="countPill">Recommendation %</span>
+    </div>
+    <p className="muted" style={{ margin: '-4px 0 12px' }}>Return probability is calibrated separately from recommendation strength.</p>
+    {props.recs.length ? <div className="recommendationList">{props.recs.map((recommendation, index) => <article className="recommendation" key={recommendation.player.id}>
+      <div className="recommendationTopline">
+        <span className="medal">#{index + 1}</span>
+        <div><strong>{props.favorites.has(recommendation.player.id) ? '★ ' : ''}{recommendation.player.name}</strong><small>{recommendation.player.position} • Rank {recommendation.player.overallRank}</small></div>
+        <span className="score">{recommendation.recommendationPercent}%</span>
+      </div>
+      <div className="scoreTrack"><span style={{ width: `${recommendation.recommendationPercent}%` }} /></div>
+      <div className="recommendationSignals">
+        {recommendation.survivalProbability != null
+          ? <span
+              className={`signalChip availability ${recommendation.availabilityLabel.toLowerCase()}`}
+              title="Calibrated from 2018–2025 market ADP, picks to survive, and opponent roster need. Manager identity is excluded from this percentage."
+            >
+              {Math.round(recommendation.survivalProbability * 100)}% chance back{recommendation.returnPick ? ` by #${recommendation.returnPick}` : ''}
+            </span>
+          : <span className={`signalChip availability ${recommendation.availabilityLabel.toLowerCase()}`}>{availabilitySignal(recommendation.availabilityLabel, recommendation.returnPick)}</span>}
+        {recommendation.positionTrend !== 'QUIET' ? <span className="signalChip">{recommendation.positionTrend === 'HOT' ? '🔥' : '↗'} {recommendation.player.position} run</span> : null}
+        {recommendation.marketFall != null ? <span className="signalChip">Market fall +{Math.round(recommendation.marketFall)}</span> : null}
+        {recommendation.breakdown.rosterFit >= 90 ? <span className="signalChip">Starter need</span> : null}
+        {props.favorites.has(recommendation.player.id) ? <span className="signalChip favorite">★ Favorite</span> : null}
+        {(props.config.draftStrategy ?? 'BALANCED') !== 'BALANCED' && recommendation.breakdown.strategyFit >= 85 ? <span className="signalChip">{props.strategyLabel} fit</span> : null}
+      </div>
+      <button className="secondaryButton" onClick={() => props.onDraft(recommendation.player)} aria-label={`Draft ${recommendation.player.name} for my team`}>Draft for my team</button>
+      <ul>{recommendation.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+    </article>)}</div> : <div className="emptyState">No recommendations available.</div>}
+  </section>;
+}
+
 function TargetsPanel({ targets, nextPick }: { targets: UpcomingTarget[]; nextPick: number | null }) {
   return <section className="panel targetPanel" style={{ order: -1 }}>
     <div className="panelHeader">
@@ -127,4 +164,11 @@ function TargetsPanel({ targets, nextPick }: { targets: UpcomingTarget[]; nextPi
       <ul>{target.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
     </article>)}</div> : <div className="emptyState">No realistic targets yet. This updates as players come off the board.</div>}
   </section>;
+}
+
+function availabilitySignal(label: AvailabilityLabel, returnPick?: number) {
+  if (label === 'UNLIKELY') return returnPick ? `Unlikely back by #${returnPick}` : 'Unlikely to return';
+  if (label === 'LIKELY') return returnPick ? `Likely back by #${returnPick}` : 'Likely to return';
+  if (label === 'UNCERTAIN') return returnPick ? `Return uncertain by #${returnPick}` : 'Return uncertain';
+  return 'Final selection';
 }
