@@ -10,6 +10,7 @@ on:
       - 'docs/DRAFT_NIGHT_QA.md'
       - 'docs/OPPONENT_MODEL_V1.md'
       - 'docs/RELEASE_READINESS.md'
+      - 'README.md'
       - 'package.json'
       - 'vitest.config.ts'
       - '.github/workflows/draft-companion.yml'
@@ -17,6 +18,7 @@ on:
     paths:
       - 'apps/draft-companion/**'
       - 'docs/OPPONENT_MODEL_V1.md'
+      - 'README.md'
       - 'package.json'
       - 'vitest.config.ts'
 
