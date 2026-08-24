@@ -13,6 +13,7 @@ export interface DraftSnapshot {
   picks: DraftPick[];
   favoritePlayerIds: string[];
   teamNames: string[];
+  managerIds: string[];
   draftStarted: boolean;
 }
 
@@ -22,6 +23,7 @@ export function serializeDraftSnapshot(args: {
   picks: DraftPick[];
   favoritePlayerIds?: string[];
   teamNames?: string[];
+  managerIds?: string[];
   draftStarted?: boolean;
   savedAt?: Date;
 }): string {
@@ -33,6 +35,7 @@ export function serializeDraftSnapshot(args: {
     picks: args.picks,
     favoritePlayerIds: [...new Set(args.favoritePlayerIds ?? [])],
     teamNames: Array.from({ length: args.config.teamCount }, (_, index) => args.teamNames?.[index] ?? ''),
+    managerIds: Array.from({ length: args.config.teamCount }, (_, index) => args.managerIds?.[index] ?? ''),
     draftStarted: args.draftStarted ?? args.picks.length > 0,
   };
   return JSON.stringify(snapshot);
@@ -74,6 +77,15 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
       teamNames = Array.from({ length: config.teamCount }, () => '');
     }
 
+    let managerIds: string[];
+    if (value.managerIds != null) {
+      if (!Array.isArray(value.managerIds) || !value.managerIds.every((id) => typeof id === 'string' && id.length <= 64)) return null;
+      const savedManagerIds = value.managerIds as string[];
+      managerIds = Array.from({ length: config.teamCount }, (_, index) => savedManagerIds[index] ?? '');
+    } else {
+      managerIds = Array.from({ length: config.teamCount }, () => '');
+    }
+
     if (value.draftStarted != null && typeof value.draftStarted !== 'boolean') return null;
     const draftStarted = typeof value.draftStarted === 'boolean' ? value.draftStarted : picks.length > 0;
     if (!draftStarted && picks.length > 0) return null;
@@ -86,6 +98,7 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
       picks: [...picks].sort((a, b) => a.overallPick - b.overallPick),
       favoritePlayerIds,
       teamNames,
+      managerIds,
       draftStarted,
     };
   } catch {
