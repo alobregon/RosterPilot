@@ -24,24 +24,27 @@ The profile data includes:
 
 Historical ADP/ECR is not yet joined to the manager history, so V1 deliberately avoids claims such as "this manager reaches 12 picks for players they like."
 
-## Manager matching
+## Manager selection and matching
 
-During league setup, each slot already accepts an optional opponent label. V1 attempts to match that label against:
+League setup exposes an optional **Historical managers** selector for every draft slot. Each selection stores the stable manager ID from the research profile rather than depending on a current fantasy team name.
+
+The selector shows:
+
+- manager display name;
+- known 2025 team name;
+- number of seasons represented in the draft-history profile.
+
+Duplicate manager assignments are disabled in the setup UI. Assigning the user's own slot is optional because opponent modeling ignores the user's picks.
+
+Explicit manager IDs are authoritative. For backward compatibility with older saves and manual team labels, V1 can still fall back to matching a team label against:
 
 1. manager ID;
 2. manager display name;
 3. known 2025 team name.
 
-Matching ignores punctuation, spaces, capitalization, and accents.
+Fallback matching ignores punctuation, spaces, capitalization, and accents. Generic labels such as `Team 8` do not activate historical modeling.
 
-Examples that resolve to the same manager:
-
-```text
-Armando
-The Kittle Engine that Could
-```
-
-Generic labels such as `Team 8` do not activate historical modeling.
+Manager assignments are persisted in browser storage and JSON backups. Older V1 backups that predate the selector restore with all manager assignments unassigned rather than becoming invalid.
 
 ## Draft phases
 
@@ -85,7 +88,7 @@ Negative historical pressure is used internally to modestly increase the chance 
 
 Opponent Model V1 is intentionally bounded:
 
-- no opponent label match → zero adjustment;
+- no explicit manager assignment or fallback label match → zero adjustment;
 - no return pick → zero adjustment;
 - imported overall ranking is never modified;
 - ADP/market-fall logic is unchanged;
@@ -96,17 +99,14 @@ Opponent Model V1 is intentionally bounded:
 
 ## Current limitation
 
-The current UI field is labeled as an optional team name/opponent label. To activate historical manager modeling reliably, enter either the manager name or a recognized historical team name for each slot.
-
-A future setup improvement should expose explicit manager selection/autocomplete so current team names can change without breaking identity matching.
+Manager history is currently positional and phase-based. Historical ADP/ECR has not yet been joined to the pick history, so the model cannot estimate manager-specific player reaches or value tolerance.
 
 ## Next evolution
 
 V2 should consider:
 
-- explicit manager selection in league setup;
+- historical ADP/ECR joins for true manager-specific reach/value behavior;
 - roster-state-conditioned historical tendencies;
 - QB/TE timing priors beyond generic phase probabilities;
 - response-to-run tendencies when sample size is sufficient;
-- historical ADP/ECR joins for true manager-specific reach/value behavior;
 - calibrated opponent pick probabilities suitable for Monte Carlo draft simulation.
