@@ -9,7 +9,9 @@ on:
       - 'docs/DRAFT_NIGHT_RUNBOOK.md'
       - 'docs/DRAFT_NIGHT_QA.md'
       - 'docs/OPPONENT_MODEL_V1.md'
+      - 'docs/OPPONENT_MODEL_V2.md'
       - 'docs/RELEASE_READINESS.md'
+      - 'research/league_manager_adp_profiles_2018_2025.json'
       - 'README.md'
       - 'package.json'
       - 'vitest.config.ts'
@@ -18,6 +20,8 @@ on:
     paths:
       - 'apps/draft-companion/**'
       - 'docs/OPPONENT_MODEL_V1.md'
+      - 'docs/OPPONENT_MODEL_V2.md'
+      - 'research/league_manager_adp_profiles_2018_2025.json'
       - 'README.md'
       - 'package.json'
       - 'vitest.config.ts'
