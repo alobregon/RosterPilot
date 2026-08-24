@@ -1,7 +1,7 @@
 import { draftPickAtOverall } from './corrections';
 import { draftSlotForOverallPick } from './draft';
 import { recommendPlayers } from './recommendation';
-import type { DraftConfig, DraftPick, PlayerRanking, Position } from './types';
+import type { DraftConfig, DraftPick, PlayerRanking, Position, Recommendation } from './types';
 
 export type RoomProfile = 'RANK_ORDER' | 'RB_RUSH' | 'WR_RUSH' | 'QB_RUSH' | 'TE_RUSH' | 'DST_EARLY';
 
@@ -11,6 +11,16 @@ export interface DraftSimulationResult {
   completed: boolean;
 }
 
+export interface RecommendationSnapshot {
+  overallPick: number;
+  recommendations: Recommendation[];
+}
+
+export interface DeterministicDraftSimulationResult extends DraftSimulationResult {
+  userCounts: Record<Position, number>;
+  userRecommendations: RecommendationSnapshot[];
+}
+
 export function simulateDraft(args: {
   players: PlayerRanking[];
   config: DraftConfig;
@@ -18,7 +28,7 @@ export function simulateDraft(args: {
   roomProfile?: RoomProfile;
 }): DraftSimulationResult {
   const { players, config, favoritePlayerIds = [], roomProfile = 'RANK_ORDER' } = args;
-  const rosterSlots = config.qbStarters + config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters + config.dstStarters + config.kStarters + config.benchSpots;
+  const rosterSlots = totalRosterSlots(config);
   const total = config.teamCount * rosterSlots;
   const picks: DraftPick[] = [];
   const drafted = new Set<string>();
@@ -44,6 +54,86 @@ export function simulateDraft(args: {
   return { picks, userPlayerIds, completed: picks.length === total };
 }
 
+/**
+ * Deterministic rank-order simulation used by the release test harness.
+ * Opponents always take the highest-ranked available player while the user
+ * follows the same recommendation engine that powers the live draft UI.
+ * Every on-clock recommendation set is captured so tests can validate the
+ * recommendation-percent contract across a complete draft lifecycle.
+ */
+export function simulateDeterministicDraft(args: {
+  players: PlayerRanking[];
+  config: DraftConfig;
+  favoritePlayerIds?: readonly string[];
+}): DeterministicDraftSimulationResult {
+  const { players, config, favoritePlayerIds = [] } = args;
+  const total = config.teamCount * totalRosterSlots(config);
+  const picks: DraftPick[] = [];
+  const drafted = new Set<string>();
+  const userPlayerIds: string[] = [];
+  const userRecommendations: RecommendationSnapshot[] = [];
+  const playerById = new Map(players.map((player) => [player.id, player]));
+
+  for (let overallPick = 1; overallPick <= total; overallPick += 1) {
+    const slot = draftSlotForOverallPick(overallPick, config.teamCount);
+    const available = players.filter((player) => !drafted.has(player.id));
+    if (available.length === 0) break;
+
+    let selected: PlayerRanking | undefined;
+    if (slot === config.userDraftSlot) {
+      const recommendations = recommendPlayers({
+        players,
+        picks,
+        config,
+        currentOverallPick: overallPick,
+        favoritePlayerIds,
+        limit: 3,
+      });
+      userRecommendations.push({ overallPick, recommendations });
+      selected = recommendations[0]?.player;
+    } else {
+      selected = [...available].sort((a, b) => a.overallRank - b.overallRank)[0];
+    }
+
+    if (!selected) break;
+    drafted.add(selected.id);
+    picks.push(draftPickAtOverall(overallPick, selected.id, config.teamCount));
+    if (slot === config.userDraftSlot) userPlayerIds.push(selected.id);
+  }
+
+  const userCounts = emptyPositionCounts();
+  for (const playerId of userPlayerIds) {
+    const player = playerById.get(playerId);
+    if (player) userCounts[player.position] += 1;
+  }
+
+  return {
+    picks,
+    userPlayerIds,
+    userCounts,
+    userRecommendations,
+    completed: picks.length === total,
+  };
+}
+
+/**
+ * Checks whether a completed roster can fill every configured starting slot.
+ * FLEX is satisfied by the aggregate RB/WR/TE pool after their fixed starter
+ * requirements are met.
+ */
+export function hasLegalStartingRoster(counts: Record<Position, number>, config: DraftConfig): boolean {
+  if (counts.QB < config.qbStarters) return false;
+  if (counts.RB < config.rbStarters) return false;
+  if (counts.WR < config.wrStarters) return false;
+  if (counts.TE < config.teStarters) return false;
+  if (counts.DST < config.dstStarters) return false;
+  if (counts.K < config.kStarters) return false;
+
+  const skillPlayers = counts.RB + counts.WR + counts.TE;
+  const requiredSkillPlayers = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
+  return skillPlayers >= requiredSkillPlayers;
+}
+
 function chooseOpponentPlayer(
   available: PlayerRanking[],
   profile: RoomProfile,
@@ -65,4 +155,12 @@ function preferredPosition(profile: RoomProfile, round: number): Position | null
   if (profile === 'TE_RUSH' && round <= 4) return 'TE';
   if (profile === 'DST_EARLY' && round >= 8 && round <= 10) return 'DST';
   return null;
+}
+
+function totalRosterSlots(config: DraftConfig): number {
+  return config.qbStarters + config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters + config.dstStarters + config.kStarters + config.benchSpots;
+}
+
+function emptyPositionCounts(): Record<Position, number> {
+  return { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0 };
 }
