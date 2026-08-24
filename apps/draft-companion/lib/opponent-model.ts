@@ -56,6 +56,12 @@ const MAX_REACH_AVAILABILITY_ADJUSTMENT = 8;
 const MAX_MANAGER_REACH_ADJUSTMENT = 4.5;
 const MAX_EFFECTIVE_ADP_SHIFT = 6;
 
+// Walk-forward validation over 2019-2025 did not improve out-of-sample
+// manager-relative ADP prediction versus a neutral-manager baseline. Preserve
+// the derived research data and scorer for future calibration, but do not let
+// the V2 reach signal affect live recommendations until it earns its weight.
+export const HISTORICAL_ADP_REACH_ENABLED = false;
+
 export const managerProfileOptions: ManagerProfileOption[] = profiles
   .map((profile) => ({
     id: profile.manager_id,
@@ -69,17 +75,16 @@ export const managerProfileOptions: ManagerProfileOption[] = profiles
 /**
  * Returns a bounded adjustment to Future Availability urgency based on the
  * historical behavior of the managers drafting before the user's following
- * turn. V1 contributes phase-relative positional demand. V2 adds manager-
- * specific reach/wait behavior learned from 2018-2025 FantasyPros ADP joins.
+ * turn. V1 contributes phase-relative positional demand. V2's manager-specific
+ * reach/wait scorer remains available for research but is currently gated off
+ * after walk-forward validation failed to beat a neutral-manager baseline.
  *
  * Positive values mean the player is less likely to make it back; negative
  * values mean the historical room tendencies are slightly more favorable.
  * Explicit manager IDs are authoritative. Team-name matching remains a
  * backward-compatible fallback for older saved drafts and manual labels.
  *
- * Historical ADP never changes the player's imported ranking or current ADP.
- * It only changes the Future Availability signal, and the combined historical
- * adjustment remains capped at the same ±14 points used by V1.
+ * Historical behavior never changes the player's imported ranking/value.
  */
 export function opponentHistoryAvailabilitySignal(args: {
   player: PlayerRanking;
@@ -118,7 +123,9 @@ export function opponentHistoryAvailabilitySignal(args: {
 
     const perPickPosition = picks.map((pick) => managerPositionAdjustment(profile, player.position, roundForOverallPick(pick, config.teamCount)));
     const managerPosition = average(perPickPosition);
-    const managerReach = managerReachAvailabilityAdjustment(profile.manager_id, player, picks, config.teamCount);
+    const managerReach = HISTORICAL_ADP_REACH_ENABLED
+      ? managerReachAvailabilityAdjustment(profile.manager_id, player, picks, config.teamCount)
+      : 0;
     const opportunityWeight = 1 + Math.max(0, picks.length - 1) * 0.35;
     positionWeightedAdjustment += managerPosition * opportunityWeight;
     reachWeightedAdjustment += managerReach * opportunityWeight;
@@ -128,7 +135,7 @@ export function opponentHistoryAvailabilitySignal(args: {
       createsPressure = true;
       reasons.push(`${profile.display_name} historically leans ${displayPosition(player.position)} in this draft phase`);
     }
-    if (managerReach >= 2) {
+    if (HISTORICAL_ADP_REACH_ENABLED && managerReach >= 2) {
       createsPressure = true;
       reasons.push(`${profile.display_name} historically reaches for ${displayPosition(player.position)} ahead of league ADP`);
     }
@@ -165,6 +172,7 @@ export function resolveManagerProfile(label: string | undefined): ManagerProfile
  * Returns the manager-specific effective-ADP shift learned from historical
  * drafts. Negative means the manager tends to select this kind of player
  * earlier than the league does relative to market ADP; positive means later.
+ * This research scorer is currently not applied to live recommendations.
  */
 export function historicalAdpShift(managerId: string, position: Position, round: number): number {
   if (!isSkillPosition(position)) return 0;
