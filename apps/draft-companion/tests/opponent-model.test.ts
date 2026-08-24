@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { recommendForCurrentPick } from '../lib/decision';
-import { opponentHistoryAvailabilitySignal, resolveManagerProfile } from '../lib/opponent-model';
+import {
+  managerProfileOptions,
+  opponentHistoryAvailabilitySignal,
+  resolveManagerProfile,
+  resolveManagerProfileById,
+} from '../lib/opponent-model';
 import type { DraftConfig, PlayerRanking } from '../lib/types';
 
 const config: DraftConfig = {
@@ -28,10 +33,37 @@ const tightEnd: PlayerRanking = {
 };
 
 describe('league-specific opponent model', () => {
-  it('matches both manager names and known team names', () => {
+  it('exposes manager profiles for explicit setup selection', () => {
+    const armando = managerProfileOptions.find((option) => option.id === 'Armando');
+    expect(armando?.displayName).toBe('Armando');
+    expect(armando?.currentTeam).toBe('The Kittle Engine that Could');
+    expect(armando?.draftCount).toBeGreaterThanOrEqual(10);
+    expect(resolveManagerProfileById('Armando')?.manager_id).toBe('Armando');
+  });
+
+  it('matches both manager names and known team names as a fallback', () => {
     expect(resolveManagerProfile('Armando')?.manager_id).toBe('Armando');
     expect(resolveManagerProfile('The Kittle Engine that Could')?.manager_id).toBe('Armando');
     expect(resolveManagerProfile('Team 8')).toBeNull();
+  });
+
+  it('uses an explicit manager binding even when the team label is unrelated', () => {
+    const managerIds = Array.from({ length: 10 }, () => '');
+    managerIds[7] = 'Armando';
+    const teamNames = Array.from({ length: 10 }, (_, index) => `Team ${index + 1}`);
+    teamNames[7] = 'Completely Different Team Name';
+
+    const signal = opponentHistoryAvailabilitySignal({
+      player: tightEnd,
+      config,
+      currentOverallPick: 7,
+      managerIds,
+      teamNames,
+    });
+
+    expect(signal.matchedManagers).toBe(1);
+    expect(signal.adjustment).toBeGreaterThan(0);
+    expect(signal.reasons.some((reason) => reason.includes('Armando'))).toBe(true);
   });
 
   it('adds bounded TE pressure when a historically TE-aggressive manager drafts before the return pick', () => {
@@ -73,8 +105,8 @@ describe('league-specific opponent model', () => {
   });
 
   it('raises future-availability urgency without changing the imported player ranking', () => {
-    const teamNames = Array.from({ length: 10 }, (_, index) => `Team ${index + 1}`);
-    teamNames[7] = 'The Kittle Engine that Could';
+    const managerIds = Array.from({ length: 10 }, () => '');
+    managerIds[7] = 'Armando';
 
     const baseline = recommendForCurrentPick({
       players: [tightEnd],
@@ -88,7 +120,7 @@ describe('league-specific opponent model', () => {
       picks: [],
       config,
       currentOverallPick: 7,
-      teamNames,
+      managerIds,
       limit: 1,
     })[0];
 
