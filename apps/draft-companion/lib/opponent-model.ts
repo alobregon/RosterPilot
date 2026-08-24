@@ -1,8 +1,10 @@
 import managerProfilesData from '../../../research/league_manager_profiles_2013_2025.json';
+import managerAdpProfilesData from '../../../research/league_manager_adp_profiles_2018_2025.json';
 import { draftSlotForOverallPick, followingUserOverallPick, nextUserOverallPick, roundForOverallPick } from './draft';
 import type { DraftConfig, PlayerRanking, Position } from './types';
 
 type HistoricalPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
+type SkillPosition = 'QB' | 'RB' | 'WR' | 'TE';
 type DraftPhase = 'R1_4' | 'R5_8' | 'R9_12' | 'R13_16';
 
 interface ManagerProfile {
@@ -12,6 +14,21 @@ interface ManagerProfile {
   seasons?: number[];
   draft_count: number;
   phase_position_probabilities_recency_weighted: Record<DraftPhase, Record<HistoricalPosition, number>>;
+}
+
+interface ReachStat {
+  n?: number;
+  shift: number;
+  reach_5_rate?: number;
+  reach_10_rate?: number;
+}
+
+interface ManagerAdpProfile {
+  manager_id: string;
+  matched_skill_picks: number;
+  overall: ReachStat;
+  by_position: Partial<Record<SkillPosition, ReachStat>>;
+  by_phase: Partial<Record<DraftPhase, ReachStat>>;
 }
 
 export interface ManagerProfileOption {
@@ -24,14 +41,20 @@ export interface ManagerProfileOption {
 
 export interface OpponentHistorySignal {
   adjustment: number;
+  positionAdjustment: number;
+  reachAdjustment: number;
   matchedManagers: number;
   pressureManagers: number;
   reasons: string[];
 }
 
 const profiles = managerProfilesData.profiles as unknown as ManagerProfile[];
+const adpProfiles = managerAdpProfilesData.profiles as unknown as ManagerAdpProfile[];
 const MAX_AVAILABILITY_ADJUSTMENT = 14;
-const MAX_MANAGER_ADJUSTMENT = 8;
+const MAX_MANAGER_POSITION_ADJUSTMENT = 8;
+const MAX_REACH_AVAILABILITY_ADJUSTMENT = 8;
+const MAX_MANAGER_REACH_ADJUSTMENT = 4.5;
+const MAX_EFFECTIVE_ADP_SHIFT = 6;
 
 export const managerProfileOptions: ManagerProfileOption[] = profiles
   .map((profile) => ({
@@ -45,15 +68,18 @@ export const managerProfileOptions: ManagerProfileOption[] = profiles
 
 /**
  * Returns a bounded adjustment to Future Availability urgency based on the
- * historical positional tendencies of the managers drafting before the user's
- * following turn. Positive values mean the player is less likely to make it
- * back; negative values mean the historical room tendencies are slightly more
- * favorable.
+ * historical behavior of the managers drafting before the user's following
+ * turn. V1 contributes phase-relative positional demand. V2 adds manager-
+ * specific reach/wait behavior learned from 2018-2025 FantasyPros ADP joins.
  *
- * Explicit manager IDs are authoritative. Team-name matching remains as a
+ * Positive values mean the player is less likely to make it back; negative
+ * values mean the historical room tendencies are slightly more favorable.
+ * Explicit manager IDs are authoritative. Team-name matching remains a
  * backward-compatible fallback for older saved drafts and manual labels.
- * This signal is intentionally relative to the Purple League average for the
- * same draft phase. It never changes the player's imported ranking/value.
+ *
+ * Historical ADP never changes the player's imported ranking or current ADP.
+ * It only changes the Future Availability signal, and the combined historical
+ * adjustment remains capped at the same ±14 points used by V1.
  */
 export function opponentHistoryAvailabilitySignal(args: {
   player: PlayerRanking;
@@ -79,7 +105,8 @@ export function opponentHistoryAvailabilitySignal(args: {
     opportunities.set(slot, list);
   }
 
-  let weightedAdjustment = 0;
+  let positionWeightedAdjustment = 0;
+  let reachWeightedAdjustment = 0;
   let matchedManagers = 0;
   let pressureManagers = 0;
   const reasons: string[] = [];
@@ -89,19 +116,31 @@ export function opponentHistoryAvailabilitySignal(args: {
     if (!profile) continue;
     matchedManagers += 1;
 
-    const perPick = picks.map((pick) => managerPositionAdjustment(profile, player.position, roundForOverallPick(pick, config.teamCount)));
-    const managerAdjustment = perPick.reduce((sum, value) => sum + value, 0) / perPick.length;
+    const perPickPosition = picks.map((pick) => managerPositionAdjustment(profile, player.position, roundForOverallPick(pick, config.teamCount)));
+    const managerPosition = average(perPickPosition);
+    const managerReach = managerReachAvailabilityAdjustment(profile.manager_id, player, picks, config.teamCount);
     const opportunityWeight = 1 + Math.max(0, picks.length - 1) * 0.35;
-    weightedAdjustment += managerAdjustment * opportunityWeight;
+    positionWeightedAdjustment += managerPosition * opportunityWeight;
+    reachWeightedAdjustment += managerReach * opportunityWeight;
 
-    if (managerAdjustment >= 3.5) {
-      pressureManagers += 1;
+    let createsPressure = false;
+    if (managerPosition >= 3.5) {
+      createsPressure = true;
       reasons.push(`${profile.display_name} historically leans ${displayPosition(player.position)} in this draft phase`);
     }
+    if (managerReach >= 2) {
+      createsPressure = true;
+      reasons.push(`${profile.display_name} historically reaches for ${displayPosition(player.position)} ahead of league ADP`);
+    }
+    if (createsPressure) pressureManagers += 1;
   }
 
+  const positionAdjustment = clamp(positionWeightedAdjustment, -MAX_AVAILABILITY_ADJUSTMENT, MAX_AVAILABILITY_ADJUSTMENT);
+  const reachAdjustment = clamp(reachWeightedAdjustment, -MAX_REACH_AVAILABILITY_ADJUSTMENT, MAX_REACH_AVAILABILITY_ADJUSTMENT);
   return {
-    adjustment: clamp(weightedAdjustment, -MAX_AVAILABILITY_ADJUSTMENT, MAX_AVAILABILITY_ADJUSTMENT),
+    adjustment: clamp(positionAdjustment + reachAdjustment, -MAX_AVAILABILITY_ADJUSTMENT, MAX_AVAILABILITY_ADJUSTMENT),
+    positionAdjustment,
+    reachAdjustment,
     matchedManagers,
     pressureManagers,
     reasons: [...new Set(reasons)].slice(0, 2),
@@ -122,20 +161,52 @@ export function resolveManagerProfile(label: string | undefined): ManagerProfile
   }) ?? null;
 }
 
+/**
+ * Returns the manager-specific effective-ADP shift learned from historical
+ * drafts. Negative means the manager tends to select this kind of player
+ * earlier than the league does relative to market ADP; positive means later.
+ */
+export function historicalAdpShift(managerId: string, position: Position, round: number): number {
+  if (!isSkillPosition(position)) return 0;
+  const profile = adpProfiles.find((candidate) => candidate.manager_id === managerId);
+  if (!profile) return 0;
+  const positionStat = profile.by_position[position];
+  const phaseStat = profile.by_phase[phaseForRound(round)];
+  const shift = profile.overall.shift * 0.45 + (positionStat?.shift ?? profile.overall.shift) * 0.35 + (phaseStat?.shift ?? profile.overall.shift) * 0.20;
+  return clamp(shift, -MAX_EFFECTIVE_ADP_SHIFT, MAX_EFFECTIVE_ADP_SHIFT);
+}
+
 function managerPositionAdjustment(profile: ManagerProfile, position: Position, round: number): number {
   const phase = phaseForRound(round);
   const historicalPosition = historyPosition(position);
   const managerProbability = profile.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition] ?? 0;
   const leagueProbability = averageProbability(phase, historicalPosition);
   const confidence = clamp(profile.draft_count / 10, 0.35, 1);
-  return clamp((managerProbability - leagueProbability) * 70 * confidence, -MAX_MANAGER_ADJUSTMENT, MAX_MANAGER_ADJUSTMENT);
+  return clamp((managerProbability - leagueProbability) * 70 * confidence, -MAX_MANAGER_POSITION_ADJUSTMENT, MAX_MANAGER_POSITION_ADJUSTMENT);
+}
+
+function managerReachAvailabilityAdjustment(managerId: string, player: PlayerRanking, picks: number[], teamCount: number): number {
+  if (player.adp == null || !isSkillPosition(player.position) || !picks.length) return 0;
+  const adjustments = picks.map((pick) => {
+    const shift = historicalAdpShift(managerId, player.position, roundForOverallPick(pick, teamCount));
+    if (Math.abs(shift) < 0.05) return 0;
+    const baseline = marketSelectionPressure(pick, player.adp);
+    const personalized = marketSelectionPressure(pick, player.adp + shift);
+    return (personalized - baseline) * 0.38;
+  });
+  return clamp(average(adjustments), -MAX_MANAGER_REACH_ADJUSTMENT, MAX_MANAGER_REACH_ADJUSTMENT);
+}
+
+function marketSelectionPressure(opponentPick: number, marketPick: number): number {
+  const x = (opponentPick - marketPick) / 4.5;
+  return 100 / (1 + Math.exp(-x));
 }
 
 function averageProbability(phase: DraftPhase, position: HistoricalPosition): number {
   const values = profiles
     .map((profile) => profile.phase_position_probabilities_recency_weighted[phase]?.[position])
     .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
-  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+  return values.length ? average(values) : 0;
 }
 
 function phaseForRound(round: number): DraftPhase {
@@ -147,6 +218,10 @@ function phaseForRound(round: number): DraftPhase {
 
 function historyPosition(position: Position): HistoricalPosition {
   return position === 'DST' ? 'DEF' : position;
+}
+
+function isSkillPosition(position: Position): position is SkillPosition {
+  return position === 'QB' || position === 'RB' || position === 'WR' || position === 'TE';
 }
 
 function displayPosition(position: Position): string {
@@ -166,7 +241,11 @@ function totalRosterSlots(config: DraftConfig): number {
 }
 
 function emptySignal(): OpponentHistorySignal {
-  return { adjustment: 0, matchedManagers: 0, pressureManagers: 0, reasons: [] };
+  return { adjustment: 0, positionAdjustment: 0, reachAdjustment: 0, matchedManagers: 0, pressureManagers: 0, reasons: [] };
+}
+
+function average(values: number[]): number {
+  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 }
 
 function clamp(value: number, min: number, max: number): number {
