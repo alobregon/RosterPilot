@@ -5,15 +5,20 @@ import { createPortal } from 'react-dom';
 import { DraftUi, type DraftUiProps } from './draft-ui';
 import type { UpcomingTarget } from '@/lib/targets';
 
+const ROUND_COLUMN_WIDTH = 64;
+const MIN_TEAM_COLUMN_WIDTH = 122;
+
 export function DraftUiWithTargets(props: DraftUiProps & { targets: UpcomingTarget[] }) {
   const targetMode = props.started && !props.complete && !props.correcting && !props.onClock;
   const [host, setHost] = useState<Element | null>(null);
+  const boardMinWidth = ROUND_COLUMN_WIDTH + props.config.teamCount * MIN_TEAM_COLUMN_WIDTH;
 
   useEffect(() => {
     setHost(targetMode ? document.querySelector('.sideStack') : null);
   }, [targetMode, props.currentOverallPick]);
 
   return <>
+    <style>{`.draftBoardHeader,.draftBoardRow{min-width:${boardMinWidth}px;width:max(100%,${boardMinWidth}px)}`}</style>
     {targetMode ? <style>{'.recommendationPanel{display:none}'}</style> : null}
     <DraftUi {...props} recs={props.onClock ? props.recs : []} />
     {targetMode && host ? createPortal(<TargetsPanel targets={props.targets} nextPick={props.nextUserPick} />, host) : null}
