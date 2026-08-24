@@ -37,6 +37,7 @@ export default function Page() {
   const [picks, setPicks] = useState<DraftPick[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [teamNames, setTeamNames] = useState(() => defaultTeamNames(10));
+  const [managerIds, setManagerIds] = useState(() => defaultTeamNames(10));
   const [started, setStarted] = useState(false);
   const [correction, setCorrection] = useState<Correction | null>(null);
   const [search, setSearch] = useState('');
@@ -70,10 +71,11 @@ export default function Page() {
             config,
             currentOverallPick: session.currentOverallPick,
             favoritePlayerIds: favoriteIds,
+            managerIds,
             teamNames,
             limit: 3,
           }),
-    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, teamNames],
+    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, managerIds, teamNames],
   );
   const targets = useMemo(
     () =>
@@ -122,6 +124,7 @@ export default function Page() {
     setPicks(snapshot.picks);
     setFavoriteIds(snapshot.favoritePlayerIds);
     setTeamNames(snapshot.teamNames);
+    setManagerIds(snapshot.managerIds);
     setStarted(snapshot.draftStarted);
     setCorrection(null);
     setMessage(`Restored ${snapshot.players.length} players • ${snapshot.picks.length} picks saved`);
@@ -152,6 +155,7 @@ export default function Page() {
           picks,
           favoritePlayerIds: favoriteIds,
           teamNames,
+          managerIds,
           draftStarted: started,
         }),
       );
@@ -159,7 +163,7 @@ export default function Page() {
     } catch {
       setStorage('Could not save to browser storage. Download a JSON backup now.');
     }
-  }, [hydrated, config, players, picks, favoriteIds, teamNames, started]);
+  }, [hydrated, config, players, picks, favoriteIds, teamNames, managerIds, started]);
 
   async function importRankings(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -208,6 +212,7 @@ export default function Page() {
       picks,
       favoritePlayerIds: favoriteIds,
       teamNames,
+      managerIds,
       draftStarted: started,
     });
     const url = URL.createObjectURL(new Blob([raw], { type: 'application/json' }));
@@ -243,6 +248,7 @@ export default function Page() {
       picks={picks}
       favorites={favorites}
       teamNames={teamNames}
+      managerIds={managerIds}
       started={started}
       correction={correction}
       correcting={correcting}
@@ -285,6 +291,7 @@ export default function Page() {
       onTeamCount={(value) => {
         const teamCount = Math.min(20, Math.max(4, Math.trunc(value || 10)));
         setTeamNames((existing) => resizeTeamNames(existing, teamCount));
+        setManagerIds((existing) => resizeTeamNames(existing, teamCount));
         setConfig((current) => {
           const nextSlot = Math.min(current.userDraftSlot, teamCount);
           return {
@@ -312,6 +319,13 @@ export default function Page() {
         setTeamNames((existing) => {
           const next = resizeTeamNames(existing, config.teamCount);
           next[index] = value.slice(0, 32);
+          return next;
+        })
+      }
+      onManagerId={(index, value) =>
+        setManagerIds((existing) => {
+          const next = resizeTeamNames(existing, config.teamCount);
+          next[index] = value;
           return next;
         })
       }
