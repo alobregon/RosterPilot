@@ -1,13 +1,15 @@
 import { recommendPlayers, relativeRecommendationPercents } from './recommendation';
 import { roundForOverallPick } from './draft';
 import { opponentHistoryAvailabilitySignal } from './opponent-model';
+import { survivalProbabilityForPlayer } from './survival';
 import type { AvailabilityLabel, DraftConfig, DraftPick, PlayerRanking, Recommendation } from './types';
 
 /**
  * On-clock recommendation wrapper. The underlying engine remains the source of
  * factor scores, while this layer enforces extra early-round rank discipline,
- * reports market falls only after they actually occur, and applies a bounded
- * Purple League opponent-history adjustment to Future Availability.
+ * reports market falls only after they actually occur, uses the calibrated
+ * direct-survival model when the candidate is inside its validated domain, and
+ * applies the bounded Purple League V1 history signal only as a tie-breaker.
  */
 export function recommendForCurrentPick(args: {
   players: PlayerRanking[];
@@ -38,6 +40,17 @@ export function recommendForCurrentPick(args: {
       : 0;
     const tierDamping = round <= 2 ? (item.breakdown.tierUrgency - 50) * 0.1125 : 0;
 
+    const survival = survivalProbabilityForPlayer({
+      player: item.player,
+      players,
+      picks,
+      config,
+      currentOverallPick,
+    });
+    const calibratedAvailabilityUrgency = survival
+      ? (1 - survival.probability) * 100
+      : item.breakdown.futureAvailability;
+
     const history = opponentHistoryAvailabilitySignal({
       player: item.player,
       config,
@@ -45,9 +58,9 @@ export function recommendForCurrentPick(args: {
       managerIds,
       teamNames,
     });
-    const futureAvailability = clamp(item.breakdown.futureAvailability + history.adjustment, 0, 100);
-    const historyScoreAdjustment = (futureAvailability - item.breakdown.futureAvailability) * 0.05;
-    const rawScore = item.rawScore - earlyRankPenalty - tierDamping + historyScoreAdjustment;
+    const futureAvailability = clamp(calibratedAvailabilityUrgency + history.adjustment, 0, 100);
+    const availabilityScoreAdjustment = (futureAvailability - item.breakdown.futureAvailability) * 0.05;
+    const rawScore = item.rawScore - earlyRankPenalty - tierDamping + availabilityScoreAdjustment;
 
     const actualMarketFall = item.player.adp == null
       ? undefined
@@ -63,6 +76,7 @@ export function recommendForCurrentPick(args: {
       ...item,
       rawScore,
       marketFall,
+      survivalProbability: survival?.probability,
       availabilityLabel: availabilityLabel(item.availabilityLabel, futureAvailability),
       breakdown: { ...item.breakdown, futureAvailability },
       reasons: reasons.slice(0, 3),
