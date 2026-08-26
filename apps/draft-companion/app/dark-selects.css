@@ -1,0 +1,18 @@
+/* Keep native select controls and their OS/browser popups aligned with the app's dark theme. */
+select {
+  color-scheme: dark;
+}
+
+select option,
+select optgroup {
+  background-color: #0c1016;
+  color: #f4f7fb;
+}
+
+.teamNameField select {
+  color-scheme: dark;
+}
+
+.teamNameField select option:disabled {
+  color: #657284;
+}
