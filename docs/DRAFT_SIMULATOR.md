@@ -29,13 +29,28 @@ With **Historical manager data off**, the simulator preserves the simple room-pr
 With **Historical manager data on**, an assigned manager uses a bounded personalized selection score. Current-year rankings and ADP remain the dominant market signal, then close choices can be adjusted by:
 
 - the manager's current roster need;
-- the manager's recency-weighted Purple League positional tendency for the current draft phase;
+- the manager's **sequence-conditioned** Purple League position tendency;
 - the selected room-profile pressure, if any;
 - a small deterministic jitter so equally plausible choices do not all collapse to the same position.
 
 Historical behavior is intentionally restricted to the **top 12 currently available market candidates**. That guardrail prevents old tendencies from manufacturing extreme reaches far outside the current board. Historical player-level reach/wait behavior remains disabled because its walk-forward validation did not beat the neutral baseline.
 
-The historical tendency used here is the same phase-relative V1 positional behavior already derived from 2013–2025 Purple League drafts. It is a simulator behavior input, not a rewrite of the imported player rankings.
+## Sequence-aware manager history
+
+The simulator no longer treats a manager's phase-level position tendency as independent of the players they have already drafted.
+
+For assigned managers, the historical position distribution is refined from broad to specific:
+
+1. R1-4 / R5-8 / R9-12 / R13-16 phase tendency;
+2. same-position repeat behavior in Rounds 2-8;
+3. whether that manager historically extends a two-pick same-position streak in Rounds 3-8;
+4. exact first-four prefix behavior when that exact early sequence has historical observations.
+
+Each more-specific layer is shrunk toward the broader layer beneath it. This prevents a one-season pattern from overpowering the current-year market while also preventing broad tendencies from being double-counted after the manager has already committed to a position.
+
+Example: Sunny-D generally has a strong early-RB tendency. But in the corrected 2013-2025 history, after an `RB-RB` start his third pick was WR three times, RB once, and QB once. After recency weighting and hierarchical shrinkage, the simulator's effective Round 3 distribution is approximately **54.6% WR, 26.8% RB, 17.5% QB, 1.1% TE**. RB-RB-RB remains possible, because it has happened, but it should no longer be the default consequence of the broad early-RB tendency.
+
+See `docs/SIMULATOR_MANAGER_SEQUENCE_MODEL.md` for the derivation and guardrails.
 
 ## Important distinction from chance-back probability
 
@@ -53,7 +68,7 @@ Both modes stop before any user selection.
 **Team names** and **Historical manager data** are independent.
 
 - Team names affect display labels only.
-- Historical manager data enables the bounded Purple League V1 historical tendency signal in recommendations and personalized simulator opponent picks.
+- Historical manager data enables the bounded Purple League V1 historical tendency signal in recommendations and sequence-aware personalized simulator opponent picks.
 - If Team names is disabled while Historical manager data is enabled, selected manager display names are used as the board/team labels.
 - Turning either option off does not erase its saved values.
 
