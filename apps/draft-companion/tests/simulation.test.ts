@@ -90,4 +90,32 @@ describe('interactive draft simulator', () => {
     const selected = players.find((player) => player.id === result[0]?.playerId);
     expect(selected?.position).toBe('QB');
   });
+
+  it('uses an assigned manager history to break close ranking decisions', () => {
+    const players: PlayerRanking[] = [
+      { id: 'wr-1', name: 'Top WR', position: 'WR', overallRank: 1, adp: 1 },
+      { id: 'te-2', name: 'Close TE', position: 'TE', overallRank: 2, adp: 2 },
+      { id: 'rb-3', name: 'Close RB', position: 'RB', overallRank: 3, adp: 3 },
+      { id: 'qb-4', name: 'Close QB', position: 'QB', overallRank: 4, adp: 4 },
+    ];
+
+    const neutral = simulateNextOpponentPick({
+      players,
+      picks: [],
+      config,
+      currentOverallPick: 1,
+      roomProfile: 'RANK_ORDER',
+    });
+    expect(neutral[0]?.playerId).toBe('wr-1');
+
+    const armando = simulateNextOpponentPick({
+      players,
+      picks: [],
+      config,
+      currentOverallPick: 1,
+      roomProfile: 'RANK_ORDER',
+      managerIds: ['Armando', '', '', ''],
+    });
+    expect(armando[0]?.playerId).toBe('te-2');
+  });
 });
