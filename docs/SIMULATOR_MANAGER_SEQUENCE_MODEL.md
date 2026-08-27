@@ -6,7 +6,7 @@ Historical manager personalization in Draft Simulator should represent **conditi
 
 A phase-level statement such as "this manager drafts RB more often than the league in Rounds 1-4" is useful as a broad prior, but it is too coarse for the manager's first pick and becomes too coarse again once that manager has already made selections. Round 1 therefore uses its own recency-weighted first-pick distribution, while later early-round picks condition on the manager's actual simulated roster sequence.
 
-The sequence model keeps the current-year market/ranking board dominant while using manager history only to break plausible close calls.
+The sequence model keeps the current-year market/ranking board as the anchor while allowing manager-specific behavior more latitude as ranking precision naturally declines later in the draft.
 
 ## Source data
 
@@ -41,24 +41,39 @@ For a simulated opponent pick with an assigned historical manager, the position 
 
 This ordering matters: sequence information **replaces/refines** the coarse phase tendency instead of being added as a second independent bonus. Round 1 likewise no longer inherits a manager's combined Rounds 1-4 preference. That prevents a manager who accumulates RBs across Rounds 2-4 from being incorrectly treated as an unusually strong Round-1 RB drafter.
 
-The resulting effective position probability is converted into a bounded manager-history score. The simulator still considers only the top 12 current market candidates, so historical behavior cannot create extreme reaches.
+## Round-dependent market tolerance
+
+The confidence gap between adjacent rankings is not constant across a draft. The live simulator therefore widens its allowable market deviation as the draft progresses.
+
+| Rounds | Candidate window | Market-slot penalty | Manager-position cap | Seeded variation |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 10 | 3.00 | ±3 | ±1.5 |
+| 2–4 | 12 | 2.50 | ±5 | ±1.5 |
+| 5–8 | 16 | 1.75 | ±7 | ±2.0 |
+| 9–12 | 20 | 1.25 | ±9 | ±2.5 |
+| 13–16+ | 24 | 0.90 | ±10 | ±3.0 |
+
+This matters because simply enlarging the candidate window would not be enough: with a fixed 3-point penalty per market slot, a late-round candidate 15 slots down would almost never be able to overcome the market score. The declining slot penalty is what makes a broader late-round candidate window behaviorally meaningful.
+
+The widening is still bounded. Even in the final rounds, historical behavior cannot select outside the top 24 currently available market candidates, and historical player-level reach/wait remains disabled.
 
 ## Round 1 guardrail
 
-Round 1 has less conditional information than later picks because the manager has not built any sequence yet. To keep the current board authoritative, the Round-1 manager-position adjustment is capped at **±3 score points** before the standard history weight is applied. Later sequence-conditioned picks retain the broader ±8 cap.
+Round 1 has less conditional information than later picks because the manager has not built any sequence yet. To keep the current board authoritative, the Round-1 manager-position adjustment is capped at **±3 score points** before the standard history weight is applied.
 
-This means a strong first-pick preference can break a close RB/WR decision, but it should not routinely erase several market slots. With the simulator's 3-point market penalty per candidate slot, the Round-1 history cap is deliberately sized as a close-call modifier rather than a license to manufacture a reach.
+This means a strong first-pick preference can break a close RB/WR decision, but it should not routinely erase several market slots. Round 1 also retains the steepest 3-point market penalty per candidate slot and the narrowest 10-player candidate window.
 
 ## Per-mock variation
 
-Each newly started simulation receives a fresh random run seed. The seed is stored with the draft configuration and used only to generate the existing small ±1.5 close-call variation.
+Each newly started simulation receives a fresh random run seed. The seed is stored with the draft configuration and drives bounded close-call variation.
 
 The important behavior is:
 
 - the same mock and same seed produce the same opponent choice from the same state;
 - refreshing or restoring that mock keeps the seed and therefore keeps future close choices stable;
 - restarting and starting a new simulation generates a new seed;
-- a new seed can change genuinely close choices, but it cannot overcome large current-market gaps by itself.
+- a new seed can change genuinely close choices, but it cannot overcome large current-market gaps by itself;
+- the variation widens from **±1.5 in Round 1 to ±3.0 in Rounds 13+**, reflecting greater late-round uncertainty.
 
 This provides draft-to-draft variety without turning opponent selection into unrestricted randomness.
 
@@ -110,16 +125,16 @@ So RB-RB-RB remains possible, because it has occurred historically, but it is no
 
 ## Live scoring hierarchy
 
-Historical behavior remains a bounded tie-breaker. Simulated opponent selection uses this hierarchy:
+Historical behavior remains bounded. Simulated opponent selection uses this hierarchy:
 
 1. current ranking / ADP market order;
 2. generic current roster need;
 3. Round-1 or sequence-conditioned manager tendency;
 4. manager-specific historical roster construction;
 5. optional room-profile pressure;
-6. small per-mock seeded variation for close ties.
+6. per-mock seeded variation.
 
-The candidate window remains the top 12 current market players.
+The relative authority of the first item is strongest in Round 1 and progressively relaxes through the candidate-window and market-slot-penalty curve above.
 
 ## What this does not change
 
