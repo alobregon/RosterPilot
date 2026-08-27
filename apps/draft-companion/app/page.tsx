@@ -47,6 +47,13 @@ const DEFAULT: DraftConfig = {
   simulationPace: 'INSTANT',
 };
 
+function createSimulationSeed(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
 export default function Page() {
   const [config, setConfig] = useState(DEFAULT);
   const [players, setPlayers] = useState<PlayerRanking[]>([]);
@@ -360,6 +367,7 @@ export default function Page() {
         if (started && !confirm('Restart the draft and unlock setup?')) return;
         setPicks([]);
         setCorrection(null);
+        setConfig((current) => ({ ...current, simulationSeed: undefined }));
         setStarted(false);
       }}
       onCancelCorrection={() => {
@@ -371,7 +379,14 @@ export default function Page() {
         );
         setCorrection(null);
       }}
-      onStart={() => setup.valid && preflight.valid && setStarted(true)}
+      onStart={() => {
+        if (!setup.valid || !preflight.valid) return;
+        setConfig((current) => ({
+          ...current,
+          simulationSeed: simulatorMode ? createSimulationSeed() : undefined,
+        }));
+        setStarted(true);
+      }}
       onTeamCount={(value) => {
         const teamCount = Math.min(20, Math.max(4, Math.trunc(value || 10)));
         setTeamNames((existing) => resizeTeamNames(existing, teamCount));
