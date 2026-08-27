@@ -79,6 +79,31 @@ RosterPilot also has a server-only FantasyPros diagnostic client. Testing with t
 
 Therefore the free FantasyPros tier is useful for integration development/player identity testing, but RosterPilot does not currently treat it as a source of usable future statistical projections. Premium/full FantasyPros projections can be evaluated later if the historical-profile prototype proves valuable.
 
+## FantasyPros current-news diagnostic
+
+FantasyPros also documents an NFL news endpoint with optional `fpid`, `limit`, and category filters. Supported categories are `injury`, `recap`, `transaction`, `rumor`, and `breaking`.
+
+RosterPilot exposes a local server-only diagnostic for evaluating what the current API key actually receives:
+
+```text
+GET /api/fantasypros/news-diagnostic?limit=10&category=transaction
+```
+
+A targeted player request can use:
+
+```text
+GET /api/fantasypros/news-diagnostic?fpid=<FANTASYPROS_PLAYER_ID>&limit=10
+```
+
+The diagnostic consumes one FantasyPros request and intentionally returns only:
+
+- top-level and news-item field names;
+- response/item counts and the provider's public-API-limited flag when present;
+- whether description/impact content is actually present;
+- at most five short, HTML-stripped snippets.
+
+It never returns the API key or the full provider payload. This diagnostic is intended to determine whether the free key is useful for building the structured offseason/current-context ledger before RosterPilot depends on FantasyPros news in production.
+
 ## Intended AI-coach composition
 
 A future AI-coach request can combine a small, relevant set of profiles with RosterPilot's live deterministic state:
