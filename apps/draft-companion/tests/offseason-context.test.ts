@@ -30,19 +30,26 @@ describe('2026 offseason context journal', () => {
     }
   });
 
-  it('keeps the unavailable ESPN article pending rather than synthesizing claims', () => {
-    expect(getOffseasonContextSource('espn-newcomers-impact-2026')?.status).toBe('PENDING_EXCERPT');
+  it('marks the user-provided ESPN article ingested and exposes grounded offensive context', () => {
+    expect(getOffseasonContextSource('espn-newcomers-impact-2026')?.status).toBe('INGESTED');
 
     const journal = getOffseasonContextJournal();
     const espnFacts = journal.entries.flatMap((entry) =>
       entry.facts.filter((fact) => fact.sourceIds.includes('espn-newcomers-impact-2026')),
     );
-    expect(espnFacts).toHaveLength(0);
+    expect(espnFacts.length).toBeGreaterThan(20);
+
+    const moore = getOffseasonContextForPlayers(['DJ Moore']).find(
+      (entry) => entry.id === 'espn-dj-moore-buffalo-role',
+    );
+    expect(moore?.outlook?.origin).toBe('SOURCE_ANALYST');
+    expect(moore?.outlook?.summary).toContain('more than 100 targets');
   });
 
-  it('returns the Ladd McConkey environment entry with an explicit inference label', () => {
+  it('returns the Ladd McConkey environment entries with explicit inference labels', () => {
     const entries = getOffseasonContextForPlayers(['Ladd McConkey']);
     const environment = entries.find((entry) => entry.id === 'lac-ladd-2026-environment');
+    const personnel = entries.find((entry) => entry.id === 'espn-chargers-mcdaniel-personnel-clue');
 
     expect(environment).toBeDefined();
     expect(environment?.categories).toEqual(
@@ -50,6 +57,10 @@ describe('2026 offseason context journal', () => {
     );
     expect(environment?.outlook?.origin).toBe('ROSTERPILOT_INFERENCE');
     expect(environment?.outlook?.direction).toBe('POSITIVE');
+
+    expect(personnel).toBeDefined();
+    expect(personnel?.outlook?.origin).toBe('ROSTERPILOT_INFERENCE');
+    expect(personnel?.outlook?.summary).toContain('does not by itself prove higher target volume');
   });
 
   it('normalizes apostrophes, accents, punctuation, and whitespace for player matching', () => {
@@ -68,6 +79,16 @@ describe('2026 offseason context journal', () => {
     expect(brooks?.outlook?.origin).toBe('SOURCE_CONFLICT');
     expect(brooks?.outlook?.direction).toBe('MIXED');
     expect(brooks?.facts.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('overrides corrected metadata without duplicating the legacy entry', () => {
+    const journal = getOffseasonContextJournal();
+    const darnoldEntries = journal.entries.filter(
+      (entry) => entry.id === 'nyj-sam-darnold-fantasy-ceiling',
+    );
+
+    expect(darnoldEntries).toHaveLength(1);
+    expect(darnoldEntries[0].subjects[0]).toMatchObject({ name: 'Sam Darnold', team: 'SEA' });
   });
 
   it('prioritizes time-sensitive and higher-confidence entries and caps output', () => {
