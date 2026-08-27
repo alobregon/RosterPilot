@@ -10,12 +10,24 @@
 - [ ] Import the 861-player FantasyPros rankings file.
 - [ ] Confirm the 10-team Half-PPR league passes league-wide positional preflight.
 - [ ] Change team count, scoring, roster slots, draft slot, and team names before Start Draft.
-- [ ] Confirm **Use opponent details** is optional and hides Team names + Historical managers when off.
-- [ ] With opponent details off, confirm the board uses generic Team N labels and historical-manager modeling is inactive.
-- [ ] Toggle opponent details back on and confirm previously entered team names and manager assignments are preserved.
-- [ ] Refresh / restore a backup with opponent details off and confirm the disabled preference is preserved without deleting saved assignments.
+- [ ] Confirm **Team names** and **Historical manager data** are independent optional toggles.
+- [ ] With both toggles off, confirm the board uses generic Team N labels and historical-manager modeling is inactive.
+- [ ] With Team names on and Historical manager data off, confirm custom labels display but no historical behavior is applied.
+- [ ] With Team names off and Historical manager data on, confirm selected manager names become the board/team labels.
+- [ ] Toggle either preference off/on and confirm previously entered labels or manager assignments are preserved.
+- [ ] Refresh / restore a backup and confirm both independent preferences and saved values are preserved.
 - [ ] Confirm an explicitly selected non-default strategy survives team-count and slot edits.
 - [ ] Start Draft locks structural league settings and ranking import.
+
+## Interactive simulator
+- [ ] Select **Draft Simulator** mode before starting.
+- [ ] Confirm **Normal / rank order** advances opponent picks without auto-selecting the user's pick.
+- [ ] Confirm **Instant to my pick** fills opponent selections immediately and stops on the user's turn.
+- [ ] Confirm **Watch picks** advances one opponent at a time and stops on the user's turn.
+- [ ] Make the user's selection from the Top 3 and confirm simulation resumes automatically afterward.
+- [ ] Exercise RB Rush, WR Rush, QB Rush, TE Rush, and Early DST room profiles and confirm the intended position pressure is visible.
+- [ ] Confirm simulator mode, room profile, and pace survive refresh / JSON backup restore.
+- [ ] Confirm corrections pause simulator advancement and resume after the correction is repaired.
 
 ## Live draft
 - [ ] Enter picks rapidly without the page jumping vertically back to the board after each selection.
