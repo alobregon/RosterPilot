@@ -38,6 +38,26 @@ With **Historical manager data on**, an assigned manager uses a bounded personal
 
 Historical player-level reach/wait behavior remains disabled because its walk-forward validation did not beat the neutral baseline.
 
+## Hard roster-feasibility guardrail
+
+Opponent personalization is never allowed to produce a roster that cannot fill the configured starting lineup.
+
+Before every simulated opponent selection, RosterPilot calculates the minimum number of future picks still required to satisfy:
+
+- QB starters;
+- fixed RB / WR / TE starters;
+- the aggregate RB / WR / TE requirement for FLEX;
+- DST starters;
+- K starters.
+
+A candidate is removed from consideration if selecting that player would leave fewer remaining roster slots than the number of mandatory starter picks still required.
+
+This is a **hard eligibility rule**, not another weighted score. Rankings, manager history, room profiles, and randomness cannot override it.
+
+When the roster deadline becomes binding, required positions bypass the normal personalized market window. For example, if a manager reaches the final pick without a kicker, the best available legal kicker remains eligible even if that kicker is far outside the normal top-24 late-round candidate window.
+
+The simulator also applies diminishing-return penalties to a third QB or third TE, especially while mandatory starter positions are still open. A second QB or TE remains possible; unnecessary third copies should require an unusually strong board-value case and cannot jeopardize roster legality.
+
 ## Round-dependent market tolerance
 
 A ranking gap does not mean the same thing at pick #4 and pick #140. The simulator therefore becomes progressively more tolerant of market-board deviations as the draft gets deeper.
@@ -57,7 +77,7 @@ This curve changes four things together:
 3. **Manager history can matter more.** Sequence and roster-construction tendencies have more room to separate similarly valued late-round players.
 4. **Random variation widens modestly.** Late rounds are inherently less predictable, but variation remains bounded and run-seeded.
 
-The current rankings/ADP still anchor every personalized pick. This is not unrestricted reaching: even in Round 13+, the simulator only evaluates the top 24 currently available market candidates.
+The current rankings/ADP still anchor every personalized pick. Outside a binding roster-feasibility requirement, personalized picks remain bounded by the round-dependent candidate window above. Mandatory starter positions are the deliberate exception so a market-window cutoff can never make the final roster illegal.
 
 ## Round 1 behavior
 
