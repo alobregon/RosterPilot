@@ -131,6 +131,8 @@ function isDraftConfig(value: unknown): value is DraftConfig {
     isIntegerInRange(value.benchSpots, 0, 20) &&
     (value.draftStrategy == null || ['BALANCED', 'HERO_RB', 'ZERO_RB', 'ROBUST_RB', 'WR_HEAVY', 'LATE_QB', 'ELITE_TE', 'UPSIDE_HEAVY'].includes(String(value.draftStrategy))) &&
     (value.opponentDetailsEnabled == null || typeof value.opponentDetailsEnabled === 'boolean') &&
+    (value.teamNamesEnabled == null || typeof value.teamNamesEnabled === 'boolean') &&
+    (value.historicalManagersEnabled == null || typeof value.historicalManagersEnabled === 'boolean') &&
     (value.draftMode == null || value.draftMode === 'LIVE' || value.draftMode === 'SIMULATOR') &&
     (value.simulationRoomProfile == null || ['RANK_ORDER', 'RB_RUSH', 'WR_RUSH', 'QB_RUSH', 'TE_RUSH', 'DST_EARLY'].includes(String(value.simulationRoomProfile))) &&
     (value.simulationPace == null || value.simulationPace === 'INSTANT' || value.simulationPace === 'WATCH')
