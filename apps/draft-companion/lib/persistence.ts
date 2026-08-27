@@ -145,7 +145,8 @@ function isDraftConfig(value: unknown): value is DraftConfig {
     (value.historicalManagersEnabled == null || typeof value.historicalManagersEnabled === 'boolean') &&
     (value.draftMode == null || value.draftMode === 'LIVE' || value.draftMode === 'SIMULATOR') &&
     (value.simulationRoomProfile == null || ['RANK_ORDER', 'RB_RUSH', 'WR_RUSH', 'QB_RUSH', 'TE_RUSH', 'DST_EARLY'].includes(String(value.simulationRoomProfile))) &&
-    (value.simulationPace == null || value.simulationPace === 'INSTANT' || value.simulationPace === 'WATCH')
+    (value.simulationPace == null || value.simulationPace === 'INSTANT' || value.simulationPace === 'WATCH') &&
+    (value.simulationSeed == null || (typeof value.simulationSeed === 'string' && value.simulationSeed.length <= 128))
   );
 }
 
