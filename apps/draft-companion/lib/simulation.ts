@@ -23,6 +23,7 @@ interface SimulatorManagerProfile {
   manager_id: string;
   draft_count: number;
   phase_position_probabilities_recency_weighted: Record<DraftPhase, Record<HistoricalPosition, number>>;
+  average_final_roster: Record<HistoricalPosition, number>;
 }
 
 interface SimulatorSequenceProfile {
@@ -41,6 +42,9 @@ const ROSTER_NEED_WEIGHT = 0.09;
 const HISTORY_WEIGHT = 1.05;
 const ROOM_PROFILE_BONUS = 10;
 const MAX_MANAGER_POSITION_BIAS = 8;
+const MAX_MANAGER_ROSTER_CONSTRUCTION_BIAS = 4;
+const MANAGER_ROSTER_PACE_WEIGHT = 1.4;
+const MANAGER_ROSTER_SHARE_WEIGHT = 18;
 const JITTER_AMPLITUDE = 1.5;
 const REPEAT_PRIOR_WEIGHT = 6;
 const STREAK_PRIOR_WEIGHT = 4;
@@ -68,10 +72,10 @@ export interface DeterministicDraftSimulationResult extends DraftSimulationResul
  * and let the user make the decision.
  *
  * When a historical manager ID is supplied for the slot, the simulator keeps
- * current rankings/ADP dominant but allows roster need and the manager's
- * recency-weighted sequence tendencies to break close calls. The historical
- * path is restricted to the top 12 current market candidates so old behavior
- * cannot manufacture extreme reaches.
+ * current rankings/ADP dominant but allows generic roster need, the manager's
+ * recency-weighted sequence tendencies, and historical roster construction to
+ * break close calls. The historical path is restricted to the top 12 current
+ * market candidates so old behavior cannot manufacture extreme reaches.
  */
 export function simulateNextOpponentPick(args: {
   players: PlayerRanking[];
@@ -320,6 +324,63 @@ export function historicalSequencePositionProbability(args: {
   return distribution[historyPosition(args.position)];
 }
 
+/**
+ * Returns a bounded manager-specific roster-construction score derived from
+ * that manager's historical average final roster. The score is intentionally
+ * small: generic starter/FLEX need remains authoritative, while this layer
+ * nudges close depth decisions toward the roster shape the manager usually
+ * builds.
+ *
+ * The historical target is treated as a position share rather than an exact
+ * count so it still behaves sensibly if the current league uses a different
+ * total roster size. The pace component compares the roster currently built
+ * with the manager's historical share of picks, and grows modestly as the
+ * draft progresses. A small league-relative share term preserves differences
+ * between managers even before much roster history has accumulated.
+ */
+export function historicalRosterConstructionBias(args: {
+  managerId: string;
+  position: Position;
+  roster: readonly PlayerRanking[];
+  config: DraftConfig;
+}): number | null {
+  const profile = historicalProfiles.find((candidate) => candidate.manager_id === args.managerId);
+  if (!profile) return null;
+
+  const historicalPosition = historyPosition(args.position);
+  const managerTotal = historicalRosterTotal(profile);
+  if (managerTotal <= 0) return 0;
+
+  const managerShare = (profile.average_final_roster[historicalPosition] ?? 0) / managerTotal;
+  const leagueShares = historicalProfiles
+    .map((candidate) => {
+      const total = historicalRosterTotal(candidate);
+      return total > 0 ? (candidate.average_final_roster[historicalPosition] ?? 0) / total : null;
+    })
+    .filter((value): value is number => value != null && Number.isFinite(value));
+  const leagueShare = leagueShares.length
+    ? leagueShares.reduce((sum, value) => sum + value, 0) / leagueShares.length
+    : managerShare;
+
+  const counts = positionCounts(args.roster);
+  const picksMade = args.roster.length;
+  const currentCount = counts[args.position];
+  const expectedCount = managerShare * picksMade;
+  const paceGap = expectedCount - currentCount;
+  const progress = clamp(picksMade / Math.max(1, totalRosterSlots(args.config)), 0, 1);
+  const paceMultiplier = 0.6 + progress * 0.9;
+  const sharePressure = (managerShare - leagueShare)
+    * MANAGER_ROSTER_SHARE_WEIGHT
+    * (0.25 + progress * 0.75);
+  const confidence = clamp(profile.draft_count / 10, 0.35, 1);
+
+  return clamp(
+    (paceGap * MANAGER_ROSTER_PACE_WEIGHT * paceMultiplier + sharePressure) * confidence,
+    -MAX_MANAGER_ROSTER_CONSTRUCTION_BIAS,
+    MAX_MANAGER_ROSTER_CONSTRUCTION_BIAS,
+  );
+}
+
 function chooseOpponentPlayer(args: {
   available: PlayerRanking[];
   roomProfile: RoomProfile;
@@ -349,9 +410,15 @@ function chooseOpponentPlayer(args: {
     const marketScore = 100 - index * MARKET_SLOT_PENALTY;
     const rosterNeed = opponentRosterNeedScore(player.position, roster, config, round) * ROSTER_NEED_WEIGHT;
     const historyBias = managerPositionBias(managerId, player.position, round, roster) * HISTORY_WEIGHT;
+    const rosterConstructionBias = historicalRosterConstructionBias({
+      managerId,
+      position: player.position,
+      roster,
+      config,
+    }) ?? 0;
     const roomBias = preferred === player.position ? ROOM_PROFILE_BONUS : 0;
     const jitter = deterministicJitter(`${managerId}|${overallPick}|${player.id}`) * JITTER_AMPLITUDE;
-    const score = marketScore + rosterNeed + historyBias + roomBias + jitter;
+    const score = marketScore + rosterNeed + historyBias + rosterConstructionBias + roomBias + jitter;
 
     if (score > bestScore) {
       best = player;
@@ -475,6 +542,13 @@ function historyPosition(position: Position): HistoricalPosition {
   return position === 'DST' ? 'DEF' : position;
 }
 
+function historicalRosterTotal(profile: SimulatorManagerProfile): number {
+  return HISTORICAL_POSITIONS.reduce(
+    (sum, position) => sum + (profile.average_final_roster[position] ?? 0),
+    0,
+  );
+}
+
 function opponentRosterNeedScore(position: Position, roster: PlayerRanking[], config: DraftConfig, round: number): number {
   const counts = positionCounts(roster);
 
@@ -512,7 +586,7 @@ function opponentRosterNeedScore(position: Position, roster: PlayerRanking[], co
   return depth === 0 ? 24 : 8;
 }
 
-function positionCounts(roster: PlayerRanking[]): Record<Position, number> {
+function positionCounts(roster: readonly PlayerRanking[]): Record<Position, number> {
   return roster.reduce<Record<Position, number>>((counts, player) => {
     counts[player.position] += 1;
     return counts;
