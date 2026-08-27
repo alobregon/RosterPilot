@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { hasLegalStartingRoster, simulateDeterministicDraft } from '../lib/simulation';
+import {
+  autoDraftOpponentsUntilUserTurn,
+  hasLegalStartingRoster,
+  simulateDeterministicDraft,
+  simulateNextOpponentPick,
+} from '../lib/simulation';
+import { draftPickAtOverall } from '../lib/corrections';
 import type { DraftConfig, PlayerRanking, Position } from '../lib/types';
 
 const config: DraftConfig = {
@@ -40,5 +46,48 @@ describe('full draft simulation harness', () => {
     for (const snapshot of result.userRecommendations) {
       expect(snapshot.recommendations.reduce((sum, recommendation) => sum + recommendation.recommendationPercent, 0)).toBe(100);
     }
+  });
+});
+
+describe('interactive draft simulator', () => {
+  it('advances one opponent pick without ever auto-picking the user slot', () => {
+    const players = syntheticPool();
+    const first = simulateNextOpponentPick({ players, picks: [], config, currentOverallPick: 1 });
+    expect(first).toHaveLength(1);
+    expect(first[0].overallPick).toBe(1);
+
+    const stopped = simulateNextOpponentPick({ players, picks: first, config, currentOverallPick: 2 });
+    expect(stopped).toEqual(first);
+  });
+
+  it('fills opponents only until the next user turn across a snake turn', () => {
+    const players = syntheticPool();
+    const picks = [
+      draftPickAtOverall(1, 'p-1', 4),
+      draftPickAtOverall(2, 'p-2', 4),
+    ];
+    const result = autoDraftOpponentsUntilUserTurn({
+      players,
+      picks,
+      config,
+      currentOverallPick: 3,
+      roomProfile: 'RANK_ORDER',
+    });
+
+    expect(result.map((pick) => pick.overallPick)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(result.some((pick) => pick.overallPick === 7)).toBe(false);
+  });
+
+  it('supports alternate room profiles for opponent picks', () => {
+    const players = syntheticPool();
+    const result = simulateNextOpponentPick({
+      players,
+      picks: [],
+      config,
+      currentOverallPick: 1,
+      roomProfile: 'QB_RUSH',
+    });
+    const selected = players.find((player) => player.id === result[0]?.playerId);
+    expect(selected?.position).toBe('QB');
   });
 });
