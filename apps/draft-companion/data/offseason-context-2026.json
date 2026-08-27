@@ -1,0 +1,666 @@
+{
+  "season": 2026,
+  "version": 1,
+  "updatedAt": "2026-08-27",
+  "purpose": "Curated manual context for the future RosterPilot AI coach. The journal does not directly alter deterministic recommendation scores.",
+  "rules": [
+    "Store reported facts separately from analyst opinions and RosterPilot inferences.",
+    "Do not convert an analyst scenario or projection into a factual claim.",
+    "Preserve conflicting source opinions instead of forcing a single consensus.",
+    "Mark injuries, camp roles, ADP and unresolved legal/suspension items as time-sensitive.",
+    "Summarize source material; do not store full article text.",
+    "A future AI coach may use these entries as grounding, but deterministic RosterPilot rankings and recommendation logic remain authoritative."
+  ],
+  "sources": [
+    {
+      "id": "footballguys-offseason-recap-2026",
+      "publisher": "Footballguys",
+      "title": "Welcome Back to Fantasy Football: A Recap of the 2026 Offseason",
+      "url": "https://www.footballguys.com/article/2026-welcome-back-to-fantasy-football-offseason-recap",
+      "status": "INGESTED",
+      "notes": "Publicly accessible portion summarized; source opinions remain attributed."
+    },
+    {
+      "id": "cbs-breakouts-2026",
+      "publisher": "CBS Sports",
+      "title": "Fantasy football rankings 2026: Top breakouts by the model that nailed Tetairoa McMillan's huge season",
+      "url": "https://www.cbssports.com/fantasy/football/news/fantasy-football-rankings-2026-top-breakouts-by-the-model-that-nailed-tetairoa-mcmillans-huge-season/",
+      "status": "INGESTED",
+      "notes": "Model-based breakout opinions are stored as analyst outlooks, not facts."
+    },
+    {
+      "id": "espn-newcomers-impact-2026",
+      "publisher": "ESPN",
+      "title": "2026 NFL offseason newcomers impact ranking: draft, trades, signings",
+      "url": "https://www.espn.com/nfl/story/_/id/49425098/2026-nfl-offseason-newcomers-impact-ranking-draft-trades-signings",
+      "status": "PENDING_EXCERPT",
+      "notes": "Article body was not available to the retrieval client. No article claims are stored until readable text or a user-provided excerpt is available."
+    },
+    {
+      "id": "fantasypros-adp-risers-fallers-2026-08",
+      "publisher": "FantasyPros",
+      "title": "Fantasy Football Risers & Fallers: Draft Rankings (2026)",
+      "url": "https://www.fantasypros.com/2026/08/10-fantasy-football-adp-risers-fallers-2026/",
+      "status": "INGESTED",
+      "notes": "ADP movement and analyst interpretation are time-sensitive."
+    },
+    {
+      "id": "nfl-rookies-best-worst-2026",
+      "publisher": "NFL.com",
+      "title": "NFL offensive rookies: Best and worst case for 17 players in 2026",
+      "url": "https://www.nfl.com/news/nfl-offensive-rookies-best-and-worst-case-for-17-players-in-2026",
+      "status": "INGESTED",
+      "notes": "Best/worst-case scenarios and stat lines are analyst projections, not historical facts."
+    },
+    {
+      "id": "nfl-late-round-sleepers-2026",
+      "publisher": "NFL.com",
+      "title": "2026 NFL fantasy football: Six late-round sleepers to target",
+      "url": "https://www.nfl.com/news/2026-nfl-fantasy-football-six-late-round-sleepers-to-target",
+      "status": "INGESTED",
+      "notes": "Sleeper labels are analyst opinions."
+    },
+    {
+      "id": "seahawks-sleepers-2026",
+      "publisher": "Seattle Seahawks",
+      "title": "Fantasy Football Sleepers, Value Picks for 2026",
+      "url": "https://www.seahawks.com/news/fantasy-football-sleepers-value-picks-for-2026",
+      "status": "INGESTED",
+      "notes": "Fantasy value labels are analyst opinions; team/camp facts are separated where practical."
+    },
+    {
+      "id": "yahoo-hayden-winks-fades-2026",
+      "publisher": "Yahoo Sports",
+      "title": "Fantasy Football Fades: Hayden Winks' least favorite picks by round for 2026",
+      "url": "https://sports.yahoo.com/fantasy/article/fantasy-football-fades-here-are-hayden-winks-least-favorite-picks-by-round-for-2026-152721581.html",
+      "status": "INGESTED",
+      "notes": "Fade calls are analyst opinions and should be preserved even when they conflict with other sources."
+    }
+  ],
+  "entries": [
+    {
+      "id": "lac-ladd-2026-environment",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Ladd McConkey", "team": "LAC" },
+        { "kind": "PLAYER", "name": "Mike McDaniel", "team": "LAC" },
+        { "kind": "PLAYER", "name": "Keenan Allen", "team": "IND" }
+      ],
+      "categories": ["COACHING_CHANGE", "TARGET_COMPETITION", "TEAM_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Mike McDaniel is the Chargers' new offensive coordinator.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Keenan Allen is no longer part of the Chargers receiving room and is with Indianapolis.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "ROSTERPILOT_INFERENCE",
+        "summary": "McConkey has a plausible path to a better receiving environment because a major target competitor left and the offense changed coordinators; the size of any production gain is uncertain."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "lac-omarion-hampton-breakout-case",
+      "subjects": [{ "kind": "PLAYER", "name": "Omarion Hampton", "team": "LAC" }],
+      "categories": ["HEALTH", "OFFENSIVE_LINE", "BACKFIELD_ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Footballguys describes Keaton Mitchell as a complementary back behind Hampton.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "CBS highlights improved health and the return/addition of offensive-line help around Hampton.", "sourceIds": ["cbs-breakouts-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "CBS's model presents Hampton as a breakout candidate and values him above several backs being drafted earlier." },
+      "timeSensitive": true
+    },
+    {
+      "id": "lac-david-njoku-arrival",
+      "subjects": [{ "kind": "PLAYER", "name": "David Njoku", "team": "LAC" }, { "kind": "PLAYER", "name": "Oronde Gadsden II", "team": "LAC" }],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "David Njoku joined the Chargers after leaving Cleveland.", "sourceIds": ["footballguys-offseason-recap-2026"] }],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Njoku adds another established receiving option and could affect tight-end target distribution." }
+    },
+    {
+      "id": "ari-offense-reset-2026",
+      "subjects": [{ "kind": "PLAYER", "name": "Jacoby Brissett", "team": "ARI" }, { "kind": "PLAYER", "name": "Jeremiyah Love", "team": "ARI" }, { "kind": "PLAYER", "name": "Tyler Allgeier", "team": "ARI" }, { "kind": "PLAYER", "name": "Mike LaFleur", "team": "ARI" }],
+      "categories": ["COACHING_CHANGE", "QB_CHANGE", "BACKFIELD_COMPETITION"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [
+        { "summary": "Mike LaFleur took over as Arizona head coach after serving as Rams offensive coordinator.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Kyler Murray left Arizona, with Jacoby Brissett expected to start Week 1.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Arizona drafted Jeremiyah Love third overall and added Tyler Allgeier.", "sourceIds": ["footballguys-offseason-recap-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Arizona has major scheme, quarterback and backfield changes, so prior-year usage should not be projected forward mechanically." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ari-jeremiyah-love-injury-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Jeremiyah Love", "team": "ARI" }],
+      "categories": ["INJURY", "ROOKIE_ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "NFL.com's rookie outlook flags a high-ankle sprain as a key near-term risk for Love.", "sourceIds": ["nfl-rookies-best-worst-2026"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Love retains lead-back upside, but health and a crowded rotation create early-season uncertainty." },
+      "timeSensitive": true
+    },
+    {
+      "id": "atl-offense-reset-2026",
+      "subjects": [{ "kind": "PLAYER", "name": "Bijan Robinson", "team": "ATL" }, { "kind": "PLAYER", "name": "Tua Tagovailoa", "team": "ATL" }, { "kind": "PLAYER", "name": "Drake London", "team": "ATL" }, { "kind": "PLAYER", "name": "Brian Robinson Jr.", "team": "ATL" }],
+      "categories": ["COACHING_CHANGE", "QB_CHANGE", "BACKFIELD_COMPETITION", "TARGET_COMPETITION"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [
+        { "summary": "Kevin Stefanski became Atlanta's head coach and Tommy Rees joined as offensive coordinator.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Tua Tagovailoa was added with Michael Penix Jr. recovering from a knee injury.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Brian Robinson Jr. was added behind Bijan Robinson, and Jahan Dotson was added after Darnell Mooney left.", "sourceIds": ["footballguys-offseason-recap-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Atlanta's core fantasy players enter a materially different offensive environment, especially at quarterback and secondary touch competition." },
+      "timeSensitive": true
+    },
+    {
+      "id": "bal-offense-coaching-change",
+      "subjects": [{ "kind": "PLAYER", "name": "Lamar Jackson", "team": "BAL" }, { "kind": "PLAYER", "name": "Ja'Kobi Lane", "team": "BAL" }],
+      "categories": ["COACHING_CHANGE", "ROOKIE_ROLE"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [
+        { "summary": "Baltimore hired Jesse Minter as head coach and Declan Doyle as offensive coordinator.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Baltimore drafted Ja'Kobi Lane and Elijah Sarratt at wide receiver.", "sourceIds": ["footballguys-offseason-recap-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "The offense has new leadership and new receiver depth, so role assumptions should be refreshed during camp." },
+      "timeSensitive": true
+    },
+    {
+      "id": "bal-jakobi-lane-sleeper",
+      "subjects": [{ "kind": "PLAYER", "name": "Ja'Kobi Lane", "team": "BAL" }],
+      "categories": ["TRAINING_CAMP", "ROOKIE_ROLE", "SLEEPER"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "NFL.com identifies Lane as a late-round sleeper after a strong start to camp and cites a path to the No. 2/red-zone receiver role.", "sourceIds": ["nfl-late-round-sleepers-2026"] },
+        { "summary": "The Seahawks fantasy roundup also lists Lane as a late value target.", "sourceIds": ["seahawks-sleepers-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_CONSENSUS", "summary": "Multiple sources see inexpensive upside if Lane earns a meaningful secondary receiver role." },
+      "timeSensitive": true
+    },
+    {
+      "id": "buf-dj-moore-arrival",
+      "subjects": [{ "kind": "PLAYER", "name": "DJ Moore", "team": "BUF" }, { "kind": "PLAYER", "name": "Josh Allen", "team": "BUF" }, { "kind": "PLAYER", "name": "James Cook", "team": "BUF" }],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Buffalo acquired DJ Moore from Chicago.", "sourceIds": ["footballguys-offseason-recap-2026"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Moore improves Buffalo's receiving talent but changes target distribution for incumbent pass catchers." }
+    },
+    {
+      "id": "buf-james-cook-price-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "James Cook", "team": "BUF" }],
+      "categories": ["ADP", "ROLE_RISK"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column questions Cook's first-round ceiling, citing limited receiving involvement and added receiving competition.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Yahoo views Cook's draft price as aggressive relative to his receiving-volume ceiling." },
+      "timeSensitive": true
+    },
+    {
+      "id": "car-jonathon-brooks-conflicting-outlook",
+      "subjects": [{ "kind": "PLAYER", "name": "Jonathon Brooks", "team": "CAR" }, { "kind": "PLAYER", "name": "Chuba Hubbard", "team": "CAR" }],
+      "categories": ["HEALTH", "BACKFIELD_COMPETITION", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Footballguys says Rico Dowdle's departure creates room for a healthy Brooks to take on a larger workload alongside Hubbard.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "The Seahawks fantasy roundup presents Brooks as a value based on recovery and preseason first-team work.", "sourceIds": ["seahawks-sleepers-2026"] },
+        { "summary": "Yahoo's fade column is more cautious because of Brooks' injury history, Hubbard competition and price.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_CONFLICT", "summary": "Brooks has workload upside but unusually wide uncertainty; RosterPilot should surface both the positive camp signal and the injury/competition downside." },
+      "timeSensitive": true
+    },
+    {
+      "id": "chi-dj-moore-departure",
+      "subjects": [{ "kind": "PLAYER", "name": "Rome Odunze", "team": "CHI" }, { "kind": "PLAYER", "name": "DJ Moore", "team": "BUF" }],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Chicago traded DJ Moore to Buffalo.", "sourceIds": ["footballguys-offseason-recap-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Moore's departure removes a major target competitor from Chicago's receiver room." }
+    },
+    {
+      "id": "cle-offense-rookie-reset",
+      "subjects": [{ "kind": "PLAYER", "name": "KC Concepcion", "team": "CLE" }, { "kind": "PLAYER", "name": "Denzel Boston", "team": "CLE" }, { "kind": "PLAYER", "name": "Quinshon Judkins", "team": "CLE" }],
+      "categories": ["COACHING_CHANGE", "QB_CHANGE", "ROOKIE_ROLE", "INJURY"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Todd Monken became Cleveland's head coach and primary play-caller.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Cleveland added first-round WR KC Concepcion and second-round WR Denzel Boston.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Quinshon Judkins is working back from a major leg injury.", "sourceIds": ["footballguys-offseason-recap-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Cleveland offers meaningful opportunity for young players but carries quarterback and role uncertainty." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cle-kc-concepcion-riser",
+      "subjects": [{ "kind": "PLAYER", "name": "KC Concepcion", "team": "CLE" }],
+      "categories": ["ADP", "ROOKIE_ROLE", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "FantasyPros lists Concepcion among ADP risers and sees a possible path to Cleveland's No. 1 receiver role.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] },
+        { "summary": "NFL.com's rookie scenario emphasizes his separation ability but also quarterback uncertainty and competition.", "sourceIds": ["nfl-rookies-best-worst-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_CONSENSUS", "summary": "There is credible breakout opportunity, tempered by Cleveland's quarterback uncertainty and other young receiving options." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cle-denzel-boston-sleeper",
+      "subjects": [{ "kind": "PLAYER", "name": "Denzel Boston", "team": "CLE" }],
+      "categories": ["TRAINING_CAMP", "ROOKIE_ROLE", "SLEEPER"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "NFL.com highlights Boston as a late sleeper based on first-team camp work and positive reviews.", "sourceIds": ["nfl-late-round-sleepers-2026"] },
+        { "summary": "NFL.com's rookie outlook also gives Boston a path to a substantial receiving role.", "sourceIds": ["nfl-rookies-best-worst-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Boston is a late-round upside target if his camp role survives into the regular season." },
+      "timeSensitive": true
+    },
+    {
+      "id": "den-jaylen-waddle-arrival",
+      "subjects": [{ "kind": "PLAYER", "name": "Jaylen Waddle", "team": "DEN" }, { "kind": "PLAYER", "name": "Courtland Sutton", "team": "DEN" }],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Denver acquired Jaylen Waddle from Miami.", "sourceIds": ["footballguys-offseason-recap-2026"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Waddle raises the ceiling of Denver's passing game while also redistributing targets among incumbent receivers." }
+    },
+    {
+      "id": "den-jk-dobbins-riser",
+      "subjects": [{ "kind": "PLAYER", "name": "J.K. Dobbins", "team": "DEN" }, { "kind": "PLAYER", "name": "Jonah Coleman", "team": "DEN" }],
+      "categories": ["HEALTH", "BACKFIELD_COMPETITION", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Footballguys says Dobbins enters the season healthy and Denver added rookie Jonah Coleman.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "FantasyPros notes Dobbins as an ADP riser and characterizes him as the likely early-down leader.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Dobbins has positive role momentum, though Coleman keeps the backfield from being a pure one-player situation." },
+      "timeSensitive": true
+    },
+    {
+      "id": "det-jahmyr-gibbs-backfield-change",
+      "subjects": [{ "kind": "PLAYER", "name": "Jahmyr Gibbs", "team": "DET" }, { "kind": "PLAYER", "name": "Isiah Pacheco", "team": "DET" }],
+      "categories": ["COACHING_CHANGE", "BACKFIELD_COMPETITION", "TEAM_CHANGE"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [
+        { "summary": "Drew Petzing became Detroit's offensive coordinator.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "David Montgomery left for Houston and Detroit added Isiah Pacheco as the complementary back behind Gibbs.", "sourceIds": ["footballguys-offseason-recap-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM_HIGH", "origin": "ROSTERPILOT_INFERENCE", "summary": "Gibbs remains the clear lead talent while his backfield partner and offensive coordinator changed; monitor whether Pacheco inherits Montgomery's exact workload or a smaller one." },
+      "timeSensitive": true
+    },
+    {
+      "id": "gb-jayden-reed-return",
+      "subjects": [{ "kind": "PLAYER", "name": "Jayden Reed", "team": "GB" }],
+      "categories": ["HEALTH", "ADP", "TARGET_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "FantasyPros lists Reed as an ADP riser while returning from prior collarbone/foot injuries.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] },
+        { "summary": "Green Bay lost Romeo Doubs and Dontayvion Wicks from the receiver room.", "sourceIds": ["footballguys-offseason-recap-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Improving health plus reduced receiver competition creates a plausible path to increased opportunity." },
+      "timeSensitive": true
+    },
+    {
+      "id": "gb-josh-jacobs-suspension-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Josh Jacobs", "team": "GB" }],
+      "categories": ["LEGAL", "SUSPENSION_RISK"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Footballguys reports an open legal investigation stemming from a May arrest that could lead to a suspension.", "sourceIds": ["footballguys-offseason-recap-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "LOW_MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "This is a contingent availability risk, not a confirmed suspension; treat it as time-sensitive until resolved." },
+      "timeSensitive": true,
+      "notes": "Do not state that Jacobs is suspended unless a later source confirms it."
+    },
+    {
+      "id": "hou-david-montgomery-role-conflict",
+      "subjects": [{ "kind": "PLAYER", "name": "David Montgomery", "team": "HOU" }, { "kind": "PLAYER", "name": "Woody Marks", "team": "HOU" }],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_ROLE", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Houston traded for David Montgomery after not re-signing Nick Chubb.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Footballguys expects a heavy three-down role for Montgomery.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Yahoo's fade column is skeptical at price because of Houston's rushing environment and competition from Woody Marks.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_CONFLICT", "summary": "Montgomery has a strong role case but not universal analyst support; the journal should preserve the disagreement rather than collapse it." },
+      "timeSensitive": true
+    },
+    {
+      "id": "hou-tank-dell-return",
+      "subjects": [{ "kind": "PLAYER", "name": "Tank Dell", "team": "HOU" }],
+      "categories": ["HEALTH", "SLEEPER"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "NFL.com's sleeper article says Dell returned to full-pads practice in August after missing 2025 while recovering from a severe 2024 knee injury.", "sourceIds": ["nfl-late-round-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "NFL.com views Dell as a low-cost upside bet if his recovery continues and a meaningful receiving role returns." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ind-receiver-room-reset",
+      "subjects": [{ "kind": "PLAYER", "name": "Keenan Allen", "team": "IND" }, { "kind": "PLAYER", "name": "Josh Downs", "team": "IND" }, { "kind": "PLAYER", "name": "Alec Pierce", "team": "IND" }],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Indianapolis re-signed Alec Pierce and traded Michael Pittman Jr. to Pittsburgh.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "FantasyPros reports Keenan Allen joining Indianapolis.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] },
+        { "summary": "The Seahawks fantasy roundup still identifies Josh Downs as a value candidate despite Allen's arrival.", "sourceIds": ["seahawks-sleepers-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Indianapolis' target hierarchy changed substantially; Allen adds competition while Pittman's departure opens volume." },
+      "timeSensitive": true
+    },
+    {
+      "id": "jax-backfield-open",
+      "subjects": [{ "kind": "PLAYER", "name": "Bhayshul Tuten", "team": "JAX" }, { "kind": "PLAYER", "name": "Chris Rodriguez Jr.", "team": "JAX" }],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_COMPETITION", "SLEEPER"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Travis Etienne left Jacksonville, with Tuten competing for the lead role and Chris Rodriguez added as a physical complement.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "NFL.com lists Rodriguez as a late sleeper and notes meaningful camp/preseason opportunity.", "sourceIds": ["nfl-late-round-sleepers-2026"] }
+      ],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Etienne's departure creates draftable ambiguity: Tuten has lead-role upside, while Rodriguez has inexpensive touchdown/early-down upside." },
+      "timeSensitive": true
+    },
+    {
+      "id": "kc-mahomes-walker-environment",
+      "subjects": [{ "kind": "PLAYER", "name": "Patrick Mahomes", "team": "KC" }, { "kind": "PLAYER", "name": "Kenneth Walker III", "team": "KC" }],
+      "categories": ["HEALTH", "TEAM_CHANGE", "OFFENSIVE_IDENTITY"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Footballguys says Mahomes was cleared for full practice after his 2025 knee injury.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Kansas City added Kenneth Walker III after Isiah Pacheco left.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Yahoo's fade column questions Mahomes' fantasy price partly because post-injury rushing could fall and the offense could lean more on Walker.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }
+      ],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Mahomes' real-life ceiling remains elite, but Yahoo sees a fantasy-volume risk if rushing production falls and the run game expands." },
+      "timeSensitive": true
+    },
+    {
+      "id": "lv-qb-room-2026",
+      "subjects": [{ "kind": "PLAYER", "name": "Kirk Cousins", "team": "LV" }, { "kind": "PLAYER", "name": "Fernando Mendoza", "team": "LV" }],
+      "categories": ["QB_CHANGE", "ROOKIE_ROLE", "COACHING_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Klint Kubiak became Las Vegas head coach/play-caller; Kirk Cousins joined and Fernando Mendoza was drafted first overall.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "NFL.com's rookie outlook presents Mendoza's best-case development path as beginning behind Cousins before taking over later.", "sourceIds": ["nfl-rookies-best-worst-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "The Raiders have both a veteran bridge and a high-investment rookie, creating timing risk for Mendoza in one-QB redraft leagues." },
+      "timeSensitive": true
+    },
+    {
+      "id": "mia-malik-willis-starting-opportunity",
+      "subjects": [{ "kind": "PLAYER", "name": "Malik Willis", "team": "MIA" }],
+      "categories": ["TEAM_CHANGE", "QB_CHANGE", "BREAKOUT"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Malik Willis left Green Bay for Miami.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "CBS's model highlights Willis as a breakout candidate with a starting opportunity and fantasy value from his rushing ability.", "sourceIds": ["cbs-breakouts-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Willis carries late-round upside if he retains the starting job because rushing can raise his weekly floor." },
+      "timeSensitive": true
+    },
+    {
+      "id": "mia-tyreek-hill-availability-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Tyreek Hill", "team": "FA" }],
+      "categories": ["TEAM_CHANGE", "INJURY", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "FantasyPros lists Hill as an ADP faller after his release from Miami and notes recovery from a severe 2025 knee injury.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Uncertain team fit and recovery timeline make Hill a highly time-sensitive draft asset." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ne-aj-brown-romeo-doubs",
+      "subjects": [{ "kind": "PLAYER", "name": "A.J. Brown", "team": "NE" }, { "kind": "PLAYER", "name": "Romeo Doubs", "team": "NE" }],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "A.J. Brown moved from Philadelphia to New England.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "Romeo Doubs left Green Bay for New England.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "FantasyPros lists Doubs as an ADP riser and sees a likely secondary role behind Brown.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Doubs has a clearer projected role in a new offense, though Brown remains the primary target competition." },
+      "timeSensitive": true
+    },
+    {
+      "id": "no-jordyn-tyson-hamstring",
+      "subjects": [{ "kind": "PLAYER", "name": "Jordyn Tyson", "team": "NO" }],
+      "categories": ["INJURY", "ROOKIE_ROLE", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "FantasyPros flags Tyson's hamstring issue as a reason for a large ADP decline.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] },
+        { "summary": "NFL.com's rookie outlook also makes recovery from the hamstring injury central to his range of outcomes.", "sourceIds": ["nfl-rookies-best-worst-2026"] }
+      ],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_CONSENSUS", "summary": "Tyson's draft value is currently dominated by injury-timeline uncertainty and should be refreshed close to draft day." },
+      "timeSensitive": true
+    },
+    {
+      "id": "nyg-tyrone-tracy-role-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Tyrone Tracy Jr.", "team": "NYG" }],
+      "categories": ["BACKFIELD_COMPETITION", "ADP", "ROLE_RISK"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "FantasyPros lists Tracy as an ADP faller, pointing to added competition and pass-protection concerns.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "His workload projection is less secure than earlier in the offseason." },
+      "timeSensitive": true
+    },
+    {
+      "id": "nyg-isaiah-likely-role",
+      "subjects": [{ "kind": "PLAYER", "name": "Isaiah Likely", "team": "NYG" }],
+      "categories": ["TEAM_CHANGE", "TARGET_OPPORTUNITY", "SLEEPER"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Isaiah Likely left Baltimore for the Giants.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "The Seahawks fantasy roundup lists Likely as a tight-end value based on potential for a larger receiving role.", "sourceIds": ["seahawks-sleepers-2026"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "A new team creates a plausible path to more receiving work, but the role still needs regular-season confirmation." },
+      "timeSensitive": true
+    },
+    {
+      "id": "nyj-sam-darnold-fantasy-ceiling",
+      "subjects": [{ "kind": "PLAYER", "name": "Sam Darnold", "team": "NYJ" }],
+      "categories": ["TEAM_CHANGE", "ADP", "OFFENSIVE_IDENTITY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "FantasyPros lists Darnold as an ADP faller and cites a run-heavy offensive environment as a fantasy-ceiling concern.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The concern is fantasy passing volume rather than necessarily poor real-life quarterback play." },
+      "timeSensitive": true
+    },
+    {
+      "id": "nyj-kenyon-sadiq-injury-role",
+      "subjects": [{ "kind": "PLAYER", "name": "Kenyon Sadiq", "team": "NYJ" }, { "kind": "PLAYER", "name": "Mason Taylor", "team": "NYJ" }],
+      "categories": ["INJURY", "ROOKIE_ROLE", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "NFL.com's rookie outlook flags a core-muscle injury and competition from Mason Taylor as key factors for Sadiq.", "sourceIds": ["nfl-rookies-best-worst-2026"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Sadiq has rookie upside but begins with health and role uncertainty." },
+      "timeSensitive": true
+    },
+    {
+      "id": "phi-makai-lemon-rookie-role",
+      "subjects": [{ "kind": "PLAYER", "name": "Makai Lemon", "team": "PHI" }],
+      "categories": ["ROOKIE_ROLE", "INJURY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "NFL.com's rookie outlook sees role upside for Lemon but notes hamstring-related missed work as a risk.", "sourceIds": ["nfl-rookies-best-worst-2026"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Lemon's talent/role case is attractive if health allows him to secure early snaps." },
+      "timeSensitive": true
+    },
+    {
+      "id": "pit-michael-pittman-team-change",
+      "subjects": [{ "kind": "PLAYER", "name": "Michael Pittman Jr.", "team": "PIT" }],
+      "categories": ["TEAM_CHANGE"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Indianapolis traded Michael Pittman Jr. to Pittsburgh.", "sourceIds": ["footballguys-offseason-recap-2026"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "ROSTERPILOT_INFERENCE", "summary": "Pittman's move changes both Pittsburgh's target competition and Indianapolis' vacated volume; more team-specific evidence is needed before assigning a stronger direction." }
+    },
+    {
+      "id": "sf-dezhaun-stribling-opportunity",
+      "subjects": [{ "kind": "PLAYER", "name": "De'Zhaun Stribling", "team": "SF" }],
+      "categories": ["ADP", "ROOKIE_ROLE", "TARGET_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "FantasyPros lists Stribling as a major ADP riser amid injuries in San Francisco's receiver room.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] },
+        { "summary": "NFL.com's rookie outlook warns that established target competition can cap his ceiling.", "sourceIds": ["nfl-rookies-best-worst-2026"] },
+        { "summary": "The Seahawks fantasy roundup also lists Stribling as a late value after strong preseason play.", "sourceIds": ["seahawks-sleepers-2026"] }
+      ],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_CONSENSUS", "summary": "Stribling has strong late-round momentum, but the target tree remains crowded enough to cap confidence." },
+      "timeSensitive": true
+    },
+    {
+      "id": "sea-jadarian-price-rookie-opportunity",
+      "subjects": [{ "kind": "PLAYER", "name": "Jadarian Price", "team": "SEA" }],
+      "categories": ["ROOKIE_ROLE", "BACKFIELD_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "NFL.com's rookie outlook gives Price a path to substantial work while Zach Charbonnet returns from ACL injury, while also flagging ball-security and pass-protection downside.", "sourceIds": ["nfl-rookies-best-worst-2026"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Price has a meaningful early opportunity but needs to earn trust in passing situations and ball security." },
+      "timeSensitive": true
+    },
+    {
+      "id": "sea-rashid-shaheed-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Rashid Shaheed", "team": "SEA" }],
+      "categories": ["SLEEPER", "TRAINING_CAMP"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "The Seahawks fantasy roundup cites a healthy/full preseason and improving rapport with the quarterback as part of Shaheed's late-round case.", "sourceIds": ["seahawks-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Shaheed offers inexpensive big-play upside if the preseason role carries over." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ten-carnell-tate-conflicting-price",
+      "subjects": [{ "kind": "PLAYER", "name": "Carnell Tate", "team": "TEN" }],
+      "categories": ["ROOKIE_ROLE", "ADP", "TARGET_OPPORTUNITY"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "NFL.com's rookie outlook gives Tate a path to leading Tennessee in targets if the passing offense improves.", "sourceIds": ["nfl-rookies-best-worst-2026"] },
+        { "summary": "Yahoo's fade column is less enthusiastic at current draft cost because of rookie, role and offensive-environment uncertainty.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }
+      ],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_CONFLICT", "summary": "Tate has high target-share upside but enough uncertainty that price is the key variable." },
+      "timeSensitive": true
+    },
+    {
+      "id": "was-stefon-diggs-sleeper",
+      "subjects": [{ "kind": "PLAYER", "name": "Stefon Diggs", "team": "WAS" }, { "kind": "PLAYER", "name": "Terry McLaurin", "team": "WAS" }],
+      "categories": ["TEAM_CHANGE", "SLEEPER", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "NFL.com lists Diggs as a late-round sleeper after joining Washington and sees a plausible high-volume secondary/1B receiving role.", "sourceIds": ["nfl-late-round-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Diggs' cost may understate his path to meaningful targets if his efficiency and health hold." },
+      "timeSensitive": true
+    },
+    {
+      "id": "buf-dalton-kincaid-sleeper",
+      "subjects": [{ "kind": "PLAYER", "name": "Dalton Kincaid", "team": "BUF" }],
+      "categories": ["HEALTH", "SLEEPER", "TARGET_OPPORTUNITY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "NFL.com lists Kincaid as a late-round sleeper and emphasizes improved health plus strong receiving-efficiency indicators.", "sourceIds": ["nfl-late-round-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Kincaid has TE1 upside at a discounted cost if health and route involvement persist." },
+      "timeSensitive": true
+    },
+    {
+      "id": "gb-matthew-golden-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Matthew Golden", "team": "GB" }],
+      "categories": ["SLEEPER", "TRAINING_CAMP", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "The Seahawks fantasy roundup lists Golden as a value and cites a strong offseason plus deep-threat potential.", "sourceIds": ["seahawks-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Golden is a late-round ceiling play in a receiver room that lost multiple veterans." },
+      "timeSensitive": true
+    },
+    {
+      "id": "lac-tre-harris-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Tre Harris", "team": "LAC" }],
+      "categories": ["SLEEPER", "COACHING_CHANGE", "ROOKIE_ROLE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "The Seahawks fantasy roundup lists Harris as a deep value and cites Mike McDaniel's arrival, likely three-receiver usage and Harris' blocking as paths to playing time.", "sourceIds": ["seahawks-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Harris has inexpensive role upside if McDaniel uses frequent three-WR personnel and Harris stays on the field." },
+      "timeSensitive": true
+    },
+    {
+      "id": "was-rachaad-white-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Rachaad White", "team": "WAS" }],
+      "categories": ["SLEEPER", "BACKFIELD_ROLE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "The Seahawks fantasy roundup lists White as a later-round running-back value.", "sourceIds": ["seahawks-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Treat as a price-sensitive depth target; the journal needs more role evidence before making a stronger claim." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ari-tyler-allgeier-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Tyler Allgeier", "team": "ARI" }],
+      "categories": ["SLEEPER", "BACKFIELD_COMPETITION", "TEAM_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Allgeier joined Arizona, where rookie Jeremiyah Love is expected to lead the backfield.", "sourceIds": ["footballguys-offseason-recap-2026"] },
+        { "summary": "The Seahawks fantasy roundup lists Allgeier as a late value.", "sourceIds": ["seahawks-sleepers-2026"] }
+      ],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Allgeier has standalone/contingent value but faces a highly drafted rookie ahead of him." },
+      "timeSensitive": true
+    },
+    {
+      "id": "tb-baker-mayfield-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Baker Mayfield", "team": "TB" }],
+      "categories": ["SLEEPER", "QB_VALUE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "The Seahawks fantasy roundup lists Mayfield as a late quarterback value if healthy.", "sourceIds": ["seahawks-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Mayfield is a wait-on-QB option rather than a reason to force quarterback early." },
+      "timeSensitive": true
+    },
+    {
+      "id": "no-tyler-shough-value",
+      "subjects": [{ "kind": "PLAYER", "name": "Tyler Shough", "team": "NO" }],
+      "categories": ["SLEEPER", "QB_VALUE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "The Seahawks fantasy roundup lists Shough as a late quarterback value.", "sourceIds": ["seahawks-sleepers-2026"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "He is a low-cost quarterback option whose value depends heavily on the surrounding offense and weekly streaming context." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ari-trey-mcbride-price-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Trey McBride", "team": "ARI" }],
+      "categories": ["ADP", "COACHING_CHANGE", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column questions McBride's third-round price amid expected volume regression in Arizona's changed offense.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The fade is about price and volume expectations, not a claim that McBride is a poor player." },
+      "timeSensitive": true
+    },
+    {
+      "id": "kc-rashee-rice-recovery-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Rashee Rice", "team": "KC" }],
+      "categories": ["INJURY", "ADP", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column cites continued knee-recovery concerns and a changing Kansas City offensive environment as reasons for caution at cost.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Rice's health/recovery timeline is a material draft-day variable and should be refreshed close to the draft." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cin-joe-burrow-price-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Joe Burrow", "team": "CIN" }],
+      "categories": ["ADP", "QB_VALUE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column views Burrow's Round 4 cost as expensive given the depth of the quarterback position.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "This is a roster-construction/value objection rather than a negative talent outlook." },
+      "timeSensitive": true
+    },
+    {
+      "id": "tb-bucky-irving-role-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Bucky Irving", "team": "TB" }],
+      "categories": ["ADP", "BACKFIELD_COMPETITION", "ROLE_RISK"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column questions Irving's price, citing 2025 rushing efficiency and competition for goal-line/passing-down work.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Irving may still be useful, but Yahoo sees workload segmentation as a reason to avoid paying an aggressive price." },
+      "timeSensitive": true
+    },
+    {
+      "id": "ne-treveyon-henderson-role-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "TreVeyon Henderson", "team": "NE" }],
+      "categories": ["ADP", "BACKFIELD_COMPETITION", "ROLE_RISK"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column cites Rhamondre Stevenson competition plus Henderson's pass-protection/volume concerns.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The concern is that Henderson's role may not justify his draft cost without a clear workload takeover." },
+      "timeSensitive": true
+    },
+    {
+      "id": "sf-george-kittle-recovery-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "George Kittle", "team": "SF" }],
+      "categories": ["INJURY", "ADP"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column highlights Kittle's Achilles recovery and the risk of a slow ramp-up/efficiency decline.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Kittle's health status is highly time-sensitive and should be refreshed immediately before the draft." },
+      "timeSensitive": true
+    },
+    {
+      "id": "tb-chris-godwin-price-risk",
+      "subjects": [{ "kind": "PLAYER", "name": "Chris Godwin", "team": "TB" }],
+      "categories": ["ADP", "INJURY", "TARGET_COMPETITION"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Yahoo's fade column is cautious on Godwin because of age/injury history, 2025 efficiency and competition in Tampa Bay's receiving room.", "sourceIds": ["yahoo-hayden-winks-fades-2026"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The downside case is a price/role/health combination rather than a certainty of poor production." },
+      "timeSensitive": true
+    }
+  ]
+}
