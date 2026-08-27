@@ -25,6 +25,21 @@ const config: DraftConfig = {
   draftStrategy: 'BALANCED',
 };
 
+const tenTeamConfig: DraftConfig = {
+  teamCount: 10,
+  userDraftSlot: 7,
+  scoringFormat: 'HALF_PPR',
+  qbStarters: 1,
+  rbStarters: 2,
+  wrStarters: 3,
+  teStarters: 1,
+  flexStarters: 1,
+  dstStarters: 1,
+  kStarters: 1,
+  benchSpots: 6,
+  draftStrategy: 'BALANCED',
+};
+
 function syntheticPool(): PlayerRanking[] {
   const positions: Position[] = ['RB', 'WR', 'QB', 'TE', 'RB', 'WR', 'RB', 'WR', 'TE', 'QB', 'DST', 'K'];
   const players: PlayerRanking[] = [];
@@ -119,6 +134,55 @@ describe('interactive draft simulator', () => {
       managerIds: ['Armando', '', '', ''],
     });
     expect(armando[0]?.playerId).toBe('te-2');
+  });
+
+  it('uses a dedicated recency-weighted Round 1 tendency for Sunny-D', () => {
+    const rb = historicalSequencePositionProbability({
+      managerId: 'Sunny-DCommissioner',
+      position: 'RB',
+      round: 1,
+      priorPositions: [],
+    });
+    const wr = historicalSequencePositionProbability({
+      managerId: 'Sunny-DCommissioner',
+      position: 'WR',
+      round: 1,
+      priorPositions: [],
+    });
+
+    expect(rb).toBeCloseTo(0.588, 3);
+    expect(wr).toBeCloseTo(0.412, 3);
+  });
+
+  it('keeps the 2026 market board dominant for Sunny-D at pick five', () => {
+    const players: PlayerRanking[] = [
+      { id: 'jahmyr-gibbs-rb-det', name: 'Jahmyr Gibbs', position: 'RB', overallRank: 1, adp: 1 },
+      { id: 'bijan-robinson-rb-atl', name: 'Bijan Robinson', position: 'RB', overallRank: 2, adp: 2 },
+      { id: 'ja-marr-chase-wr-cin', name: "Ja'Marr Chase", position: 'WR', overallRank: 3, adp: 3 },
+      { id: 'puka-nacua-wr-lar', name: 'Puka Nacua', position: 'WR', overallRank: 4, adp: 4 },
+      { id: 'jaxon-smith-njigba-wr-sea', name: 'Jaxon Smith-Njigba', position: 'WR', overallRank: 5, adp: 7 },
+      { id: 'jonathan-taylor-rb-ind', name: 'Jonathan Taylor', position: 'RB', overallRank: 6, adp: 6 },
+      { id: 'christian-mccaffrey-rb-sf', name: 'Christian McCaffrey', position: 'RB', overallRank: 7, adp: 5 },
+      { id: 'amon-ra-st-brown-wr-det', name: 'Amon-Ra St. Brown', position: 'WR', overallRank: 8, adp: 8 },
+    ];
+    const picks = [
+      draftPickAtOverall(1, 'jahmyr-gibbs-rb-det', 10),
+      draftPickAtOverall(2, 'bijan-robinson-rb-atl', 10),
+      draftPickAtOverall(3, 'ja-marr-chase-wr-cin', 10),
+      draftPickAtOverall(4, 'jonathan-taylor-rb-ind', 10),
+    ];
+    const managerIds = ['', '', '', '', 'Sunny-DCommissioner', '', '', '', '', ''];
+
+    const result = simulateNextOpponentPick({
+      players,
+      picks,
+      config: tenTeamConfig,
+      currentOverallPick: 5,
+      roomProfile: 'RANK_ORDER',
+      managerIds,
+    });
+
+    expect(result.find((pick) => pick.overallPick === 5)?.playerId).toBe('puka-nacua-wr-lar');
   });
 
   it('conditions Sunny-D early-round tendencies on an RB-RB start', () => {
