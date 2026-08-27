@@ -18,10 +18,11 @@ const config: DraftConfig = {
   draftMode: 'SIMULATOR',
   simulationRoomProfile: 'RB_RUSH',
   simulationPace: 'WATCH',
+  simulationSeed: 'mock-run-123',
 };
 
 describe('interactive simulator persistence', () => {
-  it('round trips mode, room behavior, and pace', () => {
+  it('round trips mode, room behavior, pace, and the per-mock seed', () => {
     const parsed = parseDraftSnapshot(serializeDraftSnapshot({
       config,
       players: [],
@@ -33,5 +34,19 @@ describe('interactive simulator persistence', () => {
     expect(parsed?.config.draftMode).toBe('SIMULATOR');
     expect(parsed?.config.simulationRoomProfile).toBe('RB_RUSH');
     expect(parsed?.config.simulationPace).toBe('WATCH');
+    expect(parsed?.config.simulationSeed).toBe('mock-run-123');
+  });
+
+  it('rejects a malformed simulator seed in a backup', () => {
+    const raw = JSON.parse(serializeDraftSnapshot({
+      config,
+      players: [],
+      picks: [],
+      draftStarted: false,
+      savedAt: new Date('2026-08-26T18:00:00-05:00'),
+    })) as { config: Record<string, unknown> };
+    raw.config.simulationSeed = { invalid: true };
+
+    expect(parseDraftSnapshot(JSON.stringify(raw))).toBeNull();
   });
 });
