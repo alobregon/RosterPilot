@@ -28,15 +28,36 @@ With **Historical manager data off**, the simulator preserves the simple room-pr
 - **Early TE rush** — opponents prioritize TE through Round 4.
 - **Early DST room** — opponents prioritize DST in Rounds 8–10.
 
-With **Historical manager data on**, an assigned manager uses a bounded personalized selection score. Current-year rankings and ADP remain the dominant market signal, then close choices can be adjusted by:
+With **Historical manager data on**, an assigned manager uses a bounded personalized selection score. Current-year rankings and ADP remain the market anchor, then plausible alternatives can be adjusted by:
 
 - the manager's current roster need;
 - the manager's **sequence-conditioned** Purple League position tendency;
 - the manager's historical roster-construction shape;
 - the selected room-profile pressure, if any;
-- a small run-seeded variation of at most ±1.5 score points so close choices can differ between mocks.
+- small run-seeded variation.
 
-Historical behavior is intentionally restricted to the **top 12 currently available market candidates**. That guardrail prevents old tendencies from manufacturing extreme reaches far outside the current board. Historical player-level reach/wait behavior remains disabled because its walk-forward validation did not beat the neutral baseline.
+Historical player-level reach/wait behavior remains disabled because its walk-forward validation did not beat the neutral baseline.
+
+## Round-dependent market tolerance
+
+A ranking gap does not mean the same thing at pick #4 and pick #140. The simulator therefore becomes progressively more tolerant of market-board deviations as the draft gets deeper.
+
+| Rounds | Current-market candidate window | Market penalty per candidate slot | Manager-history cap | Seeded variation |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 10 | 3.00 | ±3 | ±1.5 |
+| 2–4 | 12 | 2.50 | ±5 | ±1.5 |
+| 5–8 | 16 | 1.75 | ±7 | ±2.0 |
+| 9–12 | 20 | 1.25 | ±9 | ±2.5 |
+| 13–16+ | 24 | 0.90 | ±10 | ±3.0 |
+
+This curve changes four things together:
+
+1. **Candidate window expands.** A late-round manager can consider a player farther down the current available board.
+2. **Market-slot penalty falls.** Being the 15th available candidate is much less damaging in Round 13 than it would be in Round 1.
+3. **Manager history can matter more.** Sequence and roster-construction tendencies have more room to separate similarly valued late-round players.
+4. **Random variation widens modestly.** Late rounds are inherently less predictable, but variation remains bounded and run-seeded.
+
+The current rankings/ADP still anchor every personalized pick. This is not unrestricted reaching: even in Round 13+, the simulator only evaluates the top 24 currently available market candidates.
 
 ## Round 1 behavior
 
