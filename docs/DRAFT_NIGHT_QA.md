@@ -40,6 +40,8 @@
 - [ ] Confirm **Instant to my pick** fills opponent selections immediately and stops on the user's turn.
 - [ ] Confirm **Watch picks** advances one opponent at a time and stops on the user's turn.
 - [ ] Make the user's selection from the Top 3 and confirm simulation resumes automatically afterward.
+- [ ] After opponents advance to the next user turn, click **Undo last pick** and confirm the most recent user selection plus all downstream simulated opponent picks are removed, returning the draft to that previous user turn without immediately re-simulating it.
+- [ ] Repeat simulator undo after multiple user rounds and confirm only the most recent user decision is rolled back; earlier user picks remain intact.
 - [ ] Exercise RB Rush, WR Rush, QB Rush, TE Rush, and Early DST room profiles and confirm the intended position pressure is visible.
 - [ ] Confirm simulator mode, room profile, pace, per-mock seed, and historical-manager assignments survive refresh / JSON backup restore.
 - [ ] Confirm corrections pause simulator advancement and resume after the correction is repaired.
@@ -52,7 +54,7 @@
 - [ ] Favorites and Drafted filters behave correctly.
 
 ## Corrections and recovery
-- [ ] Undo removes only the latest entered pick.
+- [ ] In Live mode, Undo removes only the latest entered pick.
 - [ ] Editing a historical pick replaces only that pick.
 - [ ] Removing a historical pick creates a correction gap and pauses recommendations.
 - [ ] Refresh with a correction gap resumes at the earliest missing pick.
