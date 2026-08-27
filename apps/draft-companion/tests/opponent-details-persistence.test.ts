@@ -41,11 +41,24 @@ describe('opponent setup preference persistence', () => {
     expect(parsed?.managerIds[0]).toBe('dixie');
   });
 
-  it('still accepts the legacy combined preference for older v1 snapshots', () => {
+  it('migrates the legacy combined preference for older v1 snapshots', () => {
     const config: DraftConfig = { ...baseConfig, opponentDetailsEnabled: true };
     const parsed = parseDraftSnapshot(serializeDraftSnapshot({ config, players: [], picks: [], draftStarted: false }));
     expect(parsed?.config.opponentDetailsEnabled).toBe(true);
-    expect(parsed?.config.teamNamesEnabled).toBeUndefined();
-    expect(parsed?.config.historicalManagersEnabled).toBeUndefined();
+    expect(parsed?.config.teamNamesEnabled).toBe(true);
+    expect(parsed?.config.historicalManagersEnabled).toBe(true);
+  });
+
+  it('infers each missing legacy preference independently from saved data', () => {
+    const parsed = parseDraftSnapshot(serializeDraftSnapshot({
+      config: baseConfig,
+      players: [],
+      picks: [],
+      teamNames: ['Custom team'],
+      managerIds: [],
+      draftStarted: false,
+    }));
+    expect(parsed?.config.teamNamesEnabled).toBe(true);
+    expect(parsed?.config.historicalManagersEnabled).toBe(false);
   });
 });
