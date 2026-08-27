@@ -231,6 +231,7 @@ export default function Page() {
             config,
             currentOverallPick: current.currentOverallPick,
             roomProfile: config.simulationRoomProfile ?? 'RANK_ORDER',
+            managerIds: activeManagerIds,
           });
         }
         return autoDraftOpponentsUntilUserTurn({
@@ -239,11 +240,12 @@ export default function Page() {
           config,
           currentOverallPick: current.currentOverallPick,
           roomProfile: config.simulationRoomProfile ?? 'RANK_ORDER',
+          managerIds: activeManagerIds,
         });
       });
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [started, simulatorMode, correcting, session.complete, onClock, players, picks.length, config]);
+  }, [started, simulatorMode, correcting, session.complete, onClock, players, picks.length, config, activeManagerIds]);
 
   async function importRankings(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
