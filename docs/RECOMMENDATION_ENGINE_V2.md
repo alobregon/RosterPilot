@@ -18,6 +18,7 @@ V2 considers:
 - heuristic future availability
 - selected draft strategy
 - user-selected favorite players (My Guys)
+- curated offseason context as a bounded final tie-breaker
 
 ## Base score
 
@@ -35,6 +36,8 @@ The current base score uses:
 Draft strategy is applied as a bounded adjustment of up to +/- 6 raw-score points after the base score. Balanced strategy applies no adjustment.
 
 Favorites are a separate bounded adjustment of up to +5 raw-score points. The boost is price-sensitive: it is strongest when a favorite has fallen at least 10 picks past the user's ranking, meaningful around fair value, and nearly neutral for a major reach. Favorites never override mandatory roster-position constraints.
+
+Curated offseason context is applied later in the on-clock wrapper as a final **+/-3 raw-score-point maximum** tie-breaker. It does not alter the imported player ranking, tier, ADP, survival probability, or any base-score component.
 
 ## Recommendation %
 
@@ -143,6 +146,38 @@ Strategy is a bounded preference, not an override of legality or a replacement f
 - WR Heavy can open WR/WR/WR in this 3-WR league.
 - Upside Heavy uses the imported FantasyPros upside rating when present.
 
+## Offseason context tie-breaker
+
+The on-clock wrapper reads curated entries from `offseason-context.ts` through `context-signal.ts`. Only the entry outlook is converted to score; source-grounded facts remain available for explanation and the future AI coach.
+
+The signal combines:
+
+- direction: positive / mixed-positive / mixed / mixed-negative / negative;
+- confidence: low-medium through high;
+- origin: source consensus, source analyst, source conflict, or explicit RosterPilot inference.
+
+The combined signal is capped at +/-3 score points, then rank/tier discipline is applied. Context therefore behaves like a close-call nudge rather than a parallel ranking system.
+
+Current rank-gap guardrails:
+
+```text
+Rounds 1-2: full within 1 rank; no context boost beyond 4 ranks
+Rounds 3-4: full within 2 ranks; no context boost beyond 6 ranks
+Rounds 5-8: full within 3 ranks; no context boost beyond 9 ranks
+Rounds 9+:  full within 4 ranks; no context boost beyond 12 ranks
+```
+
+A one-tier disadvantage halves the remaining context effect; a two-tier-or-greater disadvantage suppresses it completely. K and DST receive no offseason context adjustment.
+
+This directly captures the walkthrough behavior we want:
+
+- Amon-Ra can receive a small positive nudge against a nearly identical early-round alternative while CMC's current risk context can nudge the other direction;
+- Ladd McConkey can move ahead in a close Round-4 WR decision when the ranking gap is small;
+- Jayden Reed and Makai Lemon can receive mid/late-round opportunity boosts;
+- positive Ashton Jeanty context cannot override a meaningful early rank/tier gap to the final Tier-2 value.
+
+When the adjustment materially affects a displayed candidate, the recommendation reasons include a source-labeled `context boost` or `context caution` explanation.
+
 ## Validation
 
 The extended FantasyPros pool contains 861 players. A deterministic 160-pick smoke simulation was run for every draft slot from 1 through 10 using the default league configuration.
@@ -168,19 +203,22 @@ K   1
 
 The opponent simulation is intentionally simple (non-user teams choose the highest remaining overall rank). It is a regression/sanity harness, not a prediction of real league behavior.
 
+Walkthrough-derived context regression coverage additionally verifies close-call positive/negative signals, Ladd's bounded Round-4 contextual move, Reed/Lemon mid-round boosts, and suppression of an early rank/tier jump.
+
 ## Recommendation explanation UI
 
-The UI continues to expose exactly one percentage per candidate. Supporting decision context is shown as non-numeric labels rather than additional confidence values.
+The UI continues to expose exactly one percentage per candidate. Supporting decision context is shown as non-numeric labels or explanation text rather than additional confidence values.
 
-Current signal chips include:
+Current signals include:
 
 - Likely / Uncertain / Unlikely to return by the user's following pick;
 - Starter need;
 - Tier cliff;
 - Favorite / My Guy;
-- selected strategy fit when the strategy materially boosts the candidate.
+- selected strategy fit when the strategy materially boosts the candidate;
+- source-labeled offseason `context boost` / `context caution` explanations when the bounded signal is active.
 
-These labels are derived from the same deterministic V2 breakdown and do not create additional scoring inputs.
+The offseason explanation represents a bounded scoring input, but the imported ranking remains the authoritative player-value anchor.
 
 ## Opponent demand hardening
 
