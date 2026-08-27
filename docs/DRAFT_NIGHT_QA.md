@@ -25,16 +25,20 @@
 - [ ] Enable Historical manager data, assign managers, restart the simulation, and confirm close opponent choices can differ from pure rank order while remaining within the top current market candidates.
 - [ ] Confirm personalized opponent picks respond to roster need (for example, a manager who already filled TE is less likely to keep taking TE solely because of historical tendency).
 - [ ] Confirm Round 1 uses the dedicated recency-weighted first-pick tendency instead of the broader Rounds 1-4 phase distribution.
-- [ ] Sunny-D Round-1 regression with the 2026 rankings: after Gibbs, Bijan, Ja'Marr Chase, and Jonathan Taylor are drafted at picks 1-4, confirm Sunny-D at #5 takes **Puka Nacua** rather than Christian McCaffrey in Normal room mode.
+- [ ] Confirm the Round-1 historical adjustment is only a close-call nudge: a strong manager preference should not routinely jump several current-market slots.
+- [ ] Dixie Round-1 regression with the 2026 board: when Gibbs, Bijan, and Jonathan Taylor are already gone, confirm Ja'Marr Chase normally remains ahead of Christian McCaffrey rather than Dixie's RB history automatically forcing CMC upward.
+- [ ] Sunny-D Round-1 regression with the 2026 rankings: after Gibbs, Bijan, Ja'Marr Chase, and Jonathan Taylor are drafted at picks 1-4, confirm Sunny-D at #5 normally takes **Puka Nacua** rather than Christian McCaffrey in Normal room mode.
 - [ ] Confirm manager history is **sequence-aware** rather than a repeated phase bonus: after a manager takes the same position twice, the third-pick tendency should reflect that manager's actual repeat/streak history.
 - [ ] Sunny-D regression: after an `RB-RB` start in Round 3, confirm close WR/RB choices favor WR rather than blindly extending the broad early-RB tendency. RB-RB-RB should remain possible only when current market value is strong enough to overcome the conditional history.
 - [ ] Confirm manager-specific historical roster construction nudges depth picks toward each manager's typical final roster shape without overriding starter/FLEX needs.
+- [ ] Run the same simulator setup multiple times using Restart Draft + Start Draft and confirm some genuinely close opponent decisions can vary between mocks.
+- [ ] During one mock, refresh or restore its backup and confirm the saved simulation seed keeps subsequent close decisions stable from the same draft state.
 - [ ] Confirm disabling Historical manager data returns Normal mode to pure market-order opponent picks.
 - [ ] Confirm **Instant to my pick** fills opponent selections immediately and stops on the user's turn.
 - [ ] Confirm **Watch picks** advances one opponent at a time and stops on the user's turn.
 - [ ] Make the user's selection from the Top 3 and confirm simulation resumes automatically afterward.
 - [ ] Exercise RB Rush, WR Rush, QB Rush, TE Rush, and Early DST room profiles and confirm the intended position pressure is visible.
-- [ ] Confirm simulator mode, room profile, pace, and historical-manager assignments survive refresh / JSON backup restore.
+- [ ] Confirm simulator mode, room profile, pace, per-mock seed, and historical-manager assignments survive refresh / JSON backup restore.
 - [ ] Confirm corrections pause simulator advancement and resume after the correction is repaired.
 
 ## Live draft
