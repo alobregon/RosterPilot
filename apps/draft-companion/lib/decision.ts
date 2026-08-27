@@ -1,3 +1,4 @@
+import { offseasonContextSignalForPlayer } from './context-signal';
 import { recommendPlayers, relativeRecommendationPercents } from './recommendation';
 import { roundForOverallPick } from './draft';
 import { opponentHistoryAvailabilitySignal } from './opponent-model';
@@ -8,8 +9,9 @@ import type { AvailabilityLabel, DraftConfig, DraftPick, PlayerRanking, Recommen
  * On-clock recommendation wrapper. The underlying engine remains the source of
  * factor scores, while this layer enforces extra early-round rank discipline,
  * reports market falls only after they actually occur, uses the calibrated
- * direct-survival model when the candidate is inside its validated domain, and
- * applies the bounded Purple League V1 history signal only as a tie-breaker.
+ * direct-survival model when the candidate is inside its validated domain,
+ * applies the bounded Purple League V1 history signal only as a tie-breaker,
+ * and applies curated offseason context as a final bounded close-call signal.
  */
 export function recommendForCurrentPick(args: {
   players: PlayerRanking[];
@@ -32,6 +34,10 @@ export function recommendForCurrentPick(args: {
     limit: Math.max(12, limit * 4),
   });
   const round = roundForOverallPick(currentOverallPick, config.teamCount);
+  const rankingAnchor = candidates.reduce<Recommendation | undefined>(
+    (best, candidate) => !best || candidate.player.overallRank < best.player.overallRank ? candidate : best,
+    undefined,
+  );
 
   const rescored = candidates.map((item) => {
     const reach = item.player.overallRank - currentOverallPick;
@@ -60,7 +66,18 @@ export function recommendForCurrentPick(args: {
     });
     const futureAvailability = clamp(calibratedAvailabilityUrgency + history.adjustment, 0, 100);
     const availabilityScoreAdjustment = (futureAvailability - item.breakdown.futureAvailability) * 0.05;
-    const rawScore = item.rawScore - earlyRankPenalty - tierDamping + availabilityScoreAdjustment;
+    const context = offseasonContextSignalForPlayer({
+      player: item.player,
+      bestCandidateRank: rankingAnchor?.player.overallRank ?? item.player.overallRank,
+      bestCandidateTier: rankingAnchor?.player.tier,
+      selectionPick: currentOverallPick,
+      teamCount: config.teamCount,
+    });
+    const rawScore = item.rawScore
+      - earlyRankPenalty
+      - tierDamping
+      + availabilityScoreAdjustment
+      + context.adjustment;
 
     const actualMarketFall = item.player.adp == null
       ? undefined
@@ -71,11 +88,13 @@ export function recommendForCurrentPick(args: {
       .filter((reason) => !reason.startsWith('Favorite who has fallen'));
     if (history.reasons.length) reasons.unshift(history.reasons[0]);
     if (marketFall != null && marketFall >= 5) reasons.unshift(`${Math.round(marketFall)} picks past estimated market ADP`);
+    if (context.reason) reasons.unshift(context.reason);
 
     return {
       ...item,
       rawScore,
       marketFall,
+      contextAdjustment: context.adjustment,
       survivalProbability: survival?.probability,
       availabilityLabel: availabilityLabel(item.availabilityLabel, futureAvailability),
       breakdown: { ...item.breakdown, futureAvailability },
