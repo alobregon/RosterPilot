@@ -76,6 +76,8 @@ export interface DraftConfig {
   simulationRoomProfile?: SimulationRoomProfile;
   /** Whether simulated opponent picks fill immediately or visibly one at a time. */
   simulationPace?: SimulationPace;
+  /** Per-mock seed: stable inside one simulation, regenerated for each new mock. */
+  simulationSeed?: string;
 }
 
 export interface RecommendationBreakdown {
