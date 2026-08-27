@@ -79,6 +79,26 @@ describe('2026 offseason context journal', () => {
     expect(cmc?.outlook?.direction).toBe('MIXED_NEGATIVE');
   });
 
+  it('ingests Sports Illustrated WR sleeper context as attributed, time-sensitive outlooks', () => {
+    expect(getOffseasonContextSource('si-wr-sleepers-2026')?.status).toBe('INGESTED');
+
+    const reed = getOffseasonContextForPlayers(['Jayden Reed']).find(
+      (entry) => entry.id === 'si-jayden-reed-green-bay-wr1-case',
+    );
+    const johnston = getOffseasonContextForPlayers(['Quentin Johnston']).find(
+      (entry) => entry.id === 'si-quentin-johnston-chargers-value',
+    );
+
+    expect(reed?.facts.some((fact) => fact.summary.includes('Romeo Doubs'))).toBe(true);
+    expect(reed?.outlook).toMatchObject({
+      origin: 'SOURCE_ANALYST',
+      direction: 'POSITIVE',
+      confidence: 'MEDIUM_HIGH',
+    });
+    expect(reed?.timeSensitive).toBe(true);
+    expect(johnston?.outlook?.summary).toContain('cheaper way to invest');
+  });
+
   it('returns the Ladd McConkey environment entries with explicit inference labels', () => {
     const entries = getOffseasonContextForPlayers(['Ladd McConkey']);
     const environment = entries.find((entry) => entry.id === 'lac-ladd-2026-environment');
