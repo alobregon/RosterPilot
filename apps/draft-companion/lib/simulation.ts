@@ -1,4 +1,5 @@
 import managerProfilesData from '../../../research/league_manager_profiles_2013_2025.json';
+import round1ProfilesData from '../../../research/league_manager_round1_profiles_2013_2025.json';
 import sequenceProfilesData from '../../../research/league_manager_sequence_profiles_2013_2025.json';
 import { draftPickAtOverall } from './corrections';
 import { draftSlotForOverallPick } from './draft';
@@ -26,6 +27,12 @@ interface SimulatorManagerProfile {
   average_final_roster: Record<HistoricalPosition, number>;
 }
 
+interface SimulatorRound1Profile {
+  manager_id: string;
+  draft_count: number;
+  round1_position_probabilities_recency_weighted: Record<HistoricalPosition, number>;
+}
+
 interface SimulatorSequenceProfile {
   manager_id: string;
   draft_count: number;
@@ -35,6 +42,7 @@ interface SimulatorSequenceProfile {
 }
 
 const historicalProfiles = managerProfilesData.profiles as unknown as SimulatorManagerProfile[];
+const round1Profiles = round1ProfilesData.profiles as unknown as SimulatorRound1Profile[];
 const sequenceProfiles = sequenceProfilesData.profiles as unknown as SimulatorSequenceProfile[];
 const HISTORICAL_CANDIDATE_WINDOW = 12;
 const MARKET_SLOT_PENALTY = 3;
@@ -265,7 +273,8 @@ export function hasLegalStartingRoster(counts: Record<Position, number>, config:
  * Returns the recency-weighted effective historical probability for a manager
  * selecting a position after the supplied prior position sequence.
  *
- * This is a hierarchical backoff model:
+ * Round 1 uses a dedicated recency-weighted first-pick distribution. From
+ * Round 2 onward the model backs off hierarchically:
  *   phase tendency -> same-position repeat behavior -> two-pick streak behavior
  *   -> exact first-four prefix when that prefix has historical observations.
  *
@@ -282,7 +291,13 @@ export function historicalSequencePositionProbability(args: {
   if (!profile) return null;
 
   const phase = phaseForRound(args.round);
-  const base = normalizeDistribution(profile.phase_position_probabilities_recency_weighted[phase]);
+  const round1Profile = args.round === 1
+    ? round1Profiles.find((candidate) => candidate.manager_id === args.managerId)
+    : undefined;
+  const base = normalizeDistribution(
+    round1Profile?.round1_position_probabilities_recency_weighted
+      ?? profile.phase_position_probabilities_recency_weighted[phase],
+  );
   const sequenceProfile = sequenceProfiles.find((candidate) => candidate.manager_id === args.managerId);
   if (!sequenceProfile || !args.priorPositions.length) {
     return base[historyPosition(args.position)];
@@ -459,9 +474,13 @@ function managerPositionBias(
     sequenceProbability ??
     profile.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition] ??
     0;
-  const leagueValues = historicalProfiles
-    .map((candidate) => candidate.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition])
-    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+  const leagueValues = round === 1
+    ? round1Profiles
+      .map((candidate) => candidate.round1_position_probabilities_recency_weighted[historicalPosition])
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+    : historicalProfiles
+      .map((candidate) => candidate.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition])
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
   const leagueProbability = leagueValues.length
     ? leagueValues.reduce((sum, value) => sum + value, 0) / leagueValues.length
     : 0;
