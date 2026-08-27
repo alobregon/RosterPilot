@@ -41,7 +41,26 @@ For a simulated opponent pick with an assigned historical manager, the position 
 
 This ordering matters: sequence information **replaces/refines** the coarse phase tendency instead of being added as a second independent bonus. Round 1 likewise no longer inherits a manager's combined Rounds 1-4 preference. That prevents a manager who accumulates RBs across Rounds 2-4 from being incorrectly treated as an unusually strong Round-1 RB drafter.
 
-The resulting effective position probability is converted into the existing bounded manager-history score. The simulator still considers only the top 12 current market candidates, so historical behavior cannot create extreme reaches.
+The resulting effective position probability is converted into a bounded manager-history score. The simulator still considers only the top 12 current market candidates, so historical behavior cannot create extreme reaches.
+
+## Round 1 guardrail
+
+Round 1 has less conditional information than later picks because the manager has not built any sequence yet. To keep the current board authoritative, the Round-1 manager-position adjustment is capped at **±3 score points** before the standard history weight is applied. Later sequence-conditioned picks retain the broader ±8 cap.
+
+This means a strong first-pick preference can break a close RB/WR decision, but it should not routinely erase several market slots. With the simulator's 3-point market penalty per candidate slot, the Round-1 history cap is deliberately sized as a close-call modifier rather than a license to manufacture a reach.
+
+## Per-mock variation
+
+Each newly started simulation receives a fresh random run seed. The seed is stored with the draft configuration and used only to generate the existing small ±1.5 close-call variation.
+
+The important behavior is:
+
+- the same mock and same seed produce the same opponent choice from the same state;
+- refreshing or restoring that mock keeps the seed and therefore keeps future close choices stable;
+- restarting and starting a new simulation generates a new seed;
+- a new seed can change genuinely close choices, but it cannot overcome large current-market gaps by itself.
+
+This provides draft-to-draft variety without turning opponent selection into unrestricted randomness.
 
 ## Sunny-D Round 1 example
 
@@ -55,6 +74,12 @@ Using only his actual Round-1 selections with the same 0.85 recency decay gives 
 | WR | 41.2% | 41.1% |
 
 The manager-specific signal at his first pick is therefore small. On the 2026 board where Puka Nacua is the top remaining market player and Christian McCaffrey is several market slots lower, Round-1 history should not overpower the current board.
+
+## Dixie Round 1 example
+
+Dixie has a much stronger legitimate first-pick RB history: approximately **69.9% RB / 30.1% WR** after recency weighting, versus a league Round-1 average around **55.9% RB / 41.1% WR**.
+
+That should make Dixie more likely than most managers to take an RB when the values are close. The ±3 Round-1 cap prevents that preference from automatically moving an RB several market slots ahead of a clearly stronger current-year WR. Because the per-mock variation is small, a borderline choice can differ between mocks while the current market remains the dominant signal.
 
 ## Sunny-D RB-RB example
 
@@ -92,7 +117,7 @@ Historical behavior remains a bounded tie-breaker. Simulated opponent selection 
 3. Round-1 or sequence-conditioned manager tendency;
 4. manager-specific historical roster construction;
 5. optional room-profile pressure;
-6. small deterministic jitter for close ties.
+6. small per-mock seeded variation for close ties.
 
 The candidate window remains the top 12 current market players.
 
