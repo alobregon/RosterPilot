@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   autoDraftOpponentsUntilUserTurn,
   hasLegalStartingRoster,
+  historicalRosterConstructionBias,
   historicalSequencePositionProbability,
   simulateDeterministicDraft,
   simulateNextOpponentPick,
@@ -144,6 +145,35 @@ describe('interactive draft simulator', () => {
     expect(rbAfterTwo).toBeCloseTo(0.268, 3);
     expect(wrAfterTwo).toBeCloseTo(0.546, 3);
     expect(wrAfterTwo ?? 0).toBeGreaterThan(rbAfterTwo ?? 0);
+  });
+
+  it('nudges an RB-heavy roster toward the manager historical roster shape', () => {
+    const roster: PlayerRanking[] = [
+      { id: 'rb-a', name: 'RB A', position: 'RB', overallRank: 1 },
+      { id: 'rb-b', name: 'RB B', position: 'RB', overallRank: 2 },
+      { id: 'rb-c', name: 'RB C', position: 'RB', overallRank: 3 },
+      { id: 'rb-d', name: 'RB D', position: 'RB', overallRank: 4 },
+      { id: 'wr-a', name: 'WR A', position: 'WR', overallRank: 5 },
+    ];
+
+    const wrBias = historicalRosterConstructionBias({
+      managerId: 'Hansel',
+      position: 'WR',
+      roster,
+      config,
+    });
+    const rbBias = historicalRosterConstructionBias({
+      managerId: 'Hansel',
+      position: 'RB',
+      roster,
+      config,
+    });
+
+    expect(wrBias).not.toBeNull();
+    expect(rbBias).not.toBeNull();
+    expect(wrBias ?? 0).toBeGreaterThan(0);
+    expect(rbBias ?? 0).toBeLessThan(0);
+    expect(wrBias ?? 0).toBeGreaterThan(rbBias ?? 0);
   });
 
   it('uses the sequence-aware history to avoid blindly extending an RB-RB start', () => {
