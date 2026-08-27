@@ -1,6 +1,6 @@
 # 2026 Offseason Context Journal
 
-RosterPilot's offseason context journal is a small, curated grounding layer for the future AI coach. It exists to capture **what changed since last season** without asking an LLM to rediscover every relevant fact on draft night.
+RosterPilot's offseason context journal is a small, curated grounding layer for the draft decision engine and future AI coach. It exists to capture **what changed since last season** without asking an LLM to rediscover every relevant fact on draft night.
 
 The machine-readable journal is split into a base file plus source-specific supplements:
 
@@ -15,6 +15,12 @@ The TypeScript access layer merges those files by source and entry ID:
 
 ```text
 apps/draft-companion/lib/offseason-context.ts
+```
+
+The on-clock scoring adapter lives separately:
+
+```text
+apps/draft-companion/lib/context-signal.ts
 ```
 
 A supplemental source or entry with an existing ID replaces the base record. This lets us correct metadata or upgrade a source from `PENDING_EXCERPT` to `INGESTED` without rewriting the large base journal.
@@ -68,7 +74,7 @@ Schedule-strength claims are also analyst context rather than hard player projec
 
 Conflicts are useful information and should remain in the journal.
 
-For example, one source may see a running back's expanding camp role as a value signal while another considers the same player overpriced because of injury history or competition. RosterPilot should preserve both pieces of evidence and let the eventual AI coach explain the tradeoff.
+For example, one source may see a running back's expanding camp role as a value signal while another considers the same player overpriced because of injury history or competition. RosterPilot should preserve both pieces of evidence and let the decision layer or eventual AI coach explain the tradeoff.
 
 Do not silently average conflicting claims into a false consensus.
 
@@ -147,11 +153,41 @@ The Sports Illustrated Aug. 6 WR-sleepers article adds four mid-round receiver c
 
 The article's sleeper labels, ceiling calls and advice to reach or wait remain `SOURCE_ANALYST` outlooks. ADP references, injuries and depth-chart context are marked time-sensitive so they can be refreshed before draft night.
 
+## Use by the on-clock decision engine
+
+The journal now contributes a **bounded final tie-breaker** to `recommendForCurrentPick`. It does not modify imported ranks, tiers, ADP, survival probability, or the deterministic base-factor breakdown.
+
+The context adapter:
+
+- converts positive/negative outlook direction, confidence and origin into a small signed contribution;
+- caps the combined effect at **+/-3 raw recommendation-score points**;
+- gives source consensus slightly more weight than one analyst, and gives explicit RosterPilot inference less weight than a source-authored outlook;
+- preserves `SOURCE_CONFLICT` as weak evidence rather than treating it as consensus;
+- suppresses context for K/DST;
+- emits a source-labeled explanation when context materially affects a displayed candidate.
+
+Most importantly, rank and tier discipline shrink the adjustment as a player moves away from the best-ranked serious candidate. The current rank-gap windows are intentionally tight early and wider later:
+
+```text
+Rounds 1-2: full within 1 rank; no context boost beyond 4 ranks
+Rounds 3-4: full within 2 ranks; no context boost beyond 6 ranks
+Rounds 5-8: full within 3 ranks; no context boost beyond 9 ranks
+Rounds 9+:  full within 4 ranks; no context boost beyond 12 ranks
+```
+
+A one-tier disadvantage halves the remaining context adjustment. A two-tier-or-greater disadvantage suppresses it entirely.
+
+That guardrail encodes the draft-walkthrough lesson directly: context can help Amon-Ra over a nearly identical early-round alternative, help Ladd/Reed/Lemon in close mid-round decisions, but cannot turn a compelling article into permission to jump a meaningful ECR/tier gap such as a lower-ranked Tier-3 player over the final Tier-2 value.
+
+Regression coverage lives in:
+
+```text
+apps/draft-companion/tests/context-signal.test.ts
+```
+
 ## Use by the future AI coach
 
-The journal does **not** currently change deterministic recommendation scores.
-
-At an on-clock decision, a future context builder can retrieve only the entries associated with the few serious candidates:
+The deterministic tie-breaker uses only the compact directional signal. A future AI coach can still retrieve the richer entries associated with the few serious candidates:
 
 ```ts
 getOffseasonContextForPlayers(
