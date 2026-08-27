@@ -22,16 +22,19 @@
 ## Interactive simulator
 - [ ] Select **Draft Simulator** mode before starting.
 - [ ] With Historical manager data off, confirm **Normal / rank order** follows the current market board and never auto-selects the user's pick.
-- [ ] Enable Historical manager data, assign managers, restart the simulation, and confirm close opponent choices can differ from pure rank order while remaining within the top current market candidates.
+- [ ] Enable Historical manager data, assign managers, restart the simulation, and confirm close opponent choices can differ from pure rank order while remaining within the allowed current-market candidate window.
 - [ ] Confirm personalized opponent picks respond to roster need (for example, a manager who already filled TE is less likely to keep taking TE solely because of historical tendency).
 - [ ] Confirm Round 1 uses the dedicated recency-weighted first-pick tendency instead of the broader Rounds 1-4 phase distribution.
 - [ ] Confirm the Round-1 historical adjustment is only a close-call nudge: a strong manager preference should not routinely jump several current-market slots.
 - [ ] Dixie Round-1 regression with the 2026 board: when Gibbs, Bijan, and Jonathan Taylor are already gone, confirm Ja'Marr Chase normally remains ahead of Christian McCaffrey rather than Dixie's RB history automatically forcing CMC upward.
 - [ ] Sunny-D Round-1 regression with the 2026 rankings: after Gibbs, Bijan, Ja'Marr Chase, and Jonathan Taylor are drafted at picks 1-4, confirm Sunny-D at #5 normally takes **Puka Nacua** rather than Christian McCaffrey in Normal room mode.
+- [ ] Confirm simulator tolerance widens by round: R1 top 10 / 3.0 market-slot penalty / ±3 history; R2-4 top 12 / 2.5 / ±5; R5-8 top 16 / 1.75 / ±7; R9-12 top 20 / 1.25 / ±9; R13+ top 24 / 0.9 / ±10.
+- [ ] In middle/late rounds, confirm roster construction and manager history can plausibly select a player farther down the available market board than would be reasonable in Round 1.
+- [ ] In late rounds, confirm personalized picks never consider players outside the configured top-24 available market window.
 - [ ] Confirm manager history is **sequence-aware** rather than a repeated phase bonus: after a manager takes the same position twice, the third-pick tendency should reflect that manager's actual repeat/streak history.
 - [ ] Sunny-D regression: after an `RB-RB` start in Round 3, confirm close WR/RB choices favor WR rather than blindly extending the broad early-RB tendency. RB-RB-RB should remain possible only when current market value is strong enough to overcome the conditional history.
 - [ ] Confirm manager-specific historical roster construction nudges depth picks toward each manager's typical final roster shape without overriding starter/FLEX needs.
-- [ ] Run the same simulator setup multiple times using Restart Draft + Start Draft and confirm some genuinely close opponent decisions can vary between mocks.
+- [ ] Run the same simulator setup multiple times using Restart Draft + Start Draft and confirm some genuinely close opponent decisions can vary between mocks, with somewhat more variation visible later in the draft than in Round 1.
 - [ ] During one mock, refresh or restore its backup and confirm the saved simulation seed keeps subsequent close decisions stable from the same draft state.
 - [ ] Confirm disabling Historical manager data returns Normal mode to pure market-order opponent picks.
 - [ ] Confirm **Instant to my pick** fills opponent selections immediately and stops on the user's turn.
