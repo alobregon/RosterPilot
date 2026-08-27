@@ -185,6 +185,57 @@ describe('interactive draft simulator', () => {
     expect(result.find((pick) => pick.overallPick === 5)?.playerId).toBe('puka-nacua-wr-lar');
   });
 
+  it('caps Round 1 history so Dixie does not routinely jump three market slots for RB', () => {
+    const players: PlayerRanking[] = [
+      { id: 'jahmyr-gibbs-rb-det', name: 'Jahmyr Gibbs', position: 'RB', overallRank: 1, adp: 1 },
+      { id: 'bijan-robinson-rb-atl', name: 'Bijan Robinson', position: 'RB', overallRank: 2, adp: 2 },
+      { id: 'ja-marr-chase-wr-cin', name: "Ja'Marr Chase", position: 'WR', overallRank: 3, adp: 3 },
+      { id: 'puka-nacua-wr-lar', name: 'Puka Nacua', position: 'WR', overallRank: 4, adp: 4 },
+      { id: 'jaxon-smith-njigba-wr-sea', name: 'Jaxon Smith-Njigba', position: 'WR', overallRank: 5, adp: 7 },
+      { id: 'jonathan-taylor-rb-ind', name: 'Jonathan Taylor', position: 'RB', overallRank: 6, adp: 6 },
+      { id: 'christian-mccaffrey-rb-sf', name: 'Christian McCaffrey', position: 'RB', overallRank: 7, adp: 5 },
+    ];
+    const picks = [
+      draftPickAtOverall(1, 'jahmyr-gibbs-rb-det', 10),
+      draftPickAtOverall(2, 'bijan-robinson-rb-atl', 10),
+      draftPickAtOverall(3, 'jonathan-taylor-rb-ind', 10),
+    ];
+    const managerIds = ['', '', '', 'Dixie', '', '', '', '', '', ''];
+
+    const result = simulateNextOpponentPick({
+      players,
+      picks,
+      config: { ...tenTeamConfig, simulationSeed: 'dixie-market-regression' },
+      currentOverallPick: 4,
+      roomProfile: 'RANK_ORDER',
+      managerIds,
+    });
+
+    expect(result.find((pick) => pick.overallPick === 4)?.playerId).toBe('ja-marr-chase-wr-cin');
+  });
+
+  it('keeps one mock stable while allowing different seeds to change close picks', () => {
+    const players: PlayerRanking[] = [
+      { id: 'top-wr', name: 'Top WR', position: 'WR', overallRank: 1, adp: 1 },
+      { id: 'close-rb', name: 'Close RB', position: 'RB', overallRank: 2, adp: 2 },
+    ];
+    const managerIds = ['Sunny-DCommissioner', '', '', '', '', '', '', '', '', ''];
+
+    const run = (simulationSeed: string) =>
+      simulateNextOpponentPick({
+        players,
+        picks: [],
+        config: { ...tenTeamConfig, simulationSeed },
+        currentOverallPick: 1,
+        roomProfile: 'RANK_ORDER',
+        managerIds,
+      })[0]?.playerId;
+
+    expect(run('seed-0')).toBe('top-wr');
+    expect(run('seed-0')).toBe('top-wr');
+    expect(run('seed-1')).toBe('close-rb');
+  });
+
   it('conditions Sunny-D early-round tendencies on an RB-RB start', () => {
     const rbAfterOne = historicalSequencePositionProbability({
       managerId: 'Sunny-DCommissioner',
