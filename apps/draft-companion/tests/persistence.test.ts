@@ -36,7 +36,11 @@ describe('draft persistence', () => {
       savedAt: new Date('2026-08-19T22:00:00-05:00'),
     });
     const parsed = parseDraftSnapshot(raw);
-    expect(parsed?.config).toEqual(config);
+    expect(parsed?.config).toEqual({
+      ...config,
+      teamNamesEnabled: true,
+      historicalManagersEnabled: true,
+    });
     expect(parsed?.players).toEqual(players);
     expect(parsed?.picks).toEqual(picks);
     expect(parsed?.favoritePlayerIds).toEqual(['wr-dal']);
@@ -73,7 +77,8 @@ describe('draft persistence', () => {
     expect(parsed?.favoritePlayerIds).toEqual([]);
     expect(parsed?.teamNames).toEqual(Array.from({ length: 10 }, () => ''));
     expect(parsed?.managerIds).toEqual(Array.from({ length: 10 }, () => ''));
+    expect(parsed?.config.teamNamesEnabled).toBe(false);
+    expect(parsed?.config.historicalManagersEnabled).toBe(false);
     expect(parsed?.draftStarted).toBe(true);
   });
-
 });
