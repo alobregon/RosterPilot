@@ -1,0 +1,281 @@
+{
+  "season": 2026,
+  "version": 2,
+  "updatedAt": "2026-08-27",
+  "sources": [
+    {
+      "id": "yahoo-lindys-amonra-schedule-2026",
+      "publisher": "Yahoo Sports / Lindy's Sports",
+      "title": "Should You Draft Amon-Ra St Brown, Justin Jefferson Before Puka Nucua?",
+      "url": "https://sports.yahoo.com/articles/draft-amon-ra-st-brown-210300837.html",
+      "status": "INGESTED",
+      "notes": "Schedule-strength argument is analyst context, not a projection guarantee. Article was syndicated by Yahoo Sports from Lindy's Sports."
+    },
+    {
+      "id": "phillyvoice-rb-rankings-2026",
+      "publisher": "PhillyVoice",
+      "title": "2026 fantasy football RB rankings: Will age, mileage catch up to Saquon Barkley, Derrick Henry and Christian McCaffrey?",
+      "url": "https://www.phillyvoice.com/2026-fantasy-football-running-back-rankings-stats-analysis-saquon-barkley-bijan-robinson-jahmyr-gibbs/",
+      "status": "INGESTED",
+      "notes": "Rankings, breakout calls, fades and workload expectations are stored as source-analyst opinions; current injuries, team changes and historical workload/stat facts are kept separate."
+    }
+  ],
+  "entries": [
+    {
+      "id": "yahoo-amonra-2026-schedule-context",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Amon-Ra St. Brown", "team": "DET" }
+      ],
+      "categories": ["SCHEDULE", "ADP"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        {
+          "summary": "The 2026 Lions schedule includes two games against Chicago and games against the AFC East.",
+          "sourceIds": ["yahoo-lindys-amonra-schedule-2026"]
+        },
+        {
+          "summary": "The article describes St. Brown as WR4 on Yahoo's draft board at publication time.",
+          "sourceIds": ["yahoo-lindys-amonra-schedule-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "LOW_MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "The article views St. Brown's schedule as unusually favorable and argues that matchup strength can support taking him ahead of some similarly priced elite receivers. Schedule-strength assessments are volatile and should remain a small tie-breaker."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-gibbs-expanded-role",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jahmyr Gibbs", "team": "DET" },
+        { "kind": "PLAYER", "name": "David Montgomery", "team": "HOU" }
+      ],
+      "categories": ["BACKFIELD_COMPETITION", "TEAM_CHANGE", "ROLE_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "David Montgomery is now with Houston after sharing Detroit backfield snaps, short-yardage work and goal-line work with Gibbs in 2025.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice ranks Gibbs as its RB1 and expects Montgomery's departure to create room for a larger workload, including valuable short-yardage and goal-line opportunities."
+      }
+    },
+    {
+      "id": "phillyvoice-cmc-age-efficiency-risk",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Christian McCaffrey", "team": "SF" }
+      ],
+      "categories": ["AGE", "WORKLOAD", "EFFICIENCY", "INJURY_HISTORY"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "McCaffrey produced 2,126 yards from scrimmage in 2025 and caught 102 passes.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        },
+        {
+          "summary": "The article notes that McCaffrey averaged under 4.0 yards per carry for the first time in his nine-year career.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "MIXED_NEGATIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice still ranks McCaffrey as an elite option but sees age, injury history, declining rushing efficiency and likely regression from 102 receptions as meaningful downside risk."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-saquon-mileage-scheme",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Saquon Barkley", "team": "PHI" }
+      ],
+      "categories": ["WORKLOAD", "SCHEME_CHANGE", "OFFENSIVE_LINE", "AGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "The article counts 828 Barkley touches across the past two seasons including regular season and playoffs.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        },
+        {
+          "summary": "PhillyVoice describes Philadelphia's 2026 offense as moving toward wide zone and says the offensive line appears healthier.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "MIXED",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "The source still views Barkley as a high-end talent but flags cumulative workload and age as decline risks while noting the new run scheme and healthier line could help."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-kenneth-walker-kc-upside",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Kenneth Walker III", "team": "KC" },
+        { "kind": "PLAYER", "name": "Patrick Mahomes", "team": "KC" }
+      ],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_ROLE", "OFFENSIVE_LINE", "QB_HEALTH"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "Kenneth Walker III joined Kansas City after playing in Seattle.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        },
+        {
+          "summary": "The article reports that Kansas City plans to lean more on the run while Patrick Mahomes works back from ACL surgery.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice expects a career season for Walker, citing less backfield competition, a larger projected workload and a stronger offensive-line environment in Kansas City."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-omarion-hampton-mcdaniel-fit",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Omarion Hampton", "team": "LAC" },
+        { "kind": "PLAYER", "name": "Mike McDaniel", "team": "LAC" }
+      ],
+      "categories": ["COACHING_CHANGE", "BACKFIELD_ROLE", "SCHEME_CHANGE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        {
+          "summary": "Mike McDaniel is the Chargers' offensive coordinator for 2026.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice identifies Hampton as a breakout candidate because it expects McDaniel's run-heavy approach to support a large workload and Hampton also contributes as a receiver."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-ashton-jeanty-kubiak-fit",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Ashton Jeanty", "team": "LV" },
+        { "kind": "PLAYER", "name": "Klint Kubiak", "team": "LV" }
+      ],
+      "categories": ["COACHING_CHANGE", "SCHEME_CHANGE", "BACKFIELD_ROLE", "INJURY"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "The Raiders are operating under head coach Klint Kubiak, and the article reports Jeanty is dealing with an ankle sprain.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice expects Kubiak's scheme to fit Jeanty better and projects him to lead the Raiders in touches if healthy, while the ankle sprain adds near-term uncertainty."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-etienne-new-orleans-upside",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Travis Etienne Jr.", "team": "NO" },
+        { "kind": "PLAYER", "name": "Alvin Kamara", "team": "NO" }
+      ],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_COMPETITION", "SCHEME_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "Etienne joined New Orleans, where Alvin Kamara remains in the backfield.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice believes the change of team and Kellen Moore's faster-paced offense could unlock a top-10 RB outcome for Etienne even with Kamara taking some snaps."
+      }
+    },
+    {
+      "id": "phillyvoice-achane-offense-fade",
+      "subjects": [
+        { "kind": "PLAYER", "name": "De'Von Achane", "team": "MIA" }
+      ],
+      "categories": ["COACHING_CHANGE", "ROLE_RISK", "TARGET_VOLUME", "ADP"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        {
+          "summary": "Miami enters 2026 without Mike McDaniel calling the offense, and the article notes Achane averaged 73 receptions per season across 2024-2025.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "NEGATIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice fades Achane at his Round 2-3 price because it doubts his recent touch and receiving volume will carry over into Miami's new offensive environment."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-bucky-irving-competition",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Bucky Irving", "team": "TB" },
+        { "kind": "PLAYER", "name": "Kenneth Gainwell", "team": "TB" },
+        { "kind": "PLAYER", "name": "Sean Tucker", "team": "TB" }
+      ],
+      "categories": ["BACKFIELD_COMPETITION", "TEAM_CHANGE", "ROLE_RISK"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "Tampa Bay signed Kenneth Gainwell to a two-year, $14 million deal, while Sean Tucker remains part of the backfield.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "NEGATIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice interprets Gainwell's contract as evidence that Irving may lose meaningful third-down and receiving work and could operate in a committee."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "phillyvoice-josh-jacobs-risk",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Josh Jacobs", "team": "GB" }
+      ],
+      "categories": ["AGE", "EFFICIENCY", "SUSPENSION_RISK", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "The article notes Jacobs averaged 4.0 yards per carry and 4.5 yards per touch in 2025, both below his career averages.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        },
+        {
+          "summary": "The article says Jacobs could face a suspension tied to an offseason incident.",
+          "sourceIds": ["phillyvoice-rb-rankings-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "NEGATIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "PhillyVoice views Jacobs as a buyer-beware candidate because mileage, efficiency decline and possible suspension risk could compound quickly."
+      },
+      "timeSensitive": true
+    }
+  ]
+}
