@@ -64,11 +64,12 @@ export interface DraftConfig {
   kStarters: number;
   benchSpots: number;
   draftStrategy?: DraftStrategy;
-  /**
-   * Enables optional opponent labels and historical-manager assignments.
-   * Undefined is retained for backward compatibility with older snapshots.
-   */
+  /** Legacy combined toggle retained so older v1 snapshots still restore. */
   opponentDetailsEnabled?: boolean;
+  /** Enables editable team labels. Saved labels are retained while disabled. */
+  teamNamesEnabled?: boolean;
+  /** Enables Purple League historical-manager assignments and V1 modeling. */
+  historicalManagersEnabled?: boolean;
   /** Live manual entry or interactive mock-draft simulator. */
   draftMode?: DraftMode;
   /** Opponent behavior used only by interactive simulator mode. */
