@@ -1,4 +1,5 @@
 import managerProfilesData from '../../../research/league_manager_profiles_2013_2025.json';
+import sequenceProfilesData from '../../../research/league_manager_sequence_profiles_2013_2025.json';
 import { draftPickAtOverall } from './corrections';
 import { draftSlotForOverallPick } from './draft';
 import { recommendPlayers } from './recommendation';
@@ -15,6 +16,8 @@ export type RoomProfile = SimulationRoomProfile;
 
 type HistoricalPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 type DraftPhase = 'R1_4' | 'R5_8' | 'R9_12' | 'R13_16';
+type SequenceStat = [number, number, Partial<Record<HistoricalPosition, number>>];
+type RepeatStat = [number, number, number];
 
 interface SimulatorManagerProfile {
   manager_id: string;
@@ -22,7 +25,16 @@ interface SimulatorManagerProfile {
   phase_position_probabilities_recency_weighted: Record<DraftPhase, Record<HistoricalPosition, number>>;
 }
 
+interface SimulatorSequenceProfile {
+  manager_id: string;
+  draft_count: number;
+  early_prefix_next: Record<string, SequenceStat>;
+  repeat_rounds2_8: RepeatStat;
+  extend_two_same_rounds3_8: RepeatStat;
+}
+
 const historicalProfiles = managerProfilesData.profiles as unknown as SimulatorManagerProfile[];
+const sequenceProfiles = sequenceProfilesData.profiles as unknown as SimulatorSequenceProfile[];
 const HISTORICAL_CANDIDATE_WINDOW = 12;
 const MARKET_SLOT_PENALTY = 3;
 const ROSTER_NEED_WEIGHT = 0.09;
@@ -30,6 +42,9 @@ const HISTORY_WEIGHT = 1.05;
 const ROOM_PROFILE_BONUS = 10;
 const MAX_MANAGER_POSITION_BIAS = 8;
 const JITTER_AMPLITUDE = 1.5;
+const REPEAT_PRIOR_WEIGHT = 6;
+const STREAK_PRIOR_WEIGHT = 4;
+const EARLY_PREFIX_PRIOR_WEIGHT = 3;
 
 export interface DraftSimulationResult {
   picks: DraftPick[];
@@ -54,7 +69,7 @@ export interface DeterministicDraftSimulationResult extends DraftSimulationResul
  *
  * When a historical manager ID is supplied for the slot, the simulator keeps
  * current rankings/ADP dominant but allows roster need and the manager's
- * recency-weighted positional tendencies to break close calls. The historical
+ * recency-weighted sequence tendencies to break close calls. The historical
  * path is restricted to the top 12 current market candidates so old behavior
  * cannot manufacture extreme reaches.
  */
@@ -242,6 +257,69 @@ export function hasLegalStartingRoster(counts: Record<Position, number>, config:
   return skillPlayers >= requiredSkillPlayers;
 }
 
+/**
+ * Returns the recency-weighted effective historical probability for a manager
+ * selecting a position after the supplied prior position sequence.
+ *
+ * This is a hierarchical backoff model:
+ *   phase tendency -> same-position repeat behavior -> two-pick streak behavior
+ *   -> exact first-four prefix when that prefix has historical observations.
+ *
+ * Every conditional layer is shrunk toward the broader layer beneath it, so a
+ * one-season pattern cannot overpower the current market.
+ */
+export function historicalSequencePositionProbability(args: {
+  managerId: string;
+  position: Position;
+  round: number;
+  priorPositions: readonly Position[];
+}): number | null {
+  const profile = historicalProfiles.find((candidate) => candidate.manager_id === args.managerId);
+  if (!profile) return null;
+
+  const phase = phaseForRound(args.round);
+  const base = normalizeDistribution(profile.phase_position_probabilities_recency_weighted[phase]);
+  const sequenceProfile = sequenceProfiles.find((candidate) => candidate.manager_id === args.managerId);
+  if (!sequenceProfile || !args.priorPositions.length) {
+    return base[historyPosition(args.position)];
+  }
+
+  let distribution = { ...base };
+  const priorHistory = args.priorPositions.map(historyPosition);
+  const lastPosition = priorHistory[priorHistory.length - 1];
+
+  if (args.round >= 2 && args.round <= 8) {
+    distribution = conditionOnRepeat(
+      distribution,
+      lastPosition,
+      sequenceProfile.repeat_rounds2_8,
+      REPEAT_PRIOR_WEIGHT,
+    );
+
+    if (
+      priorHistory.length >= 2 &&
+      priorHistory[priorHistory.length - 2] === lastPosition
+    ) {
+      distribution = conditionOnRepeat(
+        distribution,
+        lastPosition,
+        sequenceProfile.extend_two_same_rounds3_8,
+        STREAK_PRIOR_WEIGHT,
+      );
+    }
+  }
+
+  if (args.round >= 2 && args.round <= 4) {
+    const prefix = priorHistory.slice(0, args.round - 1).join('>');
+    const prefixStat = sequenceProfile.early_prefix_next[prefix];
+    if (prefixStat) {
+      distribution = posteriorDistribution(prefixStat, distribution, EARLY_PREFIX_PRIOR_WEIGHT);
+    }
+  }
+
+  return distribution[historyPosition(args.position)];
+}
+
 function chooseOpponentPlayer(args: {
   available: PlayerRanking[];
   roomProfile: RoomProfile;
@@ -270,7 +348,7 @@ function chooseOpponentPlayer(args: {
     const player = candidates[index];
     const marketScore = 100 - index * MARKET_SLOT_PENALTY;
     const rosterNeed = opponentRosterNeedScore(player.position, roster, config, round) * ROSTER_NEED_WEIGHT;
-    const historyBias = managerPositionBias(managerId, player.position, round) * HISTORY_WEIGHT;
+    const historyBias = managerPositionBias(managerId, player.position, round, roster) * HISTORY_WEIGHT;
     const roomBias = preferred === player.position ? ROOM_PROFILE_BONUS : 0;
     const jitter = deterministicJitter(`${managerId}|${overallPick}|${player.id}`) * JITTER_AMPLITUDE;
     const score = marketScore + rosterNeed + historyBias + roomBias + jitter;
@@ -293,12 +371,27 @@ function marketOrderValue(player: PlayerRanking): number {
   return player.overallRank * 0.7 + adp * 0.3;
 }
 
-function managerPositionBias(managerId: string, position: Position, round: number): number {
+function managerPositionBias(
+  managerId: string,
+  position: Position,
+  round: number,
+  roster: PlayerRanking[],
+): number {
   const profile = historicalProfiles.find((candidate) => candidate.manager_id === managerId);
   if (!profile) return 0;
+
   const phase = phaseForRound(round);
-  const historicalPosition = position === 'DST' ? 'DEF' : position;
-  const managerProbability = profile.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition] ?? 0;
+  const historicalPosition = historyPosition(position);
+  const sequenceProbability = historicalSequencePositionProbability({
+    managerId,
+    position,
+    round,
+    priorPositions: roster.map((player) => player.position),
+  });
+  const managerProbability =
+    sequenceProbability ??
+    profile.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition] ??
+    0;
   const leagueValues = historicalProfiles
     .map((candidate) => candidate.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition])
     .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
@@ -306,7 +399,80 @@ function managerPositionBias(managerId: string, position: Position, round: numbe
     ? leagueValues.reduce((sum, value) => sum + value, 0) / leagueValues.length
     : 0;
   const confidence = clamp(profile.draft_count / 10, 0.35, 1);
-  return clamp((managerProbability - leagueProbability) * 70 * confidence, -MAX_MANAGER_POSITION_BIAS, MAX_MANAGER_POSITION_BIAS);
+  return clamp(
+    (managerProbability - leagueProbability) * 70 * confidence,
+    -MAX_MANAGER_POSITION_BIAS,
+    MAX_MANAGER_POSITION_BIAS,
+  );
+}
+
+function posteriorDistribution(
+  stat: SequenceStat,
+  prior: Record<HistoricalPosition, number>,
+  priorWeight: number,
+): Record<HistoricalPosition, number> {
+  const [, weightedTotal, weightedCounts] = stat;
+  const denominator = weightedTotal + priorWeight;
+  if (denominator <= 0) return prior;
+
+  return HISTORICAL_POSITIONS.reduce<Record<HistoricalPosition, number>>((result, position) => {
+    result[position] = ((weightedCounts[position] ?? 0) + priorWeight * prior[position]) / denominator;
+    return result;
+  }, emptyHistoricalDistribution());
+}
+
+function conditionOnRepeat(
+  prior: Record<HistoricalPosition, number>,
+  repeatedPosition: HistoricalPosition,
+  stat: RepeatStat,
+  priorWeight: number,
+): Record<HistoricalPosition, number> {
+  const [, weightedTotal, weightedSame] = stat;
+  const previousProbability = prior[repeatedPosition];
+  const denominator = weightedTotal + priorWeight;
+  if (denominator <= 0) return prior;
+
+  const repeatProbability = clamp(
+    (weightedSame + priorWeight * previousProbability) / denominator,
+    0,
+    1,
+  );
+  const remainingPrior = Math.max(0, 1 - previousProbability);
+  const result = { ...prior, [repeatedPosition]: repeatProbability };
+
+  if (remainingPrior <= 1e-9) {
+    for (const position of HISTORICAL_POSITIONS) {
+      if (position !== repeatedPosition) result[position] = 0;
+    }
+    return result;
+  }
+
+  const scale = (1 - repeatProbability) / remainingPrior;
+  for (const position of HISTORICAL_POSITIONS) {
+    if (position !== repeatedPosition) result[position] = prior[position] * scale;
+  }
+  return result;
+}
+
+function normalizeDistribution(
+  input: Record<HistoricalPosition, number>,
+): Record<HistoricalPosition, number> {
+  const total = HISTORICAL_POSITIONS.reduce((sum, position) => sum + (input[position] ?? 0), 0);
+  if (total <= 0) return emptyHistoricalDistribution();
+  return HISTORICAL_POSITIONS.reduce<Record<HistoricalPosition, number>>((result, position) => {
+    result[position] = (input[position] ?? 0) / total;
+    return result;
+  }, emptyHistoricalDistribution());
+}
+
+const HISTORICAL_POSITIONS: HistoricalPosition[] = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
+
+function emptyHistoricalDistribution(): Record<HistoricalPosition, number> {
+  return { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DEF: 0 };
+}
+
+function historyPosition(position: Position): HistoricalPosition {
+  return position === 'DST' ? 'DEF' : position;
 }
 
 function opponentRosterNeedScore(position: Position, roster: PlayerRanking[], config: DraftConfig, round: number): number {
