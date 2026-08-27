@@ -46,6 +46,39 @@ describe('2026 offseason context journal', () => {
     expect(moore?.outlook?.summary).toContain('more than 100 targets');
   });
 
+  it('keeps the Yahoo Amon-Ra schedule take small and explicitly analyst-authored', () => {
+    expect(getOffseasonContextSource('yahoo-lindys-amonra-schedule-2026')?.status).toBe('INGESTED');
+
+    const schedule = getOffseasonContextForPlayers(['Amon-Ra St. Brown']).find(
+      (entry) => entry.id === 'yahoo-amonra-2026-schedule-context',
+    );
+    expect(schedule?.categories).toContain('SCHEDULE');
+    expect(schedule?.outlook).toMatchObject({
+      origin: 'SOURCE_ANALYST',
+      direction: 'POSITIVE',
+      confidence: 'LOW_MEDIUM',
+    });
+  });
+
+  it('exposes PhillyVoice RB upside and downside without turning opinions into facts', () => {
+    expect(getOffseasonContextSource('phillyvoice-rb-rankings-2026')?.status).toBe('INGESTED');
+
+    const gibbs = getOffseasonContextForPlayers(['Jahmyr Gibbs']).find(
+      (entry) => entry.id === 'phillyvoice-gibbs-expanded-role',
+    );
+    const cmc = getOffseasonContextForPlayers(['Christian McCaffrey']).find(
+      (entry) => entry.id === 'phillyvoice-cmc-age-efficiency-risk',
+    );
+
+    expect(gibbs?.outlook).toMatchObject({
+      origin: 'SOURCE_ANALYST',
+      direction: 'POSITIVE',
+      confidence: 'MEDIUM_HIGH',
+    });
+    expect(cmc?.facts.some((fact) => fact.summary.includes('2,126 yards from scrimmage'))).toBe(true);
+    expect(cmc?.outlook?.direction).toBe('MIXED_NEGATIVE');
+  });
+
   it('returns the Ladd McConkey environment entries with explicit inference labels', () => {
     const entries = getOffseasonContextForPlayers(['Ladd McConkey']);
     const environment = entries.find((entry) => entry.id === 'lac-ladd-2026-environment');
