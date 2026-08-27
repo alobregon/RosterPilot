@@ -1,9 +1,16 @@
 import { draftPickAtOverall } from './corrections';
 import { draftSlotForOverallPick } from './draft';
 import { recommendPlayers } from './recommendation';
-import type { DraftConfig, DraftPick, PlayerRanking, Position, Recommendation } from './types';
+import type {
+  DraftConfig,
+  DraftPick,
+  PlayerRanking,
+  Position,
+  Recommendation,
+  SimulationRoomProfile,
+} from './types';
 
-export type RoomProfile = 'RANK_ORDER' | 'RB_RUSH' | 'WR_RUSH' | 'QB_RUSH' | 'TE_RUSH' | 'DST_EARLY';
+export type RoomProfile = SimulationRoomProfile;
 
 export interface DraftSimulationResult {
   picks: DraftPick[];
@@ -19,6 +26,69 @@ export interface RecommendationSnapshot {
 export interface DeterministicDraftSimulationResult extends DraftSimulationResult {
   userCounts: Record<Position, number>;
   userRecommendations: RecommendationSnapshot[];
+}
+
+/**
+ * Adds exactly one simulated opponent pick. If the supplied pick belongs to
+ * the user, the draft is returned unchanged so the interactive UI can stop
+ * and let the user make the decision.
+ */
+export function simulateNextOpponentPick(args: {
+  players: PlayerRanking[];
+  picks: DraftPick[];
+  config: DraftConfig;
+  currentOverallPick: number;
+  roomProfile?: SimulationRoomProfile;
+}): DraftPick[] {
+  const { players, picks, config, currentOverallPick } = args;
+  if (draftSlotForOverallPick(currentOverallPick, config.teamCount) === config.userDraftSlot) return picks;
+  if (currentOverallPick > config.teamCount * totalRosterSlots(config)) return picks;
+
+  const drafted = new Set(picks.map((pick) => pick.playerId));
+  const available = players.filter((player) => !drafted.has(player.id));
+  if (!available.length) return picks;
+
+  const selected = chooseOpponentPlayer(
+    available,
+    args.roomProfile ?? config.simulationRoomProfile ?? 'RANK_ORDER',
+    currentOverallPick,
+    config.teamCount,
+  );
+  return [...picks, draftPickAtOverall(currentOverallPick, selected.id, config.teamCount)]
+    .sort((a, b) => a.overallPick - b.overallPick);
+}
+
+/**
+ * Fills simulated opponent selections until the user's next pick. This is the
+ * fast path used by interactive Simulator mode. It never auto-selects a user
+ * player.
+ */
+export function autoDraftOpponentsUntilUserTurn(args: {
+  players: PlayerRanking[];
+  picks: DraftPick[];
+  config: DraftConfig;
+  currentOverallPick: number;
+  roomProfile?: SimulationRoomProfile;
+}): DraftPick[] {
+  let next = [...args.picks].sort((a, b) => a.overallPick - b.overallPick);
+  let overallPick = args.currentOverallPick;
+  const total = args.config.teamCount * totalRosterSlots(args.config);
+
+  while (
+    overallPick <= total &&
+    draftSlotForOverallPick(overallPick, args.config.teamCount) !== args.config.userDraftSlot
+  ) {
+    const updated = simulateNextOpponentPick({
+      ...args,
+      picks: next,
+      currentOverallPick: overallPick,
+    });
+    if (updated.length === next.length) break;
+    next = updated;
+    overallPick += 1;
+  }
+
+  return next;
 }
 
 export function simulateDraft(args: {
