@@ -8,6 +8,8 @@ on:
       - 'apps/draft-companion/**'
       - 'docs/DRAFT_NIGHT_RUNBOOK.md'
       - 'docs/DRAFT_NIGHT_QA.md'
+      - 'docs/DRAFT_SIMULATOR.md'
+      - 'docs/SIMULATOR_MANAGER_SEQUENCE_MODEL.md'
       - 'docs/OPPONENT_MODEL_V1.md'
       - 'docs/OPPONENT_MODEL_V2.md'
       - 'docs/OPPONENT_MODEL_V2_BACKTEST.md'
@@ -15,6 +17,7 @@ on:
       - 'docs/SURVIVAL_PROBABILITY.md'
       - 'docs/RELEASE_READINESS.md'
       - 'research/README.md'
+      - 'research/league_manager_sequence_profiles_2013_2025.json'
       - 'research/league_manager_adp_profiles_2018_2025.json'
       - 'README.md'
       - 'package.json'
@@ -23,16 +26,21 @@ on:
   pull_request:
     paths:
       - 'apps/draft-companion/**'
+      - 'docs/DRAFT_NIGHT_QA.md'
+      - 'docs/DRAFT_SIMULATOR.md'
+      - 'docs/SIMULATOR_MANAGER_SEQUENCE_MODEL.md'
       - 'docs/OPPONENT_MODEL_V1.md'
       - 'docs/OPPONENT_MODEL_V2.md'
       - 'docs/OPPONENT_MODEL_V2_BACKTEST.md'
       - 'docs/OPPONENT_SURVIVAL_BACKTEST.md'
       - 'docs/SURVIVAL_PROBABILITY.md'
       - 'research/README.md'
+      - 'research/league_manager_sequence_profiles_2013_2025.json'
       - 'research/league_manager_adp_profiles_2018_2025.json'
       - 'README.md'
       - 'package.json'
       - 'vitest.config.ts'
+      - '.github/workflows/draft-companion.yml'
 
 jobs:
   verify:
