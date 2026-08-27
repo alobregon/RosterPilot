@@ -13,7 +13,9 @@ const MIN_TEAM_COLUMN_WIDTH = 122;
 type DraftUiWithTargetsProps = DraftUiProps & {
   targets: UpcomingTarget[];
   managerIds: string[];
+  useOpponentDetails: boolean;
   onManagerId: (index: number, value: string) => void;
+  onUseOpponentDetails: (enabled: boolean) => void;
 };
 
 export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
@@ -25,15 +27,39 @@ export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
   useEffect(() => {
     setHost(targetMode || props.onClock ? document.querySelector('.sideStack') : null);
     setSetupHost(document.querySelector('.teamNamesSection'));
-  }, [targetMode, props.onClock, props.currentOverallPick, props.config.teamCount, props.started]);
+  }, [targetMode, props.onClock, props.currentOverallPick, props.config.teamCount, props.started, props.useOpponentDetails]);
 
-  const { targets, managerIds, onManagerId, ...draftUiProps } = props;
+  const {
+    targets,
+    managerIds,
+    useOpponentDetails,
+    onManagerId,
+    onUseOpponentDetails,
+    ...draftUiProps
+  } = props;
+
+  const opponentDetailsStyle = `
+    .teamNamesSection{display:flex;flex-direction:column}
+    .opponentDetailsToggle{order:-2}
+    .teamNamesSection>.teamNamesHeader{order:-1}
+    .teamNamesSection>.teamNameGrid{order:0}
+    .historicalManagersSection{order:1}
+    ${useOpponentDetails ? '' : '.teamNamesSection>.teamNamesHeader,.teamNamesSection>.teamNameGrid,.historicalManagersSection{display:none}'}
+  `;
 
   return <>
-    <style>{`.draftBoardHeader,.draftBoardRow{min-width:${boardMinWidth}px;width:max(100%,${boardMinWidth}px)}`}</style>
+    <style>{`.draftBoardHeader,.draftBoardRow{min-width:${boardMinWidth}px;width:max(100%,${boardMinWidth}px)}${opponentDetailsStyle}`}</style>
     {targetMode || props.onClock ? <style>{'.recommendationPanel{display:none}'}</style> : null}
     <DraftUi {...draftUiProps} recs={props.onClock ? props.recs : []} />
     {setupHost ? createPortal(
+      <OpponentDetailsToggle
+        enabled={useOpponentDetails}
+        disabled={props.started}
+        onChange={onUseOpponentDetails}
+      />,
+      setupHost,
+    ) : null}
+    {setupHost && useOpponentDetails ? createPortal(
       <ManagerSelector
         teamCount={props.config.teamCount}
         userDraftSlot={props.config.userDraftSlot}
@@ -46,6 +72,42 @@ export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
     {props.onClock && host ? createPortal(<CalibratedRecommendations props={props} />, host) : null}
     {targetMode && host ? createPortal(<TargetsPanel targets={targets} nextPick={props.nextUserPick} />, host) : null}
   </>;
+}
+
+function OpponentDetailsToggle({
+  enabled,
+  disabled,
+  onChange,
+}: {
+  enabled: boolean;
+  disabled: boolean;
+  onChange: (enabled: boolean) => void;
+}) {
+  return <div
+    className="opponentDetailsToggle"
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 16,
+      padding: '2px 0 14px',
+    }}
+  >
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: disabled ? 'default' : 'pointer' }}>
+      <input
+        type="checkbox"
+        checked={enabled}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.checked)}
+        style={{ width: 18, height: 18, accentColor: 'var(--accent)' }}
+      />
+      <span style={{ display: 'grid', gap: 2 }}>
+        <strong>Use opponent details</strong>
+        <small className="muted">Optional team labels and Purple League historical-manager assignments.</small>
+      </span>
+    </label>
+    <span className="countPill">{enabled ? 'Enabled' : 'Off'}</span>
+  </div>;
 }
 
 function ManagerSelector({
@@ -63,7 +125,7 @@ function ManagerSelector({
 }) {
   const selectedIds = new Set(managerIds.filter(Boolean));
 
-  return <div style={{ borderTop: '1px solid var(--border)', marginTop: 14, paddingTop: 14 }}>
+  return <div className="historicalManagersSection" style={{ borderTop: '1px solid var(--border)', marginTop: 14, paddingTop: 14 }}>
     <div className="teamNamesHeader">
       <div>
         <strong>Historical managers</strong>
