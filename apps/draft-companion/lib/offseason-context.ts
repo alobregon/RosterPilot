@@ -1,4 +1,5 @@
 import journalData from '../data/offseason-context-2026.json';
+import espnSupplementData from '../data/offseason-context-2026-espn.json';
 
 export type OffseasonContextSourceStatus = 'INGESTED' | 'PENDING_EXCERPT';
 export type OffseasonContextSubjectKind = 'PLAYER' | 'TEAM';
@@ -64,7 +65,17 @@ export interface OffseasonContextJournal {
   entries: OffseasonContextEntry[];
 }
 
-const JOURNAL = journalData as unknown as OffseasonContextJournal;
+interface OffseasonContextSupplement {
+  season: number;
+  version: number;
+  updatedAt: string;
+  sources: OffseasonContextSource[];
+  entries: OffseasonContextEntry[];
+}
+
+const BASE_JOURNAL = journalData as unknown as OffseasonContextJournal;
+const ESPN_SUPPLEMENT = espnSupplementData as unknown as OffseasonContextSupplement;
+const JOURNAL = mergeOffseasonContext(BASE_JOURNAL, [ESPN_SUPPLEMENT]);
 
 export function getOffseasonContextJournal(): OffseasonContextJournal {
   return JOURNAL;
@@ -104,6 +115,37 @@ export function normalizeContextName(value: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, ' ');
+}
+
+function mergeOffseasonContext(
+  base: OffseasonContextJournal,
+  supplements: readonly OffseasonContextSupplement[],
+): OffseasonContextJournal {
+  const sources = new Map(base.sources.map((source) => [source.id, source]));
+  const entries = new Map(base.entries.map((entry) => [entry.id, entry]));
+  let version = base.version;
+  let updatedAt = base.updatedAt;
+
+  for (const supplement of supplements) {
+    if (supplement.season !== base.season) {
+      throw new Error(
+        `Offseason context supplement season ${supplement.season} does not match base season ${base.season}.`,
+      );
+    }
+
+    for (const source of supplement.sources) sources.set(source.id, source);
+    for (const entry of supplement.entries) entries.set(entry.id, entry);
+    version = Math.max(version, supplement.version);
+    if (supplement.updatedAt > updatedAt) updatedAt = supplement.updatedAt;
+  }
+
+  return {
+    ...base,
+    version,
+    updatedAt,
+    sources: [...sources.values()],
+    entries: [...entries.values()],
+  };
 }
 
 function compareContextEntries(a: OffseasonContextEntry, b: OffseasonContextEntry): number {
