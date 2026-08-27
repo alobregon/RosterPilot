@@ -17,9 +17,13 @@ const baseConfig: DraftConfig = {
   draftStrategy: 'BALANCED',
 };
 
-describe('opponent details preference persistence', () => {
-  it('preserves the disabled preference while retaining saved assignments', () => {
-    const config: DraftConfig = { ...baseConfig, opponentDetailsEnabled: false };
+describe('opponent setup preference persistence', () => {
+  it('preserves independent toggles while retaining saved values', () => {
+    const config: DraftConfig = {
+      ...baseConfig,
+      teamNamesEnabled: false,
+      historicalManagersEnabled: true,
+    };
     const raw = serializeDraftSnapshot({
       config,
       players: [],
@@ -31,14 +35,17 @@ describe('opponent details preference persistence', () => {
     });
 
     const parsed = parseDraftSnapshot(raw);
-    expect(parsed?.config.opponentDetailsEnabled).toBe(false);
+    expect(parsed?.config.teamNamesEnabled).toBe(false);
+    expect(parsed?.config.historicalManagersEnabled).toBe(true);
     expect(parsed?.teamNames[0]).toBe('Dildo Year');
     expect(parsed?.managerIds[0]).toBe('dixie');
   });
 
-  it('preserves the enabled preference', () => {
+  it('still accepts the legacy combined preference for older v1 snapshots', () => {
     const config: DraftConfig = { ...baseConfig, opponentDetailsEnabled: true };
     const parsed = parseDraftSnapshot(serializeDraftSnapshot({ config, players: [], picks: [], draftStarted: false }));
     expect(parsed?.config.opponentDetailsEnabled).toBe(true);
+    expect(parsed?.config.teamNamesEnabled).toBeUndefined();
+    expect(parsed?.config.historicalManagersEnabled).toBeUndefined();
   });
 });
