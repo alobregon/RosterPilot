@@ -3,6 +3,7 @@ import {
   FantasyProsApiError,
   fetchFantasyProsPreseasonProjections,
   isFantasyProsProjectionPosition,
+  parseFantasyProsPlayerIds,
 } from '@/lib/fantasypros';
 
 export const runtime = 'nodejs';
@@ -45,14 +46,33 @@ export async function GET(request: Request) {
     );
   }
 
+  let playerIds: number[];
   try {
-    const payload = await fetchFantasyProsPreseasonProjections({ apiKey, season, position });
+    playerIds = parseFantasyProsPlayerIds(url.searchParams.get('players'));
+  } catch (error) {
+    return Response.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Invalid FantasyPros player IDs.',
+      },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const payload = await fetchFantasyProsPreseasonProjections({
+      apiKey,
+      season,
+      position,
+      playerIds,
+    });
     return Response.json({
       ok: true,
       request: {
         season,
         week: 0,
         position,
+        playerIds,
         fantasyProsRequestsUsed: 1,
       },
       diagnostic: buildFantasyProsProjectionDiagnostic(payload),
