@@ -29,6 +29,7 @@ const DEFAULT: DraftConfig = {
   kStarters: 1,
   benchSpots: 6,
   draftStrategy: 'BALANCED',
+  opponentDetailsEnabled: false,
 };
 
 export default function Page() {
@@ -56,6 +57,18 @@ export default function Page() {
   const onClock = started && !correcting && session.currentSlot === config.userDraftSlot;
   const favorites = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const drafted = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
+  const useOpponentDetails =
+    config.opponentDetailsEnabled === true ||
+    (config.opponentDetailsEnabled == null &&
+      (teamNames.some((name) => name.trim().length > 0) || managerIds.some((id) => id.length > 0)));
+  const activeTeamNames = useMemo(
+    () => (useOpponentDetails ? teamNames : defaultTeamNames(config.teamCount)),
+    [useOpponentDetails, teamNames, config.teamCount],
+  );
+  const activeManagerIds = useMemo(
+    () => (useOpponentDetails ? managerIds : defaultTeamNames(config.teamCount)),
+    [useOpponentDetails, managerIds, config.teamCount],
+  );
   const board = useMemo(() => buildDraftBoard(config, picks, players), [config, picks, players]);
   const userRoster = useMemo(
     () => rosterForSlot(config.userDraftSlot, picks, players),
@@ -71,11 +84,11 @@ export default function Page() {
             config,
             currentOverallPick: session.currentOverallPick,
             favoritePlayerIds: favoriteIds,
-            managerIds,
-            teamNames,
+            managerIds: activeManagerIds,
+            teamNames: activeTeamNames,
             limit: 3,
           }),
-    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, managerIds, teamNames],
+    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, activeManagerIds, activeTeamNames],
   );
   const targets = useMemo(
     () =>
@@ -247,8 +260,9 @@ export default function Page() {
       players={players}
       picks={picks}
       favorites={favorites}
-      teamNames={teamNames}
+      teamNames={activeTeamNames}
       managerIds={managerIds}
+      useOpponentDetails={useOpponentDetails}
       started={started}
       correction={correction}
       correcting={correcting}
@@ -314,6 +328,9 @@ export default function Page() {
       onStrategy={(value: DraftStrategy) => setConfig((current) => ({ ...current, draftStrategy: value }))}
       onRoster={(key, value, max) =>
         setConfig((current) => ({ ...current, [key]: Math.min(max, Math.max(0, Math.trunc(value || 0))) }))
+      }
+      onUseOpponentDetails={(enabled) =>
+        setConfig((current) => ({ ...current, opponentDetailsEnabled: enabled }))
       }
       onTeamName={(index, value) =>
         setTeamNames((existing) => {
