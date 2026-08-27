@@ -21,12 +21,15 @@
 
 ## Interactive simulator
 - [ ] Select **Draft Simulator** mode before starting.
-- [ ] Confirm **Normal / rank order** advances opponent picks without auto-selecting the user's pick.
+- [ ] With Historical manager data off, confirm **Normal / rank order** follows the current market board and never auto-selects the user's pick.
+- [ ] Enable Historical manager data, assign managers, restart the simulation, and confirm close opponent choices can differ from pure rank order while remaining within the top current market candidates.
+- [ ] Confirm personalized opponent picks respond to roster need (for example, a manager who already filled TE is less likely to keep taking TE solely because of historical tendency).
+- [ ] Confirm disabling Historical manager data returns Normal mode to pure market-order opponent picks.
 - [ ] Confirm **Instant to my pick** fills opponent selections immediately and stops on the user's turn.
 - [ ] Confirm **Watch picks** advances one opponent at a time and stops on the user's turn.
 - [ ] Make the user's selection from the Top 3 and confirm simulation resumes automatically afterward.
 - [ ] Exercise RB Rush, WR Rush, QB Rush, TE Rush, and Early DST room profiles and confirm the intended position pressure is visible.
-- [ ] Confirm simulator mode, room profile, and pace survive refresh / JSON backup restore.
+- [ ] Confirm simulator mode, room profile, pace, and historical-manager assignments survive refresh / JSON backup restore.
 - [ ] Confirm corrections pause simulator advancement and resume after the correction is repaired.
 
 ## Live draft
