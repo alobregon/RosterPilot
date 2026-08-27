@@ -61,6 +61,11 @@ export interface DraftConfig {
   kStarters: number;
   benchSpots: number;
   draftStrategy?: DraftStrategy;
+  /**
+   * Enables optional opponent labels and historical-manager assignments.
+   * Undefined is retained for backward compatibility with older snapshots.
+   */
+  opponentDetailsEnabled?: boolean;
 }
 
 export interface RecommendationBreakdown {
