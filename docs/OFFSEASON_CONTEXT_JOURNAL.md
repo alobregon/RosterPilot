@@ -2,17 +2,20 @@
 
 RosterPilot's offseason context journal is a small, curated grounding layer for the future AI coach. It exists to capture **what changed since last season** without asking an LLM to rediscover every relevant fact on draft night.
 
-The machine-readable journal lives at:
+The machine-readable journal is split into a base file plus source-specific supplements:
 
 ```text
 apps/draft-companion/data/offseason-context-2026.json
+apps/draft-companion/data/offseason-context-2026-espn.json
 ```
 
-The TypeScript access layer lives at:
+The TypeScript access layer merges those files by source and entry ID:
 
 ```text
 apps/draft-companion/lib/offseason-context.ts
 ```
+
+A supplemental source or entry with an existing ID replaces the base record. This lets us correct metadata or upgrade a source from `PENDING_EXCERPT` to `INGESTED` without rewriting the large base journal.
 
 ## What belongs in the journal
 
@@ -26,9 +29,10 @@ Good entries are fantasy-relevant changes that can materially alter how historic
 - suspensions or unresolved availability risks
 - training-camp/preseason role evidence
 - meaningful ADP moves
+- offensive-line changes that materially affect a fantasy environment
 - clearly attributed analyst breakout, sleeper or fade cases
 
-The journal is curated rather than exhaustive. A fact should be included because it could change a draft decision, not simply because it appeared in an article.
+The journal is curated rather than exhaustive. A fact should be included because it could change a draft decision, not simply because it appeared in an article. Defensive-only offseason moves are generally omitted unless they materially affect a standard fantasy decision.
 
 ## Fact vs. interpretation
 
@@ -42,16 +46,18 @@ Player: Ladd McConkey
 Facts:
 - Mike McDaniel is the Chargers' new offensive coordinator.
 - Keenan Allen is no longer in the Chargers receiving room.
+- Alec Ingold followed McDaniel to Los Angeles.
+- ESPN reports McDaniel's 2025 Miami offense used 21 personnel heavily.
 
 RosterPilot inference:
-- Positive environment, medium confidence.
-- McConkey has a plausible path to increased opportunity, but the size
-  of any production increase is unknown.
+- Positive/mixed-positive environment, medium confidence.
+- The personnel and scheme changes create plausible opportunity and matchup
+  changes, but they do not prove that McConkey's target volume will increase.
 ```
 
 The inference is explicitly labeled `ROSTERPILOT_INFERENCE`; it must never be presented as a reported fact.
 
-Source-authored opinions are labeled separately, for example `SOURCE_ANALYST`, `SOURCE_CONSENSUS`, or `SOURCE_CONFLICT`.
+Source-authored opinions are labeled separately, for example `SOURCE_ANALYST`, `SOURCE_CONSENSUS`, or `SOURCE_CONFLICT`. Source projections remain projections. For example, ESPN's expectation that DJ Moore will exceed 100 targets in Buffalo is stored as a `SOURCE_ANALYST` outlook, not as a factual 2026 stat.
 
 ## Conflicting viewpoints
 
@@ -75,16 +81,36 @@ A future ingestion/refresh workflow can use that flag to prioritize which entrie
 
 When the user supplies a useful article:
 
-1. Add a source record with publisher, title, URL and ingestion status.
+1. Add or update a source record with publisher, title, URL and ingestion status.
 2. Summarize only fantasy-relevant facts; do not copy article text.
 3. Create one or more focused context entries linked by `sourceIds`.
-4. If the source itself makes a fantasy recommendation, store it as a source outlook.
+4. If the source itself makes a fantasy recommendation or projection, store it as a source outlook.
 5. Add a RosterPilot inference only when the reasoning is explicit and useful.
 6. Mark volatile facts as time-sensitive.
 7. Keep contradictory entries or facts rather than deleting whichever view is less convenient.
 8. Run the Draft Companion test suite.
 
-If the article cannot be read reliably, add the source as `PENDING_EXCERPT` and store **zero claims** from it until readable text is available. This is the current treatment of the supplied ESPN source.
+If an article cannot be read reliably, add the source as `PENDING_EXCERPT` and store **zero claims** from it until readable text is available. Once readable text is supplied, a supplement may replace that source record with `INGESTED` and add grounded entries.
+
+## ESPN supplement
+
+The user-provided ESPN newcomers article is now ingested. The supplement intentionally keeps only offensive/fantasy-relevant context, including examples such as:
+
+- A.J. Brown joining Drake Maye in New England
+- Kyler Murray moving into Kevin O'Connell's Minnesota offense
+- Jaylen Waddle joining Bo Nix and Courtland Sutton in Denver
+- DJ Moore becoming Buffalo's projected top receiver
+- Jeremiyah Love's three-down upside in Arizona
+- Mike Evans' projected boundary/red-zone role in San Francisco
+- Kenneth Walker III joining Kansas City
+- Houston offensive-line investment around C.J. Stroud and David Montgomery
+- Isaiah Likely's larger opportunity with the Giants
+- Alec Ingold following Mike McDaniel to the Chargers
+- Makai Lemon's opportunity after A.J. Brown's departure from Philadelphia
+- Travis Etienne joining a Saints backfield that still includes Alvin Kamara
+- the expected Kirk Cousins-to-Fernando Mendoza quarterback transition in Las Vegas
+
+The supplement also corrects the initial Sam Darnold team tag to Seattle while retaining the legacy entry ID so saved references remain stable.
 
 ## Use by the future AI coach
 
@@ -122,6 +148,6 @@ The AI should always distinguish:
 
 ## Initial source set
 
-The initial journal was seeded from user-supplied 2026 material from Footballguys, CBS Sports, FantasyPros, NFL.com, Seattle Seahawks and Yahoo Sports. The supplied ESPN article is retained as `PENDING_EXCERPT` because its body was not available to the retrieval client.
+The journal was seeded from user-supplied 2026 material from Footballguys, CBS Sports, ESPN, FantasyPros, NFL.com, Seattle Seahawks and Yahoo Sports.
 
-Source URLs and ingestion status are stored directly in the JSON journal so every factual entry can be traced back to its source.
+Source URLs and ingestion status are stored directly in the machine-readable journal files so every factual entry can be traced back to its source.
