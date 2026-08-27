@@ -41,20 +41,22 @@ interface SimulatorSequenceProfile {
   extend_two_same_rounds3_8: RepeatStat;
 }
 
+export interface SimulationTolerance {
+  candidateWindow: number;
+  marketSlotPenalty: number;
+  maxManagerPositionBias: number;
+  jitterAmplitude: number;
+}
+
 const historicalProfiles = managerProfilesData.profiles as unknown as SimulatorManagerProfile[];
 const round1Profiles = round1ProfilesData.profiles as unknown as SimulatorRound1Profile[];
 const sequenceProfiles = sequenceProfilesData.profiles as unknown as SimulatorSequenceProfile[];
-const HISTORICAL_CANDIDATE_WINDOW = 12;
-const MARKET_SLOT_PENALTY = 3;
 const ROSTER_NEED_WEIGHT = 0.09;
 const HISTORY_WEIGHT = 1.05;
 const ROOM_PROFILE_BONUS = 10;
-const MAX_MANAGER_POSITION_BIAS = 8;
-const MAX_ROUND1_MANAGER_POSITION_BIAS = 3;
 const MAX_MANAGER_ROSTER_CONSTRUCTION_BIAS = 4;
 const MANAGER_ROSTER_PACE_WEIGHT = 1.4;
 const MANAGER_ROSTER_SHARE_WEIGHT = 18;
-const JITTER_AMPLITUDE = 1.5;
 const DEFAULT_SIMULATION_SEED = 'rosterpilot-default-simulation';
 const REPEAT_PRIOR_WEIGHT = 6;
 const STREAK_PRIOR_WEIGHT = 4;
@@ -77,6 +79,54 @@ export interface DeterministicDraftSimulationResult extends DraftSimulationResul
 }
 
 /**
+ * Ranking confidence is intentionally strongest at the top of the draft and
+ * relaxes as the market becomes flatter and individual roster construction
+ * becomes more important. The candidate window, history cap, market-slot
+ * penalty, and seeded variation therefore widen together by draft phase.
+ */
+export function simulationToleranceForRound(round: number): SimulationTolerance {
+  const normalizedRound = Math.max(1, Math.trunc(round));
+  if (normalizedRound === 1) {
+    return {
+      candidateWindow: 10,
+      marketSlotPenalty: 3,
+      maxManagerPositionBias: 3,
+      jitterAmplitude: 1.5,
+    };
+  }
+  if (normalizedRound <= 4) {
+    return {
+      candidateWindow: 12,
+      marketSlotPenalty: 2.5,
+      maxManagerPositionBias: 5,
+      jitterAmplitude: 1.5,
+    };
+  }
+  if (normalizedRound <= 8) {
+    return {
+      candidateWindow: 16,
+      marketSlotPenalty: 1.75,
+      maxManagerPositionBias: 7,
+      jitterAmplitude: 2,
+    };
+  }
+  if (normalizedRound <= 12) {
+    return {
+      candidateWindow: 20,
+      marketSlotPenalty: 1.25,
+      maxManagerPositionBias: 9,
+      jitterAmplitude: 2.5,
+    };
+  }
+  return {
+    candidateWindow: 24,
+    marketSlotPenalty: 0.9,
+    maxManagerPositionBias: 10,
+    jitterAmplitude: 3,
+  };
+}
+
+/**
  * Adds exactly one simulated opponent pick. If the supplied pick belongs to
  * the user, the draft is returned unchanged so the interactive UI can stop
  * and let the user make the decision.
@@ -84,9 +134,8 @@ export interface DeterministicDraftSimulationResult extends DraftSimulationResul
  * When a historical manager ID is supplied for the slot, the simulator keeps
  * current rankings/ADP dominant but allows generic roster need, the manager's
  * recency-weighted sequence tendencies, historical roster construction, and
- * small run-seeded variation to break close calls. The historical path is
- * restricted to the top 12 current market candidates so old behavior cannot
- * manufacture extreme reaches.
+ * small run-seeded variation to break close calls. Market tolerance expands
+ * by round because rankings/ADP become less precise deeper in the draft.
  */
 export function simulateNextOpponentPick(args: {
   players: PlayerRanking[];
@@ -419,14 +468,15 @@ function chooseOpponentPlayer(args: {
     return positional[0] ?? ranked[0];
   }
 
-  const candidates = ranked.slice(0, HISTORICAL_CANDIDATE_WINDOW);
+  const tolerance = simulationToleranceForRound(round);
+  const candidates = ranked.slice(0, tolerance.candidateWindow);
   let best = candidates[0];
   let bestScore = Number.NEGATIVE_INFINITY;
   const simulationSeed = config.simulationSeed ?? DEFAULT_SIMULATION_SEED;
 
   for (let index = 0; index < candidates.length; index += 1) {
     const player = candidates[index];
-    const marketScore = 100 - index * MARKET_SLOT_PENALTY;
+    const marketScore = 100 - index * tolerance.marketSlotPenalty;
     const rosterNeed = opponentRosterNeedScore(player.position, roster, config, round) * ROSTER_NEED_WEIGHT;
     const historyBias = managerPositionBias(managerId, player.position, round, roster) * HISTORY_WEIGHT;
     const rosterConstructionBias = historicalRosterConstructionBias({
@@ -436,7 +486,8 @@ function chooseOpponentPlayer(args: {
       config,
     }) ?? 0;
     const roomBias = preferred === player.position ? ROOM_PROFILE_BONUS : 0;
-    const jitter = deterministicJitter(`${simulationSeed}|${managerId}|${overallPick}|${player.id}`) * JITTER_AMPLITUDE;
+    const jitter = deterministicJitter(`${simulationSeed}|${managerId}|${overallPick}|${player.id}`)
+      * tolerance.jitterAmplitude;
     const score = marketScore + rosterNeed + historyBias + rosterConstructionBias + roomBias + jitter;
 
     if (score > bestScore) {
@@ -489,7 +540,7 @@ function managerPositionBias(
     ? leagueValues.reduce((sum, value) => sum + value, 0) / leagueValues.length
     : 0;
   const confidence = clamp(profile.draft_count / 10, 0.35, 1);
-  const maxBias = round === 1 ? MAX_ROUND1_MANAGER_POSITION_BIAS : MAX_MANAGER_POSITION_BIAS;
+  const maxBias = simulationToleranceForRound(round).maxManagerPositionBias;
   return clamp(
     (managerProbability - leagueProbability) * 70 * confidence,
     -maxBias,
