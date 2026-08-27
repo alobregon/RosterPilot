@@ -78,65 +78,23 @@ export interface DeterministicDraftSimulationResult extends DraftSimulationResul
   userRecommendations: RecommendationSnapshot[];
 }
 
-/**
- * Ranking confidence is intentionally strongest at the top of the draft and
- * relaxes as the market becomes flatter and individual roster construction
- * becomes more important. The candidate window, history cap, market-slot
- * penalty, and seeded variation therefore widen together by draft phase.
- */
 export function simulationToleranceForRound(round: number): SimulationTolerance {
   const normalizedRound = Math.max(1, Math.trunc(round));
   if (normalizedRound === 1) {
-    return {
-      candidateWindow: 10,
-      marketSlotPenalty: 3,
-      maxManagerPositionBias: 3,
-      jitterAmplitude: 1.5,
-    };
+    return { candidateWindow: 10, marketSlotPenalty: 3, maxManagerPositionBias: 3, jitterAmplitude: 1.5 };
   }
   if (normalizedRound <= 4) {
-    return {
-      candidateWindow: 12,
-      marketSlotPenalty: 2.5,
-      maxManagerPositionBias: 5,
-      jitterAmplitude: 1.5,
-    };
+    return { candidateWindow: 12, marketSlotPenalty: 2.5, maxManagerPositionBias: 5, jitterAmplitude: 1.5 };
   }
   if (normalizedRound <= 8) {
-    return {
-      candidateWindow: 16,
-      marketSlotPenalty: 1.75,
-      maxManagerPositionBias: 7,
-      jitterAmplitude: 2,
-    };
+    return { candidateWindow: 16, marketSlotPenalty: 1.75, maxManagerPositionBias: 7, jitterAmplitude: 2 };
   }
   if (normalizedRound <= 12) {
-    return {
-      candidateWindow: 20,
-      marketSlotPenalty: 1.25,
-      maxManagerPositionBias: 9,
-      jitterAmplitude: 2.5,
-    };
+    return { candidateWindow: 20, marketSlotPenalty: 1.25, maxManagerPositionBias: 9, jitterAmplitude: 2.5 };
   }
-  return {
-    candidateWindow: 24,
-    marketSlotPenalty: 0.9,
-    maxManagerPositionBias: 10,
-    jitterAmplitude: 3,
-  };
+  return { candidateWindow: 24, marketSlotPenalty: 0.9, maxManagerPositionBias: 10, jitterAmplitude: 3 };
 }
 
-/**
- * Adds exactly one simulated opponent pick. If the supplied pick belongs to
- * the user, the draft is returned unchanged so the interactive UI can stop
- * and let the user make the decision.
- *
- * When a historical manager ID is supplied for the slot, the simulator keeps
- * current rankings/ADP dominant but allows generic roster need, the manager's
- * recency-weighted sequence tendencies, historical roster construction, and
- * small run-seeded variation to break close calls. Market tolerance expands
- * by round because rankings/ADP become less precise deeper in the draft.
- */
 export function simulateNextOpponentPick(args: {
   players: PlayerRanking[];
   picks: DraftPick[];
@@ -166,11 +124,6 @@ export function simulateNextOpponentPick(args: {
     .sort((a, b) => a.overallPick - b.overallPick);
 }
 
-/**
- * Fills simulated opponent selections until the user's next pick. This is the
- * fast path used by interactive Simulator mode. It never auto-selects a user
- * player.
- */
 export function autoDraftOpponentsUntilUserTurn(args: {
   players: PlayerRanking[];
   picks: DraftPick[];
@@ -187,16 +140,11 @@ export function autoDraftOpponentsUntilUserTurn(args: {
     overallPick <= total &&
     draftSlotForOverallPick(overallPick, args.config.teamCount) !== args.config.userDraftSlot
   ) {
-    const updated = simulateNextOpponentPick({
-      ...args,
-      picks: next,
-      currentOverallPick: overallPick,
-    });
+    const updated = simulateNextOpponentPick({ ...args, picks: next, currentOverallPick: overallPick });
     if (updated.length === next.length) break;
     next = updated;
     overallPick += 1;
   }
-
   return next;
 }
 
@@ -208,8 +156,7 @@ export function simulateDraft(args: {
   managerIds?: readonly string[];
 }): DraftSimulationResult {
   const { players, config, favoritePlayerIds = [], roomProfile = 'RANK_ORDER', managerIds = [] } = args;
-  const rosterSlots = totalRosterSlots(config);
-  const total = config.teamCount * rosterSlots;
+  const total = config.teamCount * totalRosterSlots(config);
   const picks: DraftPick[] = [];
   const drafted = new Set<string>();
   const userPlayerIds: string[] = [];
@@ -217,7 +164,7 @@ export function simulateDraft(args: {
   for (let overallPick = 1; overallPick <= total; overallPick += 1) {
     const slot = draftSlotForOverallPick(overallPick, config.teamCount);
     const available = players.filter((player) => !drafted.has(player.id));
-    if (available.length === 0) break;
+    if (!available.length) break;
 
     let selected: PlayerRanking | undefined;
     if (slot === config.userDraftSlot) {
@@ -241,13 +188,6 @@ export function simulateDraft(args: {
   return { picks, userPlayerIds, completed: picks.length === total };
 }
 
-/**
- * Deterministic rank-order simulation used by the release test harness.
- * Opponents always take the highest-ranked available player while the user
- * follows the same recommendation engine that powers the live draft UI.
- * Every on-clock recommendation set is captured so tests can validate the
- * recommendation-percent contract across a complete draft lifecycle.
- */
 export function simulateDeterministicDraft(args: {
   players: PlayerRanking[];
   config: DraftConfig;
@@ -264,7 +204,7 @@ export function simulateDeterministicDraft(args: {
   for (let overallPick = 1; overallPick <= total; overallPick += 1) {
     const slot = draftSlotForOverallPick(overallPick, config.teamCount);
     const available = players.filter((player) => !drafted.has(player.id));
-    if (available.length === 0) break;
+    if (!available.length) break;
 
     let selected: PlayerRanking | undefined;
     if (slot === config.userDraftSlot) {
@@ -281,7 +221,6 @@ export function simulateDeterministicDraft(args: {
     } else {
       selected = [...available].sort((a, b) => a.overallRank - b.overallRank)[0];
     }
-
     if (!selected) break;
     drafted.add(selected.id);
     picks.push(draftPickAtOverall(overallPick, selected.id, config.teamCount));
@@ -293,21 +232,9 @@ export function simulateDeterministicDraft(args: {
     const player = playerById.get(playerId);
     if (player) userCounts[player.position] += 1;
   }
-
-  return {
-    picks,
-    userPlayerIds,
-    userCounts,
-    userRecommendations,
-    completed: picks.length === total,
-  };
+  return { picks, userPlayerIds, userCounts, userRecommendations, completed: picks.length === total };
 }
 
-/**
- * Checks whether a completed roster can fill every configured starting slot.
- * FLEX is satisfied by the aggregate RB/WR/TE pool after their fixed starter
- * requirements are met.
- */
 export function hasLegalStartingRoster(counts: Record<Position, number>, config: DraftConfig): boolean {
   if (counts.QB < config.qbStarters) return false;
   if (counts.RB < config.rbStarters) return false;
@@ -315,24 +242,41 @@ export function hasLegalStartingRoster(counts: Record<Position, number>, config:
   if (counts.TE < config.teStarters) return false;
   if (counts.DST < config.dstStarters) return false;
   if (counts.K < config.kStarters) return false;
-
   const skillPlayers = counts.RB + counts.WR + counts.TE;
   const requiredSkillPlayers = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
   return skillPlayers >= requiredSkillPlayers;
 }
 
+/** Minimum number of future picks required to make the current roster legal. */
+export function minimumStarterPicksRequired(roster: readonly PlayerRanking[], config: DraftConfig): number {
+  const counts = positionCounts(roster);
+  const qbDeficit = Math.max(0, config.qbStarters - counts.QB);
+  const dstDeficit = Math.max(0, config.dstStarters - counts.DST);
+  const kDeficit = Math.max(0, config.kStarters - counts.K);
+  const fixedSkillDeficit = Math.max(0, config.rbStarters - counts.RB)
+    + Math.max(0, config.wrStarters - counts.WR)
+    + Math.max(0, config.teStarters - counts.TE);
+  const currentSkillPlayers = counts.RB + counts.WR + counts.TE;
+  const requiredSkillPlayers = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
+  const totalSkillDeficit = Math.max(0, requiredSkillPlayers - currentSkillPlayers);
+  return qbDeficit + dstDeficit + kDeficit + Math.max(fixedSkillDeficit, totalSkillDeficit);
+}
+
 /**
- * Returns the recency-weighted effective historical probability for a manager
- * selecting a position after the supplied prior position sequence.
- *
- * Round 1 uses a dedicated recency-weighted first-pick distribution. From
- * Round 2 onward the model backs off hierarchically:
- *   phase tendency -> same-position repeat behavior -> two-pick streak behavior
- *   -> exact first-four prefix when that prefix has historical observations.
- *
- * Every conditional layer is shrunk toward the broader layer beneath it, so a
- * one-season pattern cannot overpower the current market.
+ * A simulated opponent pick is legal only if enough roster slots remain after
+ * it to fill every configured starter plus FLEX. This is a hard constraint,
+ * independent of rankings, history, room profile, and random variation.
  */
+export function canCompleteStartingRosterAfterPick(
+  roster: readonly PlayerRanking[],
+  player: PlayerRanking,
+  config: DraftConfig,
+): boolean {
+  const nextRoster = [...roster, player];
+  const remainingPicks = Math.max(0, totalRosterSlots(config) - nextRoster.length);
+  return minimumStarterPicksRequired(nextRoster, config) <= remainingPicks;
+}
+
 export function historicalSequencePositionProbability(args: {
   managerId: string;
   position: Position;
@@ -341,7 +285,6 @@ export function historicalSequencePositionProbability(args: {
 }): number | null {
   const profile = historicalProfiles.find((candidate) => candidate.manager_id === args.managerId);
   if (!profile) return null;
-
   const phase = phaseForRound(args.round);
   const round1Profile = args.round === 1
     ? round1Profiles.find((candidate) => candidate.manager_id === args.managerId)
@@ -351,26 +294,14 @@ export function historicalSequencePositionProbability(args: {
       ?? profile.phase_position_probabilities_recency_weighted[phase],
   );
   const sequenceProfile = sequenceProfiles.find((candidate) => candidate.manager_id === args.managerId);
-  if (!sequenceProfile || !args.priorPositions.length) {
-    return base[historyPosition(args.position)];
-  }
+  if (!sequenceProfile || !args.priorPositions.length) return base[historyPosition(args.position)];
 
   let distribution = { ...base };
   const priorHistory = args.priorPositions.map(historyPosition);
   const lastPosition = priorHistory[priorHistory.length - 1];
-
   if (args.round >= 2 && args.round <= 8) {
-    distribution = conditionOnRepeat(
-      distribution,
-      lastPosition,
-      sequenceProfile.repeat_rounds2_8,
-      REPEAT_PRIOR_WEIGHT,
-    );
-
-    if (
-      priorHistory.length >= 2 &&
-      priorHistory[priorHistory.length - 2] === lastPosition
-    ) {
+    distribution = conditionOnRepeat(distribution, lastPosition, sequenceProfile.repeat_rounds2_8, REPEAT_PRIOR_WEIGHT);
+    if (priorHistory.length >= 2 && priorHistory[priorHistory.length - 2] === lastPosition) {
       distribution = conditionOnRepeat(
         distribution,
         lastPosition,
@@ -379,32 +310,14 @@ export function historicalSequencePositionProbability(args: {
       );
     }
   }
-
   if (args.round >= 2 && args.round <= 4) {
     const prefix = priorHistory.slice(0, args.round - 1).join('>');
     const prefixStat = sequenceProfile.early_prefix_next[prefix];
-    if (prefixStat) {
-      distribution = posteriorDistribution(prefixStat, distribution, EARLY_PREFIX_PRIOR_WEIGHT);
-    }
+    if (prefixStat) distribution = posteriorDistribution(prefixStat, distribution, EARLY_PREFIX_PRIOR_WEIGHT);
   }
-
   return distribution[historyPosition(args.position)];
 }
 
-/**
- * Returns a bounded manager-specific roster-construction score derived from
- * that manager's historical average final roster. The score is intentionally
- * small: generic starter/FLEX need remains authoritative, while this layer
- * nudges close depth decisions toward the roster shape the manager usually
- * builds.
- *
- * The historical target is treated as a position share rather than an exact
- * count so it still behaves sensibly if the current league uses a different
- * total roster size. The pace component compares the roster currently built
- * with the manager's historical share of picks, and grows modestly as the
- * draft progresses. A small league-relative share term preserves differences
- * between managers even before much roster history has accumulated.
- */
 export function historicalRosterConstructionBias(args: {
   managerId: string;
   position: Position;
@@ -413,7 +326,6 @@ export function historicalRosterConstructionBias(args: {
 }): number | null {
   const profile = historicalProfiles.find((candidate) => candidate.manager_id === args.managerId);
   if (!profile) return null;
-
   const historicalPosition = historyPosition(args.position);
   const managerTotal = historicalRosterTotal(profile);
   if (managerTotal <= 0) return 0;
@@ -440,7 +352,6 @@ export function historicalRosterConstructionBias(args: {
     * MANAGER_ROSTER_SHARE_WEIGHT
     * (0.25 + progress * 0.75);
   const confidence = clamp(profile.draft_count / 10, 0.35, 1);
-
   return clamp(
     (paceGap * MANAGER_ROSTER_PACE_WEIGHT * paceMultiplier + sharePressure) * confidence,
     -MAX_MANAGER_ROSTER_CONSTRUCTION_BIAS,
@@ -460,43 +371,79 @@ function chooseOpponentPlayer(args: {
   const round = Math.floor((overallPick - 1) / config.teamCount) + 1;
   const preferred = preferredPosition(roomProfile, round);
   const ranked = [...available].sort(marketOrderCompare);
+  const marketIndex = new Map(ranked.map((player, index) => [player.id, index]));
 
-  // Preserve the simple QA room behavior when manager history is not enabled.
+  // Filter the entire market first. When roster feasibility becomes binding,
+  // mandatory positions can therefore enter even from outside the normal
+  // personalized candidate window.
+  const feasibleRanked = ranked.filter((player) => canCompleteStartingRosterAfterPick(roster, player, config));
+  const eligibleRanked = feasibleRanked.length ? feasibleRanked : ranked;
+
+  // Neutral mode remains pure current-market order, subject only to the hard
+  // requirement that the opponent must still be able to finish a legal roster.
   if (!managerId) {
-    if (!preferred) return ranked[0];
-    const positional = ranked.filter((player) => player.position === preferred);
-    return positional[0] ?? ranked[0];
+    if (!preferred) return eligibleRanked[0];
+    const positional = eligibleRanked.filter((player) => player.position === preferred);
+    return positional[0] ?? eligibleRanked[0];
   }
 
   const tolerance = simulationToleranceForRound(round);
-  const candidates = ranked.slice(0, tolerance.candidateWindow);
+  const candidates = eligibleRanked.slice(0, tolerance.candidateWindow);
   let best = candidates[0];
   let bestScore = Number.NEGATIVE_INFINITY;
   const simulationSeed = config.simulationSeed ?? DEFAULT_SIMULATION_SEED;
 
-  for (let index = 0; index < candidates.length; index += 1) {
-    const player = candidates[index];
+  for (const player of candidates) {
+    const index = marketIndex.get(player.id) ?? 0;
     const marketScore = 100 - index * tolerance.marketSlotPenalty;
     const rosterNeed = opponentRosterNeedScore(player.position, roster, config, round) * ROSTER_NEED_WEIGHT;
     const historyBias = managerPositionBias(managerId, player.position, round, roster) * HISTORY_WEIGHT;
-    const rosterConstructionBias = historicalRosterConstructionBias({
-      managerId,
-      position: player.position,
-      roster,
-      config,
-    }) ?? 0;
+    const rosterConstructionBias = historicalRosterConstructionBias({ managerId, position: player.position, roster, config }) ?? 0;
     const roomBias = preferred === player.position ? ROOM_PROFILE_BONUS : 0;
+    const mandatoryPressure = mandatoryPositionPressure(player.position, roster, config);
+    const depthPenalty = excessDepthPenalty(player.position, roster, config);
     const jitter = deterministicJitter(`${simulationSeed}|${managerId}|${overallPick}|${player.id}`)
       * tolerance.jitterAmplitude;
-    const score = marketScore + rosterNeed + historyBias + rosterConstructionBias + roomBias + jitter;
+    const score = marketScore
+      + rosterNeed
+      + historyBias
+      + rosterConstructionBias
+      + roomBias
+      + mandatoryPressure
+      - depthPenalty
+      + jitter;
 
     if (score > bestScore) {
       best = player;
       bestScore = score;
     }
   }
-
   return best;
+}
+
+function mandatoryPositionPressure(position: Position, roster: readonly PlayerRanking[], config: DraftConfig): number {
+  const before = minimumStarterPicksRequired(roster, config);
+  if (before <= 0) return 0;
+  const placeholder: PlayerRanking = { id: '__candidate__', name: '__candidate__', position, overallRank: 9999 };
+  const after = minimumStarterPicksRequired([...roster, placeholder], config);
+  if (after >= before) return 0;
+  const picksRemainingIncludingCurrent = Math.max(1, totalRosterSlots(config) - roster.length);
+  const slack = Math.max(0, picksRemainingIncludingCurrent - before);
+  return slack <= 1 ? 9 : slack === 2 ? 6 : slack === 3 ? 3 : 0;
+}
+
+function excessDepthPenalty(position: Position, roster: readonly PlayerRanking[], config: DraftConfig): number {
+  const counts = positionCounts(roster);
+  const stillNeedsStarters = minimumStarterPicksRequired(roster, config) > 0;
+  if (position === 'QB' && counts.QB >= config.qbStarters + 1) {
+    const extraBackupsAlreadyHeld = counts.QB - config.qbStarters;
+    return 10 + Math.max(0, extraBackupsAlreadyHeld - 1) * 6 + (stillNeedsStarters ? 6 : 0);
+  }
+  if (position === 'TE' && counts.TE >= config.teStarters + 1) {
+    const extraBackupsAlreadyHeld = counts.TE - config.teStarters;
+    return 7 + Math.max(0, extraBackupsAlreadyHeld - 1) * 5 + (stillNeedsStarters ? 4 : 0);
+  }
+  return 0;
 }
 
 function marketOrderCompare(a: PlayerRanking, b: PlayerRanking): number {
@@ -516,7 +463,6 @@ function managerPositionBias(
 ): number {
   const profile = historicalProfiles.find((candidate) => candidate.manager_id === managerId);
   if (!profile) return 0;
-
   const phase = phaseForRound(round);
   const historicalPosition = historyPosition(position);
   const sequenceProbability = historicalSequencePositionProbability({
@@ -525,10 +471,9 @@ function managerPositionBias(
     round,
     priorPositions: roster.map((player) => player.position),
   });
-  const managerProbability =
-    sequenceProbability ??
-    profile.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition] ??
-    0;
+  const managerProbability = sequenceProbability
+    ?? profile.phase_position_probabilities_recency_weighted[phase]?.[historicalPosition]
+    ?? 0;
   const leagueValues = round === 1
     ? round1Profiles
       .map((candidate) => candidate.round1_position_probabilities_recency_weighted[historicalPosition])
@@ -541,11 +486,7 @@ function managerPositionBias(
     : 0;
   const confidence = clamp(profile.draft_count / 10, 0.35, 1);
   const maxBias = simulationToleranceForRound(round).maxManagerPositionBias;
-  return clamp(
-    (managerProbability - leagueProbability) * 70 * confidence,
-    -maxBias,
-    maxBias,
-  );
+  return clamp((managerProbability - leagueProbability) * 70 * confidence, -maxBias, maxBias);
 }
 
 function posteriorDistribution(
@@ -556,7 +497,6 @@ function posteriorDistribution(
   const [, weightedTotal, weightedCounts] = stat;
   const denominator = weightedTotal + priorWeight;
   if (denominator <= 0) return prior;
-
   return HISTORICAL_POSITIONS.reduce<Record<HistoricalPosition, number>>((result, position) => {
     result[position] = ((weightedCounts[position] ?? 0) + priorWeight * prior[position]) / denominator;
     return result;
@@ -573,22 +513,13 @@ function conditionOnRepeat(
   const previousProbability = prior[repeatedPosition];
   const denominator = weightedTotal + priorWeight;
   if (denominator <= 0) return prior;
-
-  const repeatProbability = clamp(
-    (weightedSame + priorWeight * previousProbability) / denominator,
-    0,
-    1,
-  );
+  const repeatProbability = clamp((weightedSame + priorWeight * previousProbability) / denominator, 0, 1);
   const remainingPrior = Math.max(0, 1 - previousProbability);
   const result = { ...prior, [repeatedPosition]: repeatProbability };
-
   if (remainingPrior <= 1e-9) {
-    for (const position of HISTORICAL_POSITIONS) {
-      if (position !== repeatedPosition) result[position] = 0;
-    }
+    for (const position of HISTORICAL_POSITIONS) if (position !== repeatedPosition) result[position] = 0;
     return result;
   }
-
   const scale = (1 - repeatProbability) / remainingPrior;
   for (const position of HISTORICAL_POSITIONS) {
     if (position !== repeatedPosition) result[position] = prior[position] * scale;
@@ -596,9 +527,7 @@ function conditionOnRepeat(
   return result;
 }
 
-function normalizeDistribution(
-  input: Record<HistoricalPosition, number>,
-): Record<HistoricalPosition, number> {
+function normalizeDistribution(input: Record<HistoricalPosition, number>): Record<HistoricalPosition, number> {
   const total = HISTORICAL_POSITIONS.reduce((sum, position) => sum + (input[position] ?? 0), 0);
   if (total <= 0) return emptyHistoricalDistribution();
   return HISTORICAL_POSITIONS.reduce<Record<HistoricalPosition, number>>((result, position) => {
@@ -618,18 +547,12 @@ function historyPosition(position: Position): HistoricalPosition {
 }
 
 function historicalRosterTotal(profile: SimulatorManagerProfile): number {
-  return HISTORICAL_POSITIONS.reduce(
-    (sum, position) => sum + (profile.average_final_roster[position] ?? 0),
-    0,
-  );
+  return HISTORICAL_POSITIONS.reduce((sum, position) => sum + (profile.average_final_roster[position] ?? 0), 0);
 }
 
 function opponentRosterNeedScore(position: Position, roster: PlayerRanking[], config: DraftConfig, round: number): number {
   const counts = positionCounts(roster);
-
-  if (position === 'QB') {
-    return counts.QB < config.qbStarters ? 65 : counts.QB === config.qbStarters ? 12 : 2;
-  }
+  if (position === 'QB') return counts.QB < config.qbStarters ? 65 : counts.QB === config.qbStarters ? 12 : 2;
   if (position === 'DST') {
     if (counts.DST >= config.dstStarters) return 2;
     if (round < 8) return 1;
@@ -645,15 +568,12 @@ function opponentRosterNeedScore(position: Position, roster: PlayerRanking[], co
 
   const starterTarget = position === 'RB' ? config.rbStarters : position === 'WR' ? config.wrStarters : config.teStarters;
   if (counts[position] < starterTarget) return position === 'TE' ? 72 : 100;
-
   const flexEligible = counts.RB + counts.WR + counts.TE;
   const flexTarget = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
   const baseDeficit = Math.max(0, config.rbStarters - counts.RB)
     + Math.max(0, config.wrStarters - counts.WR)
     + Math.max(0, config.teStarters - counts.TE);
-  if (baseDeficit === 0 && flexEligible < flexTarget) {
-    return position === 'TE' ? 68 : position === 'WR' ? 84 : 82;
-  }
+  if (baseDeficit === 0 && flexEligible < flexTarget) return position === 'TE' ? 68 : position === 'WR' ? 84 : 82;
 
   const depth = Math.max(0, counts[position] - starterTarget);
   if (position === 'WR') return depth === 0 ? 60 : depth === 1 ? 46 : depth === 2 ? 32 : 15;
@@ -703,7 +623,14 @@ function deterministicJitter(seed: string): number {
 }
 
 function totalRosterSlots(config: DraftConfig): number {
-  return config.qbStarters + config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters + config.dstStarters + config.kStarters + config.benchSpots;
+  return config.qbStarters
+    + config.rbStarters
+    + config.wrStarters
+    + config.teStarters
+    + config.flexStarters
+    + config.dstStarters
+    + config.kStarters
+    + config.benchSpots;
 }
 
 function emptyPositionCounts(): Record<Position, number> {
