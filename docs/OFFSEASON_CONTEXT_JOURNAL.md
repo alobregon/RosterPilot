@@ -8,6 +8,7 @@ The machine-readable journal is split into a base file plus source-specific supp
 apps/draft-companion/data/offseason-context-2026.json
 apps/draft-companion/data/offseason-context-2026-espn.json
 apps/draft-companion/data/offseason-context-2026-yahoo-phillyvoice.json
+apps/draft-companion/data/offseason-context-2026-si.json
 ```
 
 The TypeScript access layer merges those files by source and entry ID:
@@ -135,6 +136,17 @@ The PhillyVoice running-back article contributes higher-signal current-role and 
 
 Rankings, breakout claims, fades and future workload expectations from the article remain `SOURCE_ANALYST` outlooks rather than factual projections.
 
+## Sports Illustrated WR sleepers supplement
+
+The Sports Illustrated Aug. 6 WR-sleepers article adds four mid-round receiver cases:
+
+- Alec Pierce: reduced target competition after Michael Pittman Jr.'s departure, paired with a current ankle/PUP concern
+- Jakobi Meyers: sustained Jacksonville target volume after his 2025 trade and a source-authored sleeper case against his market price
+- Jayden Reed: fewer Green Bay target competitors after Romeo Doubs and Dontayvion Wicks departed, plus a source-authored target-leader/WR2-upside case
+- Quentin Johnston: a cheaper Chargers passing-game exposure case relative to Ladd McConkey, with big-play/TD upside balanced against inconsistency
+
+The article's sleeper labels, ceiling calls and advice to reach or wait remain `SOURCE_ANALYST` outlooks. ADP references, injuries and depth-chart context are marked time-sensitive so they can be refreshed before draft night.
+
 ## Use by the future AI coach
 
 The journal does **not** currently change deterministic recommendation scores.
@@ -171,6 +183,6 @@ The AI should always distinguish:
 
 ## Initial source set
 
-The journal was seeded from user-supplied 2026 material from Footballguys, CBS Sports, ESPN, FantasyPros, NFL.com, Seattle Seahawks, Yahoo Sports/Lindy's Sports, PhillyVoice and Yahoo Sports.
+The journal was seeded from user-supplied 2026 material from Footballguys, CBS Sports, ESPN, FantasyPros, NFL.com, Seattle Seahawks, Yahoo Sports/Lindy's Sports, PhillyVoice, Sports Illustrated and Yahoo Sports.
 
 Source URLs and ingestion status are stored directly in the machine-readable journal files so every factual entry can be traced back to its source.
