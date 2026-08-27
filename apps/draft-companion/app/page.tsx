@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { buildDraftBoard, rosterForSlot } from '@/lib/board';
-import { replaceDraftPick, removeDraftPick } from '@/lib/corrections';
+import { replaceDraftPick, removeDraftPick, undoLatestSimulatorUserDecision } from '@/lib/corrections';
 import { nextUserOverallPick } from '@/lib/draft';
 import { managerProfileOptions } from '@/lib/opponent-model';
 import { DRAFT_STORAGE_KEY, parseDraftSnapshot, serializeDraftSnapshot } from '@/lib/persistence';
@@ -362,7 +362,13 @@ export default function Page() {
       onImport={importRankings}
       onRestore={restoreBackup}
       onBackup={backup}
-      onUndo={() => setPicks((existing) => [...existing].sort((a, b) => a.overallPick - b.overallPick).slice(0, -1))}
+      onUndo={() =>
+        setPicks((existing) =>
+          simulatorMode
+            ? undoLatestSimulatorUserDecision(existing, config.userDraftSlot)
+            : [...existing].sort((a, b) => a.overallPick - b.overallPick).slice(0, -1),
+        )
+      }
       onRestart={() => {
         if (started && !confirm('Restart the draft and unlock setup?')) return;
         setPicks([]);
