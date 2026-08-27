@@ -7,6 +7,7 @@ The machine-readable journal is split into a base file plus source-specific supp
 ```text
 apps/draft-companion/data/offseason-context-2026.json
 apps/draft-companion/data/offseason-context-2026-espn.json
+apps/draft-companion/data/offseason-context-2026-yahoo-phillyvoice.json
 ```
 
 The TypeScript access layer merges those files by source and entry ID:
@@ -30,6 +31,7 @@ Good entries are fantasy-relevant changes that can materially alter how historic
 - training-camp/preseason role evidence
 - meaningful ADP moves
 - offensive-line changes that materially affect a fantasy environment
+- schedule/context notes when a source argues they materially affect a close draft decision
 - clearly attributed analyst breakout, sleeper or fade cases
 
 The journal is curated rather than exhaustive. A fact should be included because it could change a draft decision, not simply because it appeared in an article. Defensive-only offseason moves are generally omitted unless they materially affect a standard fantasy decision.
@@ -59,6 +61,8 @@ The inference is explicitly labeled `ROSTERPILOT_INFERENCE`; it must never be pr
 
 Source-authored opinions are labeled separately, for example `SOURCE_ANALYST`, `SOURCE_CONSENSUS`, or `SOURCE_CONFLICT`. Source projections remain projections. For example, ESPN's expectation that DJ Moore will exceed 100 targets in Buffalo is stored as a `SOURCE_ANALYST` outlook, not as a factual 2026 stat.
 
+Schedule-strength claims are also analyst context rather than hard player projections. They should normally receive lower confidence because defensive quality and matchup difficulty can change materially once the season begins.
+
 ## Conflicting viewpoints
 
 Conflicts are useful information and should remain in the journal.
@@ -69,7 +73,7 @@ Do not silently average conflicting claims into a false consensus.
 
 ## Time-sensitive entries
 
-Injuries, camp roles, ADP movement, depth-chart battles, legal/suspension risk and recovery timelines should use:
+Injuries, camp roles, ADP movement, depth-chart battles, legal/suspension risk, recovery timelines and schedule-strength assessments should use:
 
 ```json
 "timeSensitive": true
@@ -112,6 +116,25 @@ The user-provided ESPN newcomers article is now ingested. The supplement intenti
 
 The supplement also corrects the initial Sam Darnold team tag to Seattle while retaining the legacy entry ID so saved references remain stable.
 
+## Yahoo + PhillyVoice supplement
+
+The Yahoo/Lindy's Amon-Ra St. Brown article contributes a small schedule-strength context note. It is intentionally `LOW_MEDIUM` confidence and should be used only as a tie-breaker, not as a reason to override a meaningful ranking/value gap.
+
+The PhillyVoice running-back article contributes higher-signal current-role and risk context for several 2026 backs, including:
+
+- Jahmyr Gibbs after David Montgomery's move to Houston
+- Christian McCaffrey's elite 2025 production alongside age/efficiency/regression concerns
+- Saquon Barkley's extreme recent workload plus Philadelphia's scheme/line context
+- Kenneth Walker III's projected Kansas City workload
+- Omarion Hampton's fit in Mike McDaniel's run-oriented Chargers offense
+- Ashton Jeanty's Klint Kubiak fit plus current ankle issue
+- Travis Etienne's move to New Orleans
+- De'Von Achane's post-McDaniel volume uncertainty
+- Bucky Irving's added competition from Kenneth Gainwell and Sean Tucker
+- Josh Jacobs' efficiency and possible-suspension risk
+
+Rankings, breakout claims, fades and future workload expectations from the article remain `SOURCE_ANALYST` outlooks rather than factual projections.
+
 ## Use by the future AI coach
 
 The journal does **not** currently change deterministic recommendation scores.
@@ -148,6 +171,6 @@ The AI should always distinguish:
 
 ## Initial source set
 
-The journal was seeded from user-supplied 2026 material from Footballguys, CBS Sports, ESPN, FantasyPros, NFL.com, Seattle Seahawks and Yahoo Sports.
+The journal was seeded from user-supplied 2026 material from Footballguys, CBS Sports, ESPN, FantasyPros, NFL.com, Seattle Seahawks, Yahoo Sports/Lindy's Sports, PhillyVoice and Yahoo Sports.
 
 Source URLs and ingestion status are stored directly in the machine-readable journal files so every factual entry can be traced back to its source.
