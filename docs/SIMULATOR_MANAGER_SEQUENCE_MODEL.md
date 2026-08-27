@@ -4,15 +4,16 @@
 
 Historical manager personalization in Draft Simulator should represent **conditional draft behavior**, not merely a manager's broad position preference.
 
-A phase-level statement such as "this manager drafts RB more often than the league in Rounds 1-4" is useful before the draft starts, but it becomes too coarse once that manager has already made selections. A manager who generally favors RB early should not receive the same RB boost after RB-RB that they received before making any picks.
+A phase-level statement such as "this manager drafts RB more often than the league in Rounds 1-4" is useful as a broad prior, but it is too coarse for the manager's first pick and becomes too coarse again once that manager has already made selections. Round 1 therefore uses its own recency-weighted first-pick distribution, while later early-round picks condition on the manager's actual simulated roster sequence.
 
-The sequence model therefore conditions the historical position distribution on the manager's actual simulated roster sequence while keeping the current-year market/ranking board dominant.
+The sequence model keeps the current-year market/ranking board dominant while using manager history only to break plausible close calls.
 
 ## Source data
 
-Sequence statistics were derived from the corrected Purple League draft history covering 2013-2025. The raw draft-history export remains outside the repository. Only the compact derived artifact is committed:
+Statistics were derived from the corrected Purple League draft history covering 2013-2025. The raw draft-history export remains outside the repository. Compact derived artifacts are committed:
 
-`research/league_manager_sequence_profiles_2013_2025.json`
+- `research/league_manager_round1_profiles_2013_2025.json`
+- `research/league_manager_sequence_profiles_2013_2025.json`
 
 The derivation uses the same recency decay as the existing V1 manager profile:
 
@@ -20,7 +21,7 @@ The derivation uses the same recency decay as the existing V1 manager profile:
 season weight = 0.85 ^ (2025 - season)
 ```
 
-The derived artifact contains, per manager:
+The Round-1 artifact contains each manager's recency-weighted first-pick position distribution. The sequence artifact contains, per manager:
 
 - exact first-four prefix transitions, such as `RB>RB -> next position`;
 - recency-weighted same-position repeat behavior in Rounds 2-8;
@@ -30,16 +31,30 @@ Player identity and historical ADP reach/wait behavior are deliberately excluded
 
 ## Hierarchical backoff
 
-For a simulated opponent pick with an assigned historical manager, the position distribution is built from broad to specific:
+For a simulated opponent pick with an assigned historical manager, the position distribution is built as follows:
 
-1. **Draft-phase position tendency** from the existing V1 profile (`R1_4`, `R5_8`, `R9_12`, `R13_16`).
-2. **Same-position repeat behavior** when the manager already has a prior pick, shrunk toward the phase distribution with prior weight 6.
-3. **Two-pick streak continuation behavior** when the previous two picks have the same position, shrunk toward the repeat-conditioned distribution with prior weight 4.
-4. **Exact early-draft prefix** in Rounds 2-4 when that exact prior sequence exists historically, shrunk toward the broader conditional distribution with prior weight 3.
+1. **Round 1:** dedicated recency-weighted first-pick tendency, compared with the league's recency-weighted Round-1 manager baseline.
+2. **Round 2 onward:** draft-phase position tendency from the existing V1 profile (`R1_4`, `R5_8`, `R9_12`, `R13_16`).
+3. **Same-position repeat behavior** when the manager already has a prior pick, shrunk toward the phase distribution with prior weight 6.
+4. **Two-pick streak continuation behavior** when the previous two picks have the same position, shrunk toward the repeat-conditioned distribution with prior weight 4.
+5. **Exact early-draft prefix** in Rounds 2-4 when that exact prior sequence exists historically, shrunk toward the broader conditional distribution with prior weight 3.
 
-This ordering matters: sequence information **replaces/refines** the coarse phase tendency instead of being added as a second independent bonus. That prevents double-counting statements such as "likes RB early" and "has already taken RB twice."
+This ordering matters: sequence information **replaces/refines** the coarse phase tendency instead of being added as a second independent bonus. Round 1 likewise no longer inherits a manager's combined Rounds 1-4 preference. That prevents a manager who accumulates RBs across Rounds 2-4 from being incorrectly treated as an unusually strong Round-1 RB drafter.
 
-The resulting effective position probability is then compared with the league's phase-level probability and converted into the existing bounded manager-history score. The simulator still considers only the top 12 current market candidates, so sequence history cannot create extreme reaches.
+The resulting effective position probability is converted into the existing bounded manager-history score. The simulator still considers only the top 12 current market candidates, so historical behavior cannot create extreme reaches.
+
+## Sunny-D Round 1 example
+
+Sunny-D's broad recency-weighted Rounds 1-4 profile is approximately **56.7% RB / 35.2% WR**, but that is not the correct comparison for his first pick.
+
+Using only his actual Round-1 selections with the same 0.85 recency decay gives approximately:
+
+| Position | Sunny-D Round 1 | League manager Round 1 average |
+| --- | ---: | ---: |
+| RB | 58.8% | 55.9% |
+| WR | 41.2% | 41.1% |
+
+The manager-specific signal at his first pick is therefore small. On the 2026 board where Puka Nacua is the top remaining market player and Christian McCaffrey is several market slots lower, Round-1 history should not overpower the current board.
 
 ## Sunny-D RB-RB example
 
@@ -70,13 +85,14 @@ So RB-RB-RB remains possible, because it has occurred historically, but it is no
 
 ## Live scoring hierarchy
 
-Historical sequence behavior remains a bounded tie-breaker. Simulated opponent selection still uses this hierarchy:
+Historical behavior remains a bounded tie-breaker. Simulated opponent selection uses this hierarchy:
 
 1. current ranking / ADP market order;
-2. current roster need;
-3. sequence-conditioned manager tendency;
-4. optional room-profile pressure;
-5. small deterministic jitter for close ties.
+2. generic current roster need;
+3. Round-1 or sequence-conditioned manager tendency;
+4. manager-specific historical roster construction;
+5. optional room-profile pressure;
+6. small deterministic jitter for close ties.
 
 The candidate window remains the top 12 current market players.
 
