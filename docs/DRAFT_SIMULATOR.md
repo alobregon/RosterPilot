@@ -15,6 +15,8 @@ The simulator makes only opponent selections. It always stops when the configure
 
 After the user drafts a player, opponent simulation resumes automatically and stops again at the next user pick.
 
+Each new simulation receives a fresh run seed. The seed is held constant for that mock, so refreshing or restoring the same saved mock does not reshuffle future close decisions. Restarting and starting a new mock generates a new seed, allowing equally plausible close calls to vary between simulations.
+
 ## How opponent picks are chosen
 
 With **Historical manager data off**, the simulator preserves the simple room-profile behavior:
@@ -30,10 +32,19 @@ With **Historical manager data on**, an assigned manager uses a bounded personal
 
 - the manager's current roster need;
 - the manager's **sequence-conditioned** Purple League position tendency;
+- the manager's historical roster-construction shape;
 - the selected room-profile pressure, if any;
-- a small deterministic jitter so equally plausible choices do not all collapse to the same position.
+- a small run-seeded variation of at most ±1.5 score points so close choices can differ between mocks.
 
 Historical behavior is intentionally restricted to the **top 12 currently available market candidates**. That guardrail prevents old tendencies from manufacturing extreme reaches far outside the current board. Historical player-level reach/wait behavior remains disabled because its walk-forward validation did not beat the neutral baseline.
+
+## Round 1 behavior
+
+Round 1 uses a dedicated recency-weighted first-pick position distribution for each manager rather than the broader Rounds 1-4 profile.
+
+Because there is no roster sequence yet, Round-1 history is intentionally weaker than later conditional history. The manager-specific Round-1 position adjustment is capped at **±3 score points before the normal history weight**. This makes first-pick history a close-call nudge instead of allowing a manager's career RB/WR preference to routinely jump several current-market slots.
+
+For example, Dixie has a genuine strong Round-1 RB history, but that preference should not automatically move an RB ranked several market slots behind an elite WR to the top. A new simulation seed can still make a borderline RB-vs-WR decision vary when the total scores are genuinely close.
 
 ## Sequence-aware manager history
 
@@ -41,7 +52,7 @@ The simulator no longer treats a manager's phase-level position tendency as inde
 
 For assigned managers, the historical position distribution is refined from broad to specific:
 
-1. R1-4 / R5-8 / R9-12 / R13-16 phase tendency;
+1. dedicated Round-1 tendency for the first selection; otherwise R1-4 / R5-8 / R9-12 / R13-16 phase tendency;
 2. same-position repeat behavior in Rounds 2-8;
 3. whether that manager historically extends a two-pick same-position streak in Rounds 3-8;
 4. exact first-four prefix behavior when that exact early sequence has historical observations.
@@ -74,6 +85,6 @@ Both modes stop before any user selection.
 
 ## Persistence and corrections
 
-Simulator mode, room profile, pace, team-name preference, historical-manager preference, picks, and saved assignments are stored with the normal Draft Companion snapshot/JSON backup.
+Simulator mode, room profile, pace, the per-mock simulation seed, team-name preference, historical-manager preference, picks, and saved assignments are stored with the normal Draft Companion snapshot/JSON backup.
 
 Corrections pause automatic simulator progression until the draft state is contiguous again.
