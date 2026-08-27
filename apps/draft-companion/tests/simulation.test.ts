@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   autoDraftOpponentsUntilUserTurn,
   hasLegalStartingRoster,
+  historicalSequencePositionProbability,
   simulateDeterministicDraft,
   simulateNextOpponentPick,
 } from '../lib/simulation';
@@ -117,5 +118,63 @@ describe('interactive draft simulator', () => {
       managerIds: ['Armando', '', '', ''],
     });
     expect(armando[0]?.playerId).toBe('te-2');
+  });
+
+  it('conditions Sunny-D early-round tendencies on an RB-RB start', () => {
+    const rbAfterOne = historicalSequencePositionProbability({
+      managerId: 'Sunny-DCommissioner',
+      position: 'RB',
+      round: 2,
+      priorPositions: ['RB'],
+    });
+    const rbAfterTwo = historicalSequencePositionProbability({
+      managerId: 'Sunny-DCommissioner',
+      position: 'RB',
+      round: 3,
+      priorPositions: ['RB', 'RB'],
+    });
+    const wrAfterTwo = historicalSequencePositionProbability({
+      managerId: 'Sunny-DCommissioner',
+      position: 'WR',
+      round: 3,
+      priorPositions: ['RB', 'RB'],
+    });
+
+    expect(rbAfterOne).toBeCloseTo(0.651, 3);
+    expect(rbAfterTwo).toBeCloseTo(0.268, 3);
+    expect(wrAfterTwo).toBeCloseTo(0.546, 3);
+    expect(wrAfterTwo ?? 0).toBeGreaterThan(rbAfterTwo ?? 0);
+  });
+
+  it('uses the sequence-aware history to avoid blindly extending an RB-RB start', () => {
+    const players: PlayerRanking[] = [
+      { id: 'sun-rb1', name: 'Sunny RB 1', position: 'RB', overallRank: 20, adp: 20 },
+      { id: 'other-2', name: 'Other 2', position: 'WR', overallRank: 21, adp: 21 },
+      { id: 'other-3', name: 'Other 3', position: 'WR', overallRank: 22, adp: 22 },
+      { id: 'other-4', name: 'Other 4', position: 'WR', overallRank: 23, adp: 23 },
+      { id: 'other-5', name: 'Other 5', position: 'WR', overallRank: 24, adp: 24 },
+      { id: 'other-6', name: 'Other 6', position: 'WR', overallRank: 25, adp: 25 },
+      { id: 'other-7', name: 'Other 7', position: 'WR', overallRank: 26, adp: 26 },
+      { id: 'sun-rb2', name: 'Sunny RB 2', position: 'RB', overallRank: 27, adp: 27 },
+      { id: 'rb-next', name: 'Best Remaining RB', position: 'RB', overallRank: 28, adp: 28 },
+      { id: 'wr-next', name: 'Close Remaining WR', position: 'WR', overallRank: 29, adp: 29 },
+      { id: 'te-next', name: 'Close Remaining TE', position: 'TE', overallRank: 30, adp: 30 },
+    ];
+    const picks = Array.from({ length: 8 }, (_, index) => {
+      const overallPick = index + 1;
+      const playerId = overallPick === 1 ? 'sun-rb1' : overallPick === 8 ? 'sun-rb2' : `other-${overallPick}`;
+      return draftPickAtOverall(overallPick, playerId, 4);
+    });
+
+    const result = simulateNextOpponentPick({
+      players,
+      picks,
+      config,
+      currentOverallPick: 9,
+      roomProfile: 'RANK_ORDER',
+      managerIds: ['Sunny-DCommissioner', '', '', ''],
+    });
+
+    expect(result.find((pick) => pick.overallPick === 9)?.playerId).toBe('wr-next');
   });
 });
