@@ -1,5 +1,6 @@
 import journalData from '../data/offseason-context-2026.json';
 import espnSupplementData from '../data/offseason-context-2026-espn.json';
+import yahooPhillyVoiceSupplementData from '../data/offseason-context-2026-yahoo-phillyvoice.json';
 
 export type OffseasonContextSourceStatus = 'INGESTED' | 'PENDING_EXCERPT';
 export type OffseasonContextSubjectKind = 'PLAYER' | 'TEAM';
@@ -75,7 +76,12 @@ interface OffseasonContextSupplement {
 
 const BASE_JOURNAL = journalData as unknown as OffseasonContextJournal;
 const ESPN_SUPPLEMENT = espnSupplementData as unknown as OffseasonContextSupplement;
-const JOURNAL = mergeOffseasonContext(BASE_JOURNAL, [ESPN_SUPPLEMENT]);
+const YAHOO_PHILLYVOICE_SUPPLEMENT =
+  yahooPhillyVoiceSupplementData as unknown as OffseasonContextSupplement;
+const JOURNAL = mergeOffseasonContext(BASE_JOURNAL, [
+  ESPN_SUPPLEMENT,
+  YAHOO_PHILLYVOICE_SUPPLEMENT,
+]);
 
 export function getOffseasonContextJournal(): OffseasonContextJournal {
   return JOURNAL;
