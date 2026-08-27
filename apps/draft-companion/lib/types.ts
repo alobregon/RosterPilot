@@ -100,6 +100,8 @@ export interface Recommendation {
   survivalProbability?: number;
   positionTrend: PositionTrendStatus;
   marketFall?: number;
+  /** Bounded +/-3 raw-score tie-breaker derived from curated offseason context. */
+  contextAdjustment?: number;
   breakdown: RecommendationBreakdown;
   reasons: string[];
 }
