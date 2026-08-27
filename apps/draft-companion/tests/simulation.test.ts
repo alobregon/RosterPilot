@@ -6,6 +6,7 @@ import {
   historicalSequencePositionProbability,
   simulateDeterministicDraft,
   simulateNextOpponentPick,
+  simulationToleranceForRound,
 } from '../lib/simulation';
 import { draftPickAtOverall } from '../lib/corrections';
 import type { DraftConfig, PlayerRanking, Position } from '../lib/types';
@@ -106,6 +107,39 @@ describe('interactive draft simulator', () => {
     });
     const selected = players.find((player) => player.id === result[0]?.playerId);
     expect(selected?.position).toBe('QB');
+  });
+
+  it('widens market tolerance as draft-board confidence falls', () => {
+    expect(simulationToleranceForRound(1)).toEqual({
+      candidateWindow: 10,
+      marketSlotPenalty: 3,
+      maxManagerPositionBias: 3,
+      jitterAmplitude: 1.5,
+    });
+    expect(simulationToleranceForRound(3)).toEqual({
+      candidateWindow: 12,
+      marketSlotPenalty: 2.5,
+      maxManagerPositionBias: 5,
+      jitterAmplitude: 1.5,
+    });
+    expect(simulationToleranceForRound(6)).toEqual({
+      candidateWindow: 16,
+      marketSlotPenalty: 1.75,
+      maxManagerPositionBias: 7,
+      jitterAmplitude: 2,
+    });
+    expect(simulationToleranceForRound(10)).toEqual({
+      candidateWindow: 20,
+      marketSlotPenalty: 1.25,
+      maxManagerPositionBias: 9,
+      jitterAmplitude: 2.5,
+    });
+    expect(simulationToleranceForRound(14)).toEqual({
+      candidateWindow: 24,
+      marketSlotPenalty: 0.9,
+      maxManagerPositionBias: 10,
+      jitterAmplitude: 3,
+    });
   });
 
   it('uses an assigned manager history to break close ranking decisions', () => {
