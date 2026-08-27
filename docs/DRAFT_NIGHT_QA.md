@@ -24,8 +24,11 @@
 - [ ] With Historical manager data off, confirm **Normal / rank order** follows the current market board and never auto-selects the user's pick.
 - [ ] Enable Historical manager data, assign managers, restart the simulation, and confirm close opponent choices can differ from pure rank order while remaining within the top current market candidates.
 - [ ] Confirm personalized opponent picks respond to roster need (for example, a manager who already filled TE is less likely to keep taking TE solely because of historical tendency).
+- [ ] Confirm Round 1 uses the dedicated recency-weighted first-pick tendency instead of the broader Rounds 1-4 phase distribution.
+- [ ] Sunny-D Round-1 regression with the 2026 rankings: after Gibbs, Bijan, Ja'Marr Chase, and Jonathan Taylor are drafted at picks 1-4, confirm Sunny-D at #5 takes **Puka Nacua** rather than Christian McCaffrey in Normal room mode.
 - [ ] Confirm manager history is **sequence-aware** rather than a repeated phase bonus: after a manager takes the same position twice, the third-pick tendency should reflect that manager's actual repeat/streak history.
 - [ ] Sunny-D regression: after an `RB-RB` start in Round 3, confirm close WR/RB choices favor WR rather than blindly extending the broad early-RB tendency. RB-RB-RB should remain possible only when current market value is strong enough to overcome the conditional history.
+- [ ] Confirm manager-specific historical roster construction nudges depth picks toward each manager's typical final roster shape without overriding starter/FLEX needs.
 - [ ] Confirm disabling Historical manager data returns Normal mode to pure market-order opponent picks.
 - [ ] Confirm **Instant to my pick** fills opponent selections immediately and stops on the user's turn.
 - [ ] Confirm **Watch picks** advances one opponent at a time and stops on the user's turn.
