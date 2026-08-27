@@ -1,6 +1,7 @@
 import {
   buildFantasyProsNewsDiagnostic,
   FantasyProsApiError,
+  type FantasyProsNewsCategory,
   fetchFantasyProsNflNews,
   isFantasyProsNewsCategory,
 } from '@/lib/fantasypros';
@@ -38,14 +39,18 @@ export async function GET(request: Request) {
     }
   }
 
-  if (categoryText && !isFantasyProsNewsCategory(categoryText)) {
-    return Response.json(
-      {
-        ok: false,
-        error: `Unsupported news category '${categoryText}'. Use injury, recap, transaction, rumor, or breaking.`,
-      },
-      { status: 400 },
-    );
+  let category: FantasyProsNewsCategory | undefined;
+  if (categoryText) {
+    if (!isFantasyProsNewsCategory(categoryText)) {
+      return Response.json(
+        {
+          ok: false,
+          error: `Unsupported news category '${categoryText}'. Use injury, recap, transaction, rumor, or breaking.`,
+        },
+        { status: 400 },
+      );
+    }
+    category = categoryText;
   }
 
   if (!Number.isInteger(limit) || limit < 1 || limit > 25) {
@@ -59,7 +64,7 @@ export async function GET(request: Request) {
     const payload = await fetchFantasyProsNflNews({
       apiKey,
       fpid,
-      category: categoryText || undefined,
+      category,
       limit,
     });
 
@@ -68,7 +73,7 @@ export async function GET(request: Request) {
       request: {
         sport: 'NFL',
         fpid: fpid ?? null,
-        category: categoryText || null,
+        category: category ?? null,
         limit,
         fantasyProsRequestsUsed: 1,
       },
