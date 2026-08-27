@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildFantasyProsProjectionDiagnostic,
   isFantasyProsProjectionPosition,
+  parseFantasyProsPlayerIds,
 } from '../lib/fantasypros';
 
 describe('FantasyPros projection diagnostics', () => {
@@ -70,5 +71,12 @@ describe('FantasyPros projection diagnostics', () => {
     expect(isFantasyProsProjectionPosition('DST')).toBe(true);
     expect(isFantasyProsProjectionPosition('ALL')).toBe(false);
     expect(isFantasyProsProjectionPosition('')).toBe(false);
+  });
+
+  it('parses and deduplicates targeted FantasyPros player IDs', () => {
+    expect(parseFantasyProsPlayerIds('19799:23180,19799')).toEqual([19799, 23180]);
+    expect(parseFantasyProsPlayerIds(null)).toEqual([]);
+    expect(() => parseFantasyProsPlayerIds('19799:nope')).toThrow('positive integers');
+    expect(() => parseFantasyProsPlayerIds('1:2:3:4:5:6:7:8:9:10:11')).toThrow('At most 10');
   });
 });
