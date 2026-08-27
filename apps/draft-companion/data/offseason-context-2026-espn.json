@@ -1,0 +1,470 @@
+{
+  "season": 2026,
+  "version": 1,
+  "updatedAt": "2026-08-27",
+  "sources": [
+    {
+      "id": "espn-newcomers-impact-2026",
+      "publisher": "ESPN",
+      "title": "2026 NFL offseason newcomers impact ranking: draft, trades, signings",
+      "url": "https://www.espn.com/nfl/story/_/id/49425098/2026-nfl-offseason-newcomers-impact-ranking-draft-trades-signings",
+      "status": "INGESTED",
+      "notes": "Fantasy-relevant offensive entries summarized from user-provided article text. Defensive-only entries were intentionally omitted from the fantasy journal."
+    }
+  ],
+  "entries": [
+    {
+      "id": "espn-aj-brown-new-england",
+      "subjects": [
+        { "kind": "PLAYER", "name": "A.J. Brown", "team": "NE" },
+        { "kind": "PLAYER", "name": "Drake Maye", "team": "NE" },
+        { "kind": "PLAYER", "name": "Romeo Doubs", "team": "NE" }
+      ],
+      "categories": ["TEAM_CHANGE", "TARGET_COMPETITION", "QB_SUPPORT"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "New England acquired A.J. Brown, and Romeo Doubs also joined the Patriots receiving room.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Brown exceeded 1,000 receiving yards in each of his four seasons with Philadelphia.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN views Brown as a true No. 1 target for Drake Maye and sees Brown plus Doubs as a major upgrade to New England's receiver room."
+      }
+    },
+    {
+      "id": "espn-kyler-murray-minnesota",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Kyler Murray", "team": "MIN" },
+        { "kind": "PLAYER", "name": "Justin Jefferson", "team": "MIN" }
+      ],
+      "categories": ["TEAM_CHANGE", "QB_CHANGE", "SCHEME_CHANGE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Kyler Murray signed with Minnesota and ESPN identifies him as the likely starter.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Murray reached 20,000 passing yards and 3,000 rushing yards within his first seven NFL seasons.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Kevin O'Connell to create more rhythm throws for Murray while continuing to use his rushing ability and isolating Justin Jefferson as a matchup target."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-waddle-denver-fit",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jaylen Waddle", "team": "DEN" },
+        { "kind": "PLAYER", "name": "Bo Nix", "team": "DEN" },
+        { "kind": "PLAYER", "name": "Courtland Sutton", "team": "DEN" }
+      ],
+      "categories": ["TEAM_CHANGE", "QB_SUPPORT", "TARGET_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Denver acquired Jaylen Waddle from Miami.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Waddle averaged 14.2 yards per catch in 2025 and recorded 14 receptions of at least 20 yards.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN sees Waddle's route tree as a strong match for Bo Nix and expects him to add speed alongside Courtland Sutton."
+      }
+    },
+    {
+      "id": "espn-dj-moore-buffalo-role",
+      "subjects": [
+        { "kind": "PLAYER", "name": "DJ Moore", "team": "BUF" },
+        { "kind": "PLAYER", "name": "Josh Allen", "team": "BUF" },
+        { "kind": "PLAYER", "name": "Khalil Shakir", "team": "BUF" }
+      ],
+      "categories": ["TEAM_CHANGE", "TARGET_ROLE", "COACHING_CHANGE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Buffalo acquired DJ Moore from Chicago, and Joe Brady is the Bills' head coach.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Moore caught at least 90 passes in two of his three seasons with Chicago and had at least six receiving touchdowns in each of those three seasons.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN views Moore as Buffalo's explosive No. 1 receiver and projects him for more than 100 targets in 2026."
+      }
+    },
+    {
+      "id": "espn-jeremiyah-love-three-down",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jeremiyah Love", "team": "ARI" }
+      ],
+      "categories": ["ROOKIE_ROLE", "BACKFIELD_ROLE", "RECEIVING_ROLE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Arizona drafted Jeremiyah Love, who scored 21 total touchdowns for Notre Dame in 2025 and had 63 receptions during his college career.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN views Love as a potential three-down playmaker and expects his receiving route tree to expand in Arizona."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-mike-evans-san-francisco",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Mike Evans", "team": "SF" },
+        { "kind": "PLAYER", "name": "Brock Purdy", "team": "SF" }
+      ],
+      "categories": ["TEAM_CHANGE", "TARGET_ROLE", "RED_ZONE_ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Mike Evans signed with San Francisco after injuries limited his 2025 production.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Evans reached 1,000 receiving yards in each of his first 11 NFL seasons.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Evans to function as Kyle Shanahan's boundary X receiver and as an isolation/red-zone target for Brock Purdy."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-kenneth-walker-kansas-city",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Kenneth Walker III", "team": "KC" },
+        { "kind": "PLAYER", "name": "Patrick Mahomes", "team": "KC" }
+      ],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_ROLE", "RECEIVING_ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Kenneth Walker III signed with Kansas City after the Chiefs averaged 4.2 yards per carry in 2025.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Walker recorded 33 rushes of at least 10 yards in 2025 and has had at least 25 receptions in every NFL season of his career.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Walker's receiving skill to translate into Andy Reid's screen game and running-back route tree."
+      }
+    },
+    {
+      "id": "espn-houston-offensive-line-upgrade",
+      "subjects": [
+        { "kind": "PLAYER", "name": "C.J. Stroud", "team": "HOU" },
+        { "kind": "PLAYER", "name": "David Montgomery", "team": "HOU" },
+        { "kind": "PLAYER", "name": "Braden Smith", "team": "HOU" }
+      ],
+      "categories": ["OFFENSIVE_LINE", "TEAM_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Houston added Braden Smith, Wyatt Teller and rookie Keylan Rutledge after finishing 2025 with the third-lowest pass block win rate.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Smith started 13 games at right tackle for Indianapolis in 2025 and improved his pass block win rate by seven percentage points from 2024.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "ROSTERPILOT_INFERENCE",
+        "summary": "The personnel investment gives Houston a plausible path to better protection and blocking, which is a positive environment signal for Stroud and the run game but not a guarantee of improved fantasy output."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-malik-willis-miami",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Malik Willis", "team": "MIA" }
+      ],
+      "categories": ["TEAM_CHANGE", "QB_CHANGE", "RUSHING_UPSIDE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Malik Willis signed with Miami after appearing four times for Green Bay in 2025, including one start.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "In those 2025 appearances, ESPN reports Willis completed 85.7% of his passes, rushed for 123 yards and scored four touchdowns.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Bobby Slowik to use Willis as a dual-threat quarterback with designed runs, play action and vertical throws, while noting Miami is rebuilding."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-jordyn-tyson-saints-role",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jordyn Tyson", "team": "NO" },
+        { "kind": "PLAYER", "name": "Chris Olave", "team": "NO" },
+        { "kind": "PLAYER", "name": "Tyler Shough", "team": "NO" }
+      ],
+      "categories": ["ROOKIE_ROLE", "TARGET_ROLE", "QB_SUPPORT"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "New Orleans drafted Jordyn Tyson to join a receiver room led by Chris Olave and second-year quarterback Tyler Shough.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Tyson to work opposite Olave and sees his vertical and middle-of-field ability as a fit in Kellen Moore's offense."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-isaiah-likely-giants-breakout",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Isaiah Likely", "team": "NYG" },
+        { "kind": "PLAYER", "name": "Jaxson Dart", "team": "NYG" }
+      ],
+      "categories": ["TEAM_CHANGE", "TARGET_ROLE", "BREAKOUT"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Isaiah Likely signed with the Giants after spending his Baltimore career behind Mark Andrews.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN calls Likely a breakout candidate and expects the Giants to scheme him targets at multiple levels, including screens and underneath outlets for Jaxson Dart."
+      }
+    },
+    {
+      "id": "espn-david-montgomery-houston-role",
+      "subjects": [
+        { "kind": "PLAYER", "name": "David Montgomery", "team": "HOU" }
+      ],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_ROLE", "RED_ZONE_ROLE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Houston acquired David Montgomery after averaging 3.9 yards per carry in 2025.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Montgomery rushed for 33 touchdowns across his three seasons with Detroit.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN describes Montgomery as Houston's lead-role runner and emphasizes his low-red-zone production."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-chargers-mcdaniel-personnel-clue",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Ladd McConkey", "team": "LAC" },
+        { "kind": "PLAYER", "name": "Mike McDaniel", "team": "LAC" },
+        { "kind": "PLAYER", "name": "Alec Ingold", "team": "LAC" }
+      ],
+      "categories": ["COACHING_CHANGE", "SCHEME_CHANGE", "PERSONNEL_USAGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Alec Ingold signed with the Chargers to continue playing for Mike McDaniel after their time together in Miami.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "ESPN reports Miami used 21 personnel on 234 snaps in 2025, the second-most in the NFL.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "ROSTERPILOT_INFERENCE",
+        "summary": "Ingold's reunion with McDaniel is evidence of scheme continuity and more varied personnel usage in Los Angeles. That may create favorable motion/matchup opportunities, but it does not by itself prove higher target volume for McConkey."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-makai-lemon-philadelphia-role",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Makai Lemon", "team": "PHI" },
+        { "kind": "PLAYER", "name": "DeVonta Smith", "team": "PHI" },
+        { "kind": "PLAYER", "name": "A.J. Brown", "team": "NE" }
+      ],
+      "categories": ["ROOKIE_ROLE", "TARGET_COMPETITION", "COACHING_CHANGE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "A.J. Brown is no longer in Philadelphia, and the Eagles drafted Makai Lemon.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Lemon to step into the No. 2 receiver role opposite DeVonta Smith under new coordinator Sean Mannion."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-jadarian-price-seattle-backfield",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jadarian Price", "team": "SEA" },
+        { "kind": "PLAYER", "name": "Zach Charbonnet", "team": "SEA" },
+        { "kind": "PLAYER", "name": "George Holani", "team": "SEA" },
+        { "kind": "PLAYER", "name": "Emanuel Wilson", "team": "SEA" }
+      ],
+      "categories": ["ROOKIE_ROLE", "BACKFIELD_COMPETITION", "INJURY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Seattle drafted Jadarian Price into a backfield that also includes George Holani, Emanuel Wilson and Zach Charbonnet, with Charbonnet returning from an ACL tear.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN sees Price as having traits to emerge early, but explicitly expects a shared-touch backfield."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-kirk-cousins-raiders-starter",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Kirk Cousins", "team": "LV" },
+        { "kind": "PLAYER", "name": "Fernando Mendoza", "team": "LV" },
+        { "kind": "PLAYER", "name": "Brock Bowers", "team": "LV" },
+        { "kind": "PLAYER", "name": "Ashton Jeanty", "team": "LV" }
+      ],
+      "categories": ["QB_CHANGE", "ROOKIE_ROLE", "COACHING_CHANGE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Las Vegas signed Kirk Cousins and drafted Fernando Mendoza first overall; Cousins previously worked with coach Klint Kubiak in Minnesota.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Cousins to open as the starter while Mendoza develops, creating a likely in-season quarterback transition risk for Raiders skill players."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-baltimore-interior-line-upgrade",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Lamar Jackson", "team": "BAL" },
+        { "kind": "PLAYER", "name": "Olaivavega Ioane", "team": "BAL" }
+      ],
+      "categories": ["OFFENSIVE_LINE", "SCHEME_CHANGE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Baltimore rebuilt the interior offensive line and drafted Olaivavega Ioane in the first round.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN sees Ioane as a fit for Declan Doyle's wide-zone scheme and as a player who can help keep the pocket firm for Lamar Jackson."
+      }
+    },
+    {
+      "id": "espn-carnell-tate-tennessee",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Carnell Tate", "team": "TEN" },
+        { "kind": "PLAYER", "name": "Cam Ward", "team": "TEN" },
+        { "kind": "PLAYER", "name": "Wan'Dale Robinson", "team": "TEN" }
+      ],
+      "categories": ["ROOKIE_ROLE", "TARGET_COMPETITION", "QB_SUPPORT"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Tennessee drafted Carnell Tate and added Wan'Dale Robinson around second-year quarterback Cam Ward.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Tate to separate in one-on-one matchups and become available to Ward at multiple levels, while Robinson adds target competition."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-geno-smith-jets",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Geno Smith", "team": "NYJ" },
+        { "kind": "PLAYER", "name": "Garrett Wilson", "team": "NYJ" },
+        { "kind": "PLAYER", "name": "Kenyon Sadiq", "team": "NYJ" }
+      ],
+      "categories": ["TEAM_CHANGE", "QB_CHANGE", "QB_SUPPORT"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "The Jets acquired Geno Smith after he threw a league-high 17 interceptions for Las Vegas in 2025.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "New York's supporting cast includes Garrett Wilson, rookie Omar Cooper Jr. and rookie tight end Kenyon Sadiq.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN believes Smith has a stronger supporting cast in New York and could stabilize the offense if his decision-making improves."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-chig-okonkwo-washington",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Chig Okonkwo", "team": "WSH" },
+        { "kind": "PLAYER", "name": "Jayden Daniels", "team": "WSH" },
+        { "kind": "PLAYER", "name": "Antonio Williams", "team": "WSH" }
+      ],
+      "categories": ["TEAM_CHANGE", "TARGET_ROLE", "QB_SUPPORT"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Chig Okonkwo signed with Washington after catching 56 passes for Tennessee in 2025.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Okonkwo and rookie Antonio Williams to improve Jayden Daniels' middle-of-field passing options, with Okonkwo creating favorable interior matchups."
+      }
+    },
+    {
+      "id": "espn-travis-etienne-new-orleans",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Travis Etienne Jr.", "team": "NO" },
+        { "kind": "PLAYER", "name": "Alvin Kamara", "team": "NO" }
+      ],
+      "categories": ["TEAM_CHANGE", "BACKFIELD_COMPETITION", "RECEIVING_ROLE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Travis Etienne Jr. signed with New Orleans, while the Saints restructured Alvin Kamara's contract to keep him on the roster.", "sourceIds": ["espn-newcomers-impact-2026"] },
+        { "summary": "Etienne scored 13 total touchdowns for Jacksonville in 2025.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN likes Etienne's receiving and perimeter-run fit in Kellen Moore's offense but explicitly notes Kamara will limit Etienne's total volume."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "espn-fernando-mendoza-transition",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Fernando Mendoza", "team": "LV" },
+        { "kind": "PLAYER", "name": "Kirk Cousins", "team": "LV" }
+      ],
+      "categories": ["ROOKIE_ROLE", "QB_CHANGE", "COACHING_CHANGE"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "Las Vegas drafted Fernando Mendoza first overall and signed Kirk Cousins.", "sourceIds": ["espn-newcomers-impact-2026"] }
+      ],
+      "outlook": {
+        "direction": "MIXED",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "ESPN expects Mendoza to play at some point in 2026 and views Klint Kubiak's system as a fit for on-time throws, play action, boots and vertical shots."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "nyj-sam-darnold-fantasy-ceiling",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Sam Darnold", "team": "SEA" }
+      ],
+      "categories": ["TEAM_CHANGE", "ADP", "OFFENSIVE_IDENTITY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [
+        { "summary": "FantasyPros lists Darnold as an ADP faller and cites a run-heavy offensive environment as a fantasy-ceiling concern.", "sourceIds": ["fantasypros-adp-risers-fallers-2026-08"] }
+      ],
+      "outlook": {
+        "direction": "NEGATIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "The concern is fantasy passing volume rather than necessarily poor real-life quarterback play."
+      },
+      "timeSensitive": true,
+      "notes": "Legacy entry ID retained so this supplemental record overrides the initial journal's incorrect NYJ team tag."
+    }
+  ]
+}
