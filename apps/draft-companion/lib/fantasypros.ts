@@ -59,15 +59,37 @@ export function isFantasyProsProjectionPosition(value: string): value is Fantasy
   return (FANTASYPROS_NFL_PROJECTION_POSITIONS as readonly string[]).includes(value);
 }
 
+/**
+ * Parses a diagnostic query string such as `19799:12345` or `19799,12345`.
+ * FantasyPros accepts colon-delimited player IDs. We cap diagnostics at 10
+ * players so a local inspection endpoint cannot accidentally request a large
+ * response or become a generic API proxy.
+ */
+export function parseFantasyProsPlayerIds(value: string | null): number[] {
+  if (!value?.trim()) return [];
+  const pieces = value.split(/[,:]/).map((piece) => piece.trim()).filter(Boolean);
+  if (pieces.length > 10) throw new Error('At most 10 FantasyPros player IDs may be requested at once.');
+
+  const ids = pieces.map((piece) => Number(piece));
+  if (ids.some((id) => !Number.isInteger(id) || id <= 0)) {
+    throw new Error('FantasyPros player IDs must be positive integers.');
+  }
+  return [...new Set(ids)];
+}
+
 export async function fetchFantasyProsPreseasonProjections(args: {
   apiKey: string;
   season: number;
   position: FantasyProsNflProjectionPosition;
+  playerIds?: readonly number[];
   signal?: AbortSignal;
 }): Promise<FantasyProsProjectionResponse> {
   const url = new URL(`${FANTASYPROS_BASE_URL}/nfl/${args.season}/projections`);
   url.searchParams.set('position', args.position);
   url.searchParams.set('week', '0');
+  if (args.playerIds?.length) {
+    url.searchParams.set('players', args.playerIds.join(':'));
+  }
 
   const response = await fetch(url, {
     headers: {
