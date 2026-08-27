@@ -86,6 +86,16 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
       managerIds = Array.from({ length: config.teamCount }, () => '');
     }
 
+    const normalizedConfig: DraftConfig = {
+      ...config,
+      teamNamesEnabled:
+        config.teamNamesEnabled ??
+        (config.opponentDetailsEnabled ?? teamNames.some((name) => name.trim().length > 0)),
+      historicalManagersEnabled:
+        config.historicalManagersEnabled ??
+        (config.opponentDetailsEnabled ?? managerIds.some((id) => id.length > 0)),
+    };
+
     if (value.draftStarted != null && typeof value.draftStarted !== 'boolean') return null;
     const draftStarted = typeof value.draftStarted === 'boolean' ? value.draftStarted : picks.length > 0;
     if (!draftStarted && picks.length > 0) return null;
@@ -93,7 +103,7 @@ export function parseDraftSnapshot(raw: string): DraftSnapshot | null {
     return {
       version: value.version,
       savedAt: value.savedAt,
-      config,
+      config: normalizedConfig,
       players,
       picks: [...picks].sort((a, b) => a.overallPick - b.overallPick),
       favoritePlayerIds,
