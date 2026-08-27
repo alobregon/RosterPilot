@@ -1,5 +1,8 @@
 export type Position = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST';
 export type ScoringFormat = 'STANDARD' | 'HALF_PPR' | 'PPR';
+export type DraftMode = 'LIVE' | 'SIMULATOR';
+export type SimulationRoomProfile = 'RANK_ORDER' | 'RB_RUSH' | 'WR_RUSH' | 'QB_RUSH' | 'TE_RUSH' | 'DST_EARLY';
+export type SimulationPace = 'INSTANT' | 'WATCH';
 export type DraftStrategy =
   | 'BALANCED'
   | 'HERO_RB'
@@ -66,6 +69,12 @@ export interface DraftConfig {
    * Undefined is retained for backward compatibility with older snapshots.
    */
   opponentDetailsEnabled?: boolean;
+  /** Live manual entry or interactive mock-draft simulator. */
+  draftMode?: DraftMode;
+  /** Opponent behavior used only by interactive simulator mode. */
+  simulationRoomProfile?: SimulationRoomProfile;
+  /** Whether simulated opponent picks fill immediately or visibly one at a time. */
+  simulationPace?: SimulationPace;
 }
 
 export interface RecommendationBreakdown {
