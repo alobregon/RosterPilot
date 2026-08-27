@@ -4,62 +4,102 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DraftUi, type DraftUiProps } from './draft-ui';
 import { managerProfileOptions } from '@/lib/opponent-model';
-import type { AvailabilityLabel } from '@/lib/types';
+import type {
+  AvailabilityLabel,
+  DraftMode,
+  SimulationPace,
+  SimulationRoomProfile,
+} from '@/lib/types';
 import type { UpcomingTarget } from '@/lib/targets';
 
 const ROUND_COLUMN_WIDTH = 64;
 const MIN_TEAM_COLUMN_WIDTH = 122;
 
+const ROOM_PROFILES: Array<[SimulationRoomProfile, string]> = [
+  ['RANK_ORDER', 'Normal / rank order'],
+  ['RB_RUSH', 'Early RB rush'],
+  ['WR_RUSH', 'Early WR rush'],
+  ['QB_RUSH', 'Early QB rush'],
+  ['TE_RUSH', 'Early TE rush'],
+  ['DST_EARLY', 'Early DST room'],
+];
+
 type DraftUiWithTargetsProps = DraftUiProps & {
   targets: UpcomingTarget[];
   managerIds: string[];
-  useOpponentDetails: boolean;
+  useTeamNames: boolean;
+  useHistoricalManagers: boolean;
   onManagerId: (index: number, value: string) => void;
-  onUseOpponentDetails: (enabled: boolean) => void;
+  onUseTeamNames: (enabled: boolean) => void;
+  onUseHistoricalManagers: (enabled: boolean) => void;
+  onDraftMode: (value: DraftMode) => void;
+  onSimulationRoomProfile: (value: SimulationRoomProfile) => void;
+  onSimulationPace: (value: SimulationPace) => void;
 };
 
 export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
   const targetMode = props.started && !props.complete && !props.correcting && !props.onClock;
   const [host, setHost] = useState<Element | null>(null);
   const [setupHost, setSetupHost] = useState<Element | null>(null);
+  const [modeHost, setModeHost] = useState<Element | null>(null);
   const boardMinWidth = ROUND_COLUMN_WIDTH + props.config.teamCount * MIN_TEAM_COLUMN_WIDTH;
 
   useEffect(() => {
     setHost(targetMode || props.onClock ? document.querySelector('.sideStack') : null);
     setSetupHost(document.querySelector('.teamNamesSection'));
-  }, [targetMode, props.onClock, props.currentOverallPick, props.config.teamCount, props.started, props.useOpponentDetails]);
+    setModeHost(document.querySelector('.setupPrimaryControls'));
+  }, [targetMode, props.onClock, props.currentOverallPick, props.config.teamCount, props.started, props.useTeamNames, props.useHistoricalManagers]);
 
   const {
     targets,
     managerIds,
-    useOpponentDetails,
+    useTeamNames,
+    useHistoricalManagers,
     onManagerId,
-    onUseOpponentDetails,
+    onUseTeamNames,
+    onUseHistoricalManagers,
+    onDraftMode,
+    onSimulationRoomProfile,
+    onSimulationPace,
     ...draftUiProps
   } = props;
 
   const opponentDetailsStyle = `
     .teamNamesSection{display:flex;flex-direction:column}
-    .opponentDetailsToggle{order:-2}
+    .opponentSetupToggles{order:-2}
     .teamNamesSection>.teamNamesHeader{order:-1}
     .teamNamesSection>.teamNameGrid{order:0}
     .historicalManagersSection{order:1}
-    ${useOpponentDetails ? '' : '.teamNamesSection>.teamNamesHeader,.teamNamesSection>.teamNameGrid,.historicalManagersSection{display:none}'}
+    ${useTeamNames ? '' : '.teamNamesSection>.teamNamesHeader,.teamNamesSection>.teamNameGrid{display:none}'}
   `;
 
   return <>
     <style>{`.draftBoardHeader,.draftBoardRow{min-width:${boardMinWidth}px;width:max(100%,${boardMinWidth}px)}${opponentDetailsStyle}`}</style>
     {targetMode || props.onClock ? <style>{'.recommendationPanel{display:none}'}</style> : null}
     <DraftUi {...draftUiProps} recs={props.onClock ? props.recs : []} />
-    {setupHost ? createPortal(
-      <OpponentDetailsToggle
-        enabled={useOpponentDetails}
+    {modeHost ? createPortal(
+      <SimulatorControls
+        mode={props.config.draftMode ?? 'LIVE'}
+        roomProfile={props.config.simulationRoomProfile ?? 'RANK_ORDER'}
+        pace={props.config.simulationPace ?? 'INSTANT'}
         disabled={props.started}
-        onChange={onUseOpponentDetails}
+        onMode={onDraftMode}
+        onRoomProfile={onSimulationRoomProfile}
+        onPace={onSimulationPace}
+      />,
+      modeHost,
+    ) : null}
+    {setupHost ? createPortal(
+      <OpponentSetupToggles
+        teamNamesEnabled={useTeamNames}
+        historicalManagersEnabled={useHistoricalManagers}
+        disabled={props.started}
+        onTeamNames={onUseTeamNames}
+        onHistoricalManagers={onUseHistoricalManagers}
       />,
       setupHost,
     ) : null}
-    {setupHost && useOpponentDetails ? createPortal(
+    {setupHost && useHistoricalManagers ? createPortal(
       <ManagerSelector
         teamCount={props.config.teamCount}
         userDraftSlot={props.config.userDraftSlot}
@@ -74,40 +114,123 @@ export function DraftUiWithTargets(props: DraftUiWithTargetsProps) {
   </>;
 }
 
-function OpponentDetailsToggle({
-  enabled,
+function SimulatorControls({
+  mode,
+  roomProfile,
+  pace,
   disabled,
-  onChange,
+  onMode,
+  onRoomProfile,
+  onPace,
 }: {
-  enabled: boolean;
+  mode: DraftMode;
+  roomProfile: SimulationRoomProfile;
+  pace: SimulationPace;
   disabled: boolean;
-  onChange: (enabled: boolean) => void;
+  onMode: (value: DraftMode) => void;
+  onRoomProfile: (value: SimulationRoomProfile) => void;
+  onPace: (value: SimulationPace) => void;
+}) {
+  return <>
+    <label>
+      Mode
+      <select value={mode} disabled={disabled} onChange={(event) => onMode(event.target.value as DraftMode)}>
+        <option value="LIVE">Live Draft</option>
+        <option value="SIMULATOR">Draft Simulator</option>
+      </select>
+    </label>
+    {mode === 'SIMULATOR' ? <>
+      <label>
+        Room
+        <select value={roomProfile} disabled={disabled} onChange={(event) => onRoomProfile(event.target.value as SimulationRoomProfile)}>
+          {ROOM_PROFILES.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+        </select>
+      </label>
+      <label>
+        Pace
+        <select value={pace} disabled={disabled} onChange={(event) => onPace(event.target.value as SimulationPace)}>
+          <option value="INSTANT">Instant to my pick</option>
+          <option value="WATCH">Watch picks</option>
+        </select>
+      </label>
+    </> : null}
+  </>;
+}
+
+function OpponentSetupToggles({
+  teamNamesEnabled,
+  historicalManagersEnabled,
+  disabled,
+  onTeamNames,
+  onHistoricalManagers,
+}: {
+  teamNamesEnabled: boolean;
+  historicalManagersEnabled: boolean;
+  disabled: boolean;
+  onTeamNames: (enabled: boolean) => void;
+  onHistoricalManagers: (enabled: boolean) => void;
 }) {
   return <div
-    className="opponentDetailsToggle"
+    className="opponentSetupToggles"
     style={{
-      display: 'flex',
+      display: 'grid',
+      gridTemplateColumns: 'minmax(220px, 1fr) repeat(2, minmax(210px, auto))',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: 16,
+      gap: 14,
       padding: '2px 0 14px',
     }}
   >
-    <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: disabled ? 'default' : 'pointer' }}>
-      <input
-        type="checkbox"
-        checked={enabled}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
-        style={{ width: 18, height: 18, accentColor: 'var(--accent)' }}
-      />
-      <span style={{ display: 'grid', gap: 2 }}>
-        <strong>Use opponent details</strong>
-        <small className="muted">Optional team labels and Purple League historical-manager assignments.</small>
-      </span>
-    </label>
-    <span className="countPill">{enabled ? 'Enabled' : 'Off'}</span>
+    <div style={{ display: 'grid', gap: 2 }}>
+      <strong>Optional opponent setup</strong>
+      <small className="muted">
+        {historicalManagersEnabled && !teamNamesEnabled
+          ? 'Selected manager names will be used as the team labels.'
+          : 'Add only the opponent information you want to maintain.'}
+      </small>
+    </div>
+    <ToggleOption
+      label="Team names"
+      detail="Custom labels only; no history effect."
+      checked={teamNamesEnabled}
+      disabled={disabled}
+      onChange={onTeamNames}
+    />
+    <ToggleOption
+      label="Historical manager data"
+      detail="Enables Purple League V1 tendencies."
+      checked={historicalManagersEnabled}
+      disabled={disabled}
+      onChange={onHistoricalManagers}
+    />
   </div>;
+}
+
+function ToggleOption({
+  label,
+  detail,
+  checked,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  detail: string;
+  checked: boolean;
+  disabled: boolean;
+  onChange: (enabled: boolean) => void;
+}) {
+  return <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, cursor: disabled ? 'default' : 'pointer' }}>
+    <input
+      type="checkbox"
+      checked={checked}
+      disabled={disabled}
+      onChange={(event) => onChange(event.target.checked)}
+      style={{ width: 18, height: 18, marginTop: 1, accentColor: 'var(--accent)' }}
+    />
+    <span style={{ display: 'grid', gap: 2 }}>
+      <strong style={{ fontSize: '.82rem' }}>{label}</strong>
+      <small className="muted">{detail}</small>
+    </span>
+  </label>;
 }
 
 function ManagerSelector({
