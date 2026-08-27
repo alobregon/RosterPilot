@@ -10,6 +10,10 @@
 - [ ] Import the 861-player FantasyPros rankings file.
 - [ ] Confirm the 10-team Half-PPR league passes league-wide positional preflight.
 - [ ] Change team count, scoring, roster slots, draft slot, and team names before Start Draft.
+- [ ] Confirm **Use opponent details** is optional and hides Team names + Historical managers when off.
+- [ ] With opponent details off, confirm the board uses generic Team N labels and historical-manager modeling is inactive.
+- [ ] Toggle opponent details back on and confirm previously entered team names and manager assignments are preserved.
+- [ ] Refresh / restore a backup with opponent details off and confirm the disabled preference is preserved without deleting saved assignments.
 - [ ] Confirm an explicitly selected non-default strategy survives team-count and slot edits.
 - [ ] Start Draft locks structural league settings and ranking import.
 
