@@ -4,17 +4,28 @@ import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { buildDraftBoard, rosterForSlot } from '@/lib/board';
 import { replaceDraftPick, removeDraftPick } from '@/lib/corrections';
 import { nextUserOverallPick } from '@/lib/draft';
+import { managerProfileOptions } from '@/lib/opponent-model';
 import { DRAFT_STORAGE_KEY, parseDraftSnapshot, serializeDraftSnapshot } from '@/lib/persistence';
 import { validateRankingPool } from '@/lib/preflight';
 import { recommendForCurrentPick } from '@/lib/decision';
 import { deriveDraftSession } from '@/lib/session';
 import { defaultTeamNames, resizeTeamNames, validateDraftSetup } from '@/lib/setup';
+import { autoDraftOpponentsUntilUserTurn, simulateNextOpponentPick } from '@/lib/simulation';
 import { parseRankingFile } from '@/lib/spreadsheet';
 import { strategyAfterSlotChange } from '@/lib/strategy';
 import { projectUpcomingTargets } from '@/lib/targets';
 import { STRATEGIES, type Correction, type PlayerFilter, type PlayerSort } from './draft-ui';
 import { DraftUiWithTargets } from './draft-target-ui';
-import type { DraftConfig, DraftPick, DraftStrategy, PlayerRanking, ScoringFormat } from '@/lib/types';
+import type {
+  DraftConfig,
+  DraftMode,
+  DraftPick,
+  DraftStrategy,
+  PlayerRanking,
+  ScoringFormat,
+  SimulationPace,
+  SimulationRoomProfile,
+} from '@/lib/types';
 
 const DEFAULT: DraftConfig = {
   teamCount: 10,
@@ -29,7 +40,11 @@ const DEFAULT: DraftConfig = {
   kStarters: 1,
   benchSpots: 6,
   draftStrategy: 'BALANCED',
-  opponentDetailsEnabled: false,
+  teamNamesEnabled: false,
+  historicalManagersEnabled: false,
+  draftMode: 'LIVE',
+  simulationRoomProfile: 'RANK_ORDER',
+  simulationPace: 'INSTANT',
 };
 
 export default function Page() {
@@ -57,18 +72,42 @@ export default function Page() {
   const onClock = started && !correcting && session.currentSlot === config.userDraftSlot;
   const favorites = useMemo(() => new Set(favoriteIds), [favoriteIds]);
   const drafted = useMemo(() => new Set(picks.map((pick) => pick.playerId)), [picks]);
-  const useOpponentDetails =
+  const legacyOpponentDetails =
     config.opponentDetailsEnabled === true ||
     (config.opponentDetailsEnabled == null &&
       (teamNames.some((name) => name.trim().length > 0) || managerIds.some((id) => id.length > 0)));
+  const useTeamNames =
+    config.teamNamesEnabled ??
+    (config.opponentDetailsEnabled != null ? config.opponentDetailsEnabled : teamNames.some((name) => name.trim().length > 0));
+  const useHistoricalManagers =
+    config.historicalManagersEnabled ??
+    (config.opponentDetailsEnabled != null ? config.opponentDetailsEnabled : managerIds.some((id) => id.length > 0));
+  const managerDisplayNames = useMemo(
+    () =>
+      Array.from({ length: config.teamCount }, (_, index) => {
+        const id = managerIds[index];
+        return managerProfileOptions.find((option) => option.id === id)?.displayName ?? '';
+      }),
+    [managerIds, config.teamCount],
+  );
   const activeTeamNames = useMemo(
-    () => (useOpponentDetails ? teamNames : defaultTeamNames(config.teamCount)),
-    [useOpponentDetails, teamNames, config.teamCount],
+    () =>
+      useTeamNames
+        ? resizeTeamNames(teamNames, config.teamCount)
+        : useHistoricalManagers
+          ? managerDisplayNames
+          : defaultTeamNames(config.teamCount),
+    [useTeamNames, useHistoricalManagers, teamNames, managerDisplayNames, config.teamCount],
   );
   const activeManagerIds = useMemo(
-    () => (useOpponentDetails ? managerIds : defaultTeamNames(config.teamCount)),
-    [useOpponentDetails, managerIds, config.teamCount],
+    () => (useHistoricalManagers ? resizeTeamNames(managerIds, config.teamCount) : defaultTeamNames(config.teamCount)),
+    [useHistoricalManagers, managerIds, config.teamCount],
   );
+  const historyFallbackTeamNames = useMemo(
+    () => (useHistoricalManagers ? activeTeamNames : defaultTeamNames(config.teamCount)),
+    [useHistoricalManagers, activeTeamNames, config.teamCount],
+  );
+  const simulatorMode = (config.draftMode ?? 'LIVE') === 'SIMULATOR';
   const board = useMemo(() => buildDraftBoard(config, picks, players), [config, picks, players]);
   const userRoster = useMemo(
     () => rosterForSlot(config.userDraftSlot, picks, players),
@@ -85,10 +124,10 @@ export default function Page() {
             currentOverallPick: session.currentOverallPick,
             favoritePlayerIds: favoriteIds,
             managerIds: activeManagerIds,
-            teamNames: activeTeamNames,
+            teamNames: historyFallbackTeamNames,
             limit: 3,
           }),
-    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, activeManagerIds, activeTeamNames],
+    [onClock, session.complete, session.currentOverallPick, correcting, players, picks, config, favoriteIds, activeManagerIds, historyFallbackTeamNames],
   );
   const targets = useMemo(
     () =>
@@ -178,6 +217,34 @@ export default function Page() {
     }
   }, [hydrated, config, players, picks, favoriteIds, teamNames, managerIds, started]);
 
+  useEffect(() => {
+    if (!started || !simulatorMode || correcting || session.complete || onClock || !players.length) return;
+    const delay = (config.simulationPace ?? 'INSTANT') === 'WATCH' ? 550 : 0;
+    const timer = window.setTimeout(() => {
+      setPicks((existing) => {
+        const current = deriveDraftSession(existing, config, true);
+        if (current.complete || current.historicalGap || current.currentSlot === config.userDraftSlot) return existing;
+        if ((config.simulationPace ?? 'INSTANT') === 'WATCH') {
+          return simulateNextOpponentPick({
+            players,
+            picks: existing,
+            config,
+            currentOverallPick: current.currentOverallPick,
+            roomProfile: config.simulationRoomProfile ?? 'RANK_ORDER',
+          });
+        }
+        return autoDraftOpponentsUntilUserTurn({
+          players,
+          picks: existing,
+          config,
+          currentOverallPick: current.currentOverallPick,
+          roomProfile: config.simulationRoomProfile ?? 'RANK_ORDER',
+        });
+      });
+    }, delay);
+    return () => window.clearTimeout(timer);
+  }, [started, simulatorMode, correcting, session.complete, onClock, players, picks.length, config]);
+
   async function importRankings(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file || started) return;
@@ -262,7 +329,8 @@ export default function Page() {
       favorites={favorites}
       teamNames={activeTeamNames}
       managerIds={managerIds}
-      useOpponentDetails={useOpponentDetails}
+      useTeamNames={useTeamNames || legacyOpponentDetails && config.teamNamesEnabled == null}
+      useHistoricalManagers={useHistoricalManagers || legacyOpponentDetails && config.historicalManagersEnabled == null}
       started={started}
       correction={correction}
       correcting={correcting}
@@ -329,8 +397,18 @@ export default function Page() {
       onRoster={(key, value, max) =>
         setConfig((current) => ({ ...current, [key]: Math.min(max, Math.max(0, Math.trunc(value || 0))) }))
       }
-      onUseOpponentDetails={(enabled) =>
-        setConfig((current) => ({ ...current, opponentDetailsEnabled: enabled }))
+      onUseTeamNames={(enabled) =>
+        setConfig((current) => ({ ...current, teamNamesEnabled: enabled }))
+      }
+      onUseHistoricalManagers={(enabled) =>
+        setConfig((current) => ({ ...current, historicalManagersEnabled: enabled }))
+      }
+      onDraftMode={(value: DraftMode) => setConfig((current) => ({ ...current, draftMode: value }))}
+      onSimulationRoomProfile={(value: SimulationRoomProfile) =>
+        setConfig((current) => ({ ...current, simulationRoomProfile: value }))
+      }
+      onSimulationPace={(value: SimulationPace) =>
+        setConfig((current) => ({ ...current, simulationPace: value }))
       }
       onTeamName={(index, value) =>
         setTeamNames((existing) => {
@@ -356,6 +434,7 @@ export default function Page() {
       }
       onDraft={(player) => {
         if (!started || session.complete || drafted.has(player.id)) return;
+        if (simulatorMode && !correcting && session.currentSlot !== config.userDraftSlot) return;
         setPicks((existing) =>
           replaceDraftPick(
             existing,
