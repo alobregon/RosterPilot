@@ -1,0 +1,123 @@
+{
+  "season": 2026,
+  "version": 3,
+  "updatedAt": "2026-08-27",
+  "sources": [
+    {
+      "id": "si-wr-sleepers-2026",
+      "publisher": "Sports Illustrated",
+      "title": "Fantasy Football Wide Receiver Sleepers: Jayden Reed Outshines Christian Watson In Green Bay",
+      "url": "https://www.si.com/onsi/fantasy/nfl/fantasy-football-wide-receiver-sleepers-jayden-reed-outshines-christian-watson-in-green-bay",
+      "status": "INGESTED",
+      "notes": "Published Aug. 6, 2026. Sleeper labels, rankings and ceiling statements are source-analyst opinions; roster changes, injuries and historical target totals are stored separately as facts. ADP and injury information is time-sensitive."
+    }
+  ],
+  "entries": [
+    {
+      "id": "si-alec-pierce-volume-upside",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Alec Pierce", "team": "IND" },
+        { "kind": "PLAYER", "name": "Michael Pittman Jr.", "team": "PIT" }
+      ],
+      "categories": ["TARGET_COMPETITION", "CONTRACT", "INJURY", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "Indianapolis traded Michael Pittman Jr. and signed Alec Pierce to a four-year, $114 million contract.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        },
+        {
+          "summary": "Pierce was on the PUP list with a left-ankle injury when the article was published.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "MIXED_POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "Sports Illustrated sees a path to a major volume increase and high-end WR2 ceiling if Pierce is ready for the season, while the ankle injury is the main near-term risk suppressing his draft price."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "si-jakobi-meyers-jacksonville-volume",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jakobi Meyers", "team": "JAC" },
+        { "kind": "PLAYER", "name": "Parker Washington", "team": "JAC" },
+        { "kind": "PLAYER", "name": "Brian Thomas Jr.", "team": "JAC" }
+      ],
+      "categories": ["TARGET_VOLUME", "TARGET_COMPETITION", "ADP"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "Excluding his first game with Jacksonville immediately after the trade, Meyers saw at least six targets in each of his final eight games and totaled 39 receptions on 58 targets over that span.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "Sports Illustrated considers Meyers a sleeper because it views him as Jacksonville's most proven and consistent receiver and believes he can outperform a market price outside the top 40 fantasy wide receivers."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "si-jayden-reed-green-bay-wr1-case",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jayden Reed", "team": "GB" },
+        { "kind": "PLAYER", "name": "Christian Watson", "team": "GB" },
+        { "kind": "PLAYER", "name": "Matthew Golden", "team": "GB" }
+      ],
+      "categories": ["TARGET_COMPETITION", "INJURY_HISTORY", "ADP", "ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "Romeo Doubs and Dontayvion Wicks are no longer in Green Bay's receiving room.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        },
+        {
+          "summary": "The article describes Reed's 2025 season as injury-plagued and notes Christian Watson has also struggled to stay healthy during his NFL career.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        },
+        {
+          "summary": "At publication time, the article cited Reed as WR47 by ADP, one spot ahead of Matthew Golden.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM_HIGH",
+        "origin": "SOURCE_ANALYST",
+        "summary": "Sports Illustrated views Reed as Green Bay's likely target leader, considers his market price too low and assigns low-end WR2 upside, explicitly endorsing a modest reach to secure him."
+      },
+      "timeSensitive": true
+    },
+    {
+      "id": "si-quentin-johnston-chargers-value",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Quentin Johnston", "team": "LAC" },
+        { "kind": "PLAYER", "name": "Ladd McConkey", "team": "LAC" }
+      ],
+      "categories": ["ADP", "BIG_PLAY_UPSIDE", "TOUCHDOWN_UPSIDE", "TARGET_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [
+        {
+          "summary": "The article reports that Johnston scored more fantasy points per game than McConkey in 2025.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        },
+        {
+          "summary": "At publication time, the article cited Johnston as WR45 by ADP and McConkey as WR21.",
+          "sourceIds": ["si-wr-sleepers-2026"]
+        }
+      ],
+      "outlook": {
+        "direction": "POSITIVE",
+        "confidence": "MEDIUM",
+        "origin": "SOURCE_ANALYST",
+        "summary": "Sports Illustrated prefers Johnston as the cheaper way to invest in the Chargers passing game, citing big-play and touchdown upside while acknowledging his inconsistency."
+      },
+      "timeSensitive": true
+    }
+  ]
+}

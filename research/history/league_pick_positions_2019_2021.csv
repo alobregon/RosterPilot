@@ -1,0 +1,481 @@
+Year,Pick,Manager,Position
+2019,1,Alvaro Obregon,RB
+2019,2,Dixie,RB
+2019,3,Juan,RB
+2019,4,PJ,WR
+2019,5,Sunny-DCommissioner,WR
+2019,6,Juan Urtecho,WR
+2019,7,Armando,RB
+2019,8,Hansel,RB
+2019,9,Ryan,RB
+2019,10,Alex,RB
+2019,11,Alex,WR
+2019,12,Ryan,WR
+2019,13,Hansel,WR
+2019,14,Armando,RB
+2019,15,Juan Urtecho,RB
+2019,16,Sunny-DCommissioner,RB
+2019,17,PJ,RB
+2019,18,Juan,WR
+2019,19,Dixie,WR
+2019,20,Alvaro Obregon,WR
+2019,21,Alvaro Obregon,TE
+2019,22,Dixie,RB
+2019,23,Juan,TE
+2019,24,PJ,RB
+2019,25,Sunny-DCommissioner,RB
+2019,26,Juan Urtecho,RB
+2019,27,Armando,WR
+2019,28,Hansel,RB
+2019,29,Ryan,QB
+2019,30,Alex,RB
+2019,31,Alex,WR
+2019,32,Ryan,TE
+2019,33,Hansel,WR
+2019,34,Armando,WR
+2019,35,Juan Urtecho,WR
+2019,36,Sunny-DCommissioner,RB
+2019,37,PJ,WR
+2019,38,Juan,QB
+2019,39,Dixie,RB
+2019,40,Alvaro Obregon,WR
+2019,41,Alvaro Obregon,RB
+2019,42,Dixie,WR
+2019,43,Juan,WR
+2019,44,PJ,QB
+2019,45,Sunny-DCommissioner,WR
+2019,46,Juan Urtecho,WR
+2019,47,Armando,RB
+2019,48,Hansel,TE
+2019,49,Ryan,RB
+2019,50,Alex,WR
+2019,51,Alex,RB
+2019,52,Ryan,WR
+2019,53,Hansel,TE
+2019,54,Armando,WR
+2019,55,Juan Urtecho,RB
+2019,56,Sunny-DCommissioner,RB
+2019,57,PJ,WR
+2019,58,Juan,WR
+2019,59,Dixie,WR
+2019,60,Alvaro Obregon,RB
+2019,61,Alvaro Obregon,WR
+2019,62,Dixie,WR
+2019,63,Juan,RB
+2019,64,PJ,RB
+2019,65,Sunny-DCommissioner,WR
+2019,66,Juan Urtecho,WR
+2019,67,Armando,WR
+2019,68,Hansel,WR
+2019,69,Ryan,RB
+2019,70,Alex,WR
+2019,71,Alex,TE
+2019,72,Ryan,WR
+2019,73,Hansel,WR
+2019,74,Armando,RB
+2019,75,Juan Urtecho,WR
+2019,76,Sunny-DCommissioner,TE
+2019,77,PJ,WR
+2019,78,Juan,RB
+2019,79,Dixie,WR
+2019,80,Alvaro Obregon,WR
+2019,81,Alvaro Obregon,QB
+2019,82,Dixie,RB
+2019,83,Juan,DEF
+2019,84,PJ,TE
+2019,85,Sunny-DCommissioner,QB
+2019,86,Juan Urtecho,QB
+2019,87,Armando,WR
+2019,88,Hansel,QB
+2019,89,Ryan,WR
+2019,90,Alex,RB
+2019,91,Alex,QB
+2019,92,Ryan,RB
+2019,93,Hansel,RB
+2019,94,Armando,QB
+2019,95,Juan Urtecho,TE
+2019,96,Sunny-DCommissioner,WR
+2019,97,PJ,RB
+2019,98,Juan,TE
+2019,99,Dixie,WR
+2019,100,Alvaro Obregon,RB
+2019,101,Alvaro Obregon,WR
+2019,102,Dixie,RB
+2019,103,Juan,WR
+2019,104,PJ,WR
+2019,105,Sunny-DCommissioner,RB
+2019,106,Juan Urtecho,RB
+2019,107,Armando,TE
+2019,108,Hansel,WR
+2019,109,Ryan,K
+2019,110,Alex,RB
+2019,111,Alex,DEF
+2019,112,Ryan,RB
+2019,113,Hansel,QB
+2019,114,Armando,TE
+2019,115,Juan Urtecho,WR
+2019,116,Sunny-DCommissioner,DEF
+2019,117,PJ,WR
+2019,118,Juan,K
+2019,119,Dixie,DEF
+2019,120,Alvaro Obregon,WR
+2019,121,Alvaro Obregon,DEF
+2019,122,Dixie,DEF
+2019,123,Juan,RB
+2019,124,PJ,RB
+2019,125,Sunny-DCommissioner,WR
+2019,126,Juan Urtecho,RB
+2019,127,Armando,DEF
+2019,128,Hansel,RB
+2019,129,Ryan,WR
+2019,130,Alex,QB
+2019,131,Alex,TE
+2019,132,Ryan,DEF
+2019,133,Hansel,WR
+2019,134,Armando,WR
+2019,135,Juan Urtecho,WR
+2019,136,Sunny-DCommissioner,WR
+2019,137,PJ,TE
+2019,138,Juan,WR
+2019,139,Dixie,TE
+2019,140,Alvaro Obregon,WR
+2019,141,Alvaro Obregon,QB
+2019,142,Dixie,K
+2019,143,Juan,WR
+2019,144,PJ,K
+2019,145,Sunny-DCommissioner,RB
+2019,146,Juan Urtecho,K
+2019,147,Armando,QB
+2019,148,Hansel,DEF
+2019,149,Ryan,RB
+2019,150,Alex,K
+2019,151,Alex,WR
+2019,152,Ryan,WR
+2019,153,Hansel,K
+2019,154,Armando,K
+2019,155,Juan Urtecho,DEF
+2019,156,Sunny-DCommissioner,K
+2019,157,PJ,DEF
+2019,158,Juan,QB
+2019,159,Dixie,QB
+2019,160,Alvaro Obregon,K
+2020,1,Armando,RB
+2020,2,PJ,RB
+2020,3,Juan,RB
+2020,4,Alvaro Obregon,RB
+2020,5,Sunny-DCommissioner,WR
+2020,6,Alex,RB
+2020,7,Ryan,RB
+2020,8,Juan Urtecho,RB
+2020,9,Hansel,WR
+2020,10,Dixie,WR
+2020,11,Dixie,WR
+2020,12,Hansel,TE
+2020,13,Juan Urtecho,RB
+2020,14,Ryan,WR
+2020,15,Alex,WR
+2020,16,Sunny-DCommissioner,RB
+2020,17,Alvaro Obregon,RB
+2020,18,Juan,WR
+2020,19,PJ,WR
+2020,20,Armando,RB
+2020,21,Armando,QB
+2020,22,PJ,RB
+2020,23,Juan,RB
+2020,24,Alvaro Obregon,TE
+2020,25,Sunny-DCommissioner,RB
+2020,26,Alex,RB
+2020,27,Ryan,WR
+2020,28,Juan Urtecho,WR
+2020,29,Hansel,QB
+2020,30,Dixie,RB
+2020,31,Dixie,WR
+2020,32,Hansel,RB
+2020,33,Juan Urtecho,WR
+2020,34,Ryan,WR
+2020,35,Alex,TE
+2020,36,Sunny-DCommissioner,WR
+2020,37,Alvaro Obregon,WR
+2020,38,Juan,QB
+2020,39,PJ,WR
+2020,40,Armando,TE
+2020,41,Armando,WR
+2020,42,PJ,RB
+2020,43,Juan,WR
+2020,44,Alvaro Obregon,RB
+2020,45,Sunny-DCommissioner,WR
+2020,46,Alex,WR
+2020,47,Ryan,RB
+2020,48,Juan Urtecho,WR
+2020,49,Hansel,RB
+2020,50,Dixie,RB
+2020,51,Dixie,TE
+2020,52,Hansel,RB
+2020,53,Juan Urtecho,QB
+2020,54,Ryan,QB
+2020,55,Alex,RB
+2020,56,Sunny-DCommissioner,WR
+2020,57,Alvaro Obregon,WR
+2020,58,Juan,WR
+2020,59,PJ,WR
+2020,60,Armando,WR
+2020,61,Armando,WR
+2020,62,PJ,QB
+2020,63,Juan,RB
+2020,64,Alvaro Obregon,QB
+2020,65,Sunny-DCommissioner,WR
+2020,66,Alex,WR
+2020,67,Ryan,RB
+2020,68,Juan Urtecho,WR
+2020,69,Hansel,WR
+2020,70,Dixie,TE
+2020,71,Dixie,WR
+2020,72,Hansel,WR
+2020,73,Juan Urtecho,TE
+2020,74,Ryan,RB
+2020,75,Alex,RB
+2020,76,Sunny-DCommissioner,RB
+2020,77,Alvaro Obregon,WR
+2020,78,Juan,TE
+2020,79,PJ,TE
+2020,80,Armando,RB
+2020,81,Armando,WR
+2020,82,PJ,WR
+2020,83,Juan,WR
+2020,84,Alvaro Obregon,RB
+2020,85,Sunny-DCommissioner,TE
+2020,86,Alex,WR
+2020,87,Ryan,WR
+2020,88,Juan Urtecho,RB
+2020,89,Hansel,WR
+2020,90,Dixie,QB
+2020,91,Dixie,RB
+2020,92,Hansel,WR
+2020,93,Juan Urtecho,RB
+2020,94,Ryan,WR
+2020,95,Alex,QB
+2020,96,Sunny-DCommissioner,RB
+2020,97,Alvaro Obregon,WR
+2020,98,Juan,WR
+2020,99,PJ,WR
+2020,100,Armando,WR
+2020,101,Armando,RB
+2020,102,PJ,RB
+2020,103,Juan,WR
+2020,104,Alvaro Obregon,RB
+2020,105,Sunny-DCommissioner,RB
+2020,106,Alex,RB
+2020,107,Ryan,RB
+2020,108,Juan Urtecho,WR
+2020,109,Hansel,RB
+2020,110,Dixie,RB
+2020,111,Dixie,RB
+2020,112,Hansel,WR
+2020,113,Juan Urtecho,RB
+2020,114,Ryan,RB
+2020,115,Alex,WR
+2020,116,Sunny-DCommissioner,QB
+2020,117,Alvaro Obregon,DEF
+2020,118,Juan,DEF
+2020,119,PJ,WR
+2020,120,Armando,DEF
+2020,121,Armando,TE
+2020,122,PJ,RB
+2020,123,Juan,TE
+2020,124,Alvaro Obregon,WR
+2020,125,Sunny-DCommissioner,DEF
+2020,126,Alex,DEF
+2020,127,Ryan,DEF
+2020,128,Juan Urtecho,TE
+2020,129,Hansel,WR
+2020,130,Dixie,DEF
+2020,131,Dixie,K
+2020,132,Hansel,DEF
+2020,133,Juan Urtecho,K
+2020,134,Ryan,WR
+2020,135,Alex,WR
+2020,136,Sunny-DCommissioner,QB
+2020,137,Alvaro Obregon,WR
+2020,138,Juan,WR
+2020,139,PJ,K
+2020,140,Armando,QB
+2020,141,Armando,WR
+2020,142,PJ,DEF
+2020,143,Juan,RB
+2020,144,Alvaro Obregon,RB
+2020,145,Sunny-DCommissioner,K
+2020,146,Alex,QB
+2020,147,Ryan,K
+2020,148,Juan Urtecho,DEF
+2020,149,Hansel,WR
+2020,150,Dixie,WR
+2020,151,Dixie,WR
+2020,152,Hansel,K
+2020,153,Juan Urtecho,TE
+2020,154,Ryan,TE
+2020,155,Alex,K
+2020,156,Sunny-DCommissioner,TE
+2020,157,Alvaro Obregon,K
+2020,158,Juan,K
+2020,159,PJ,TE
+2020,160,Armando,K
+2021,1,Hansel,RB
+2021,2,Alex,RB
+2021,3,Sunny-DCommissioner,RB
+2021,4,Juan,QB
+2021,5,Ryan,RB
+2021,6,PJ,RB
+2021,7,Juan Urtecho,RB
+2021,8,Alvaro Obregon,WR
+2021,9,Dixie,RB
+2021,10,Armando,RB
+2021,11,Armando,TE
+2021,12,Dixie,TE
+2021,13,Alvaro Obregon,RB
+2021,14,Juan Urtecho,WR
+2021,15,PJ,WR
+2021,16,Ryan,RB
+2021,17,Juan,RB
+2021,18,Sunny-DCommissioner,RB
+2021,19,Alex,WR
+2021,20,Hansel,WR
+2021,21,Hansel,WR
+2021,22,Alex,WR
+2021,23,Sunny-DCommissioner,RB
+2021,24,Juan,WR
+2021,25,Ryan,WR
+2021,26,PJ,RB
+2021,27,Juan Urtecho,RB
+2021,28,Alvaro Obregon,WR
+2021,29,Dixie,RB
+2021,30,Armando,WR
+2021,31,Armando,RB
+2021,32,Dixie,RB
+2021,33,Alvaro Obregon,TE
+2021,34,Juan Urtecho,WR
+2021,35,PJ,RB
+2021,36,Ryan,WR
+2021,37,Juan,WR
+2021,38,Sunny-DCommissioner,WR
+2021,39,Alex,RB
+2021,40,Hansel,QB
+2021,41,Hansel,WR
+2021,42,Alex,RB
+2021,43,Sunny-DCommissioner,WR
+2021,44,Juan,TE
+2021,45,Ryan,WR
+2021,46,PJ,WR
+2021,47,Juan Urtecho,RB
+2021,48,Alvaro Obregon,WR
+2021,49,Dixie,WR
+2021,50,Armando,RB
+2021,51,Armando,WR
+2021,52,Dixie,WR
+2021,53,Alvaro Obregon,RB
+2021,54,Juan Urtecho,TE
+2021,55,PJ,WR
+2021,56,Ryan,QB
+2021,57,Juan,RB
+2021,58,Sunny-DCommissioner,TE
+2021,59,Alex,WR
+2021,60,Hansel,RB
+2021,61,Hansel,RB
+2021,62,Alex,QB
+2021,63,Sunny-DCommissioner,WR
+2021,64,Juan,WR
+2021,65,Ryan,RB
+2021,66,PJ,WR
+2021,67,Juan Urtecho,WR
+2021,68,Alvaro Obregon,QB
+2021,69,Dixie,RB
+2021,70,Armando,WR
+2021,71,Armando,WR
+2021,72,Dixie,WR
+2021,73,Alvaro Obregon,RB
+2021,74,Juan Urtecho,QB
+2021,75,PJ,QB
+2021,76,Ryan,RB
+2021,77,Juan,RB
+2021,78,Sunny-DCommissioner,WR
+2021,79,Alex,WR
+2021,80,Hansel,TE
+2021,81,Hansel,WR
+2021,82,Alex,WR
+2021,83,Sunny-DCommissioner,QB
+2021,84,Juan,WR
+2021,85,Ryan,WR
+2021,86,PJ,TE
+2021,87,Juan Urtecho,DEF
+2021,88,Alvaro Obregon,WR
+2021,89,Dixie,RB
+2021,90,Armando,RB
+2021,91,Armando,WR
+2021,92,Dixie,WR
+2021,93,Alvaro Obregon,WR
+2021,94,Juan Urtecho,WR
+2021,95,PJ,WR
+2021,96,Ryan,RB
+2021,97,Juan,K
+2021,98,Sunny-DCommissioner,RB
+2021,99,Alex,RB
+2021,100,Hansel,TE
+2021,101,Hansel,RB
+2021,102,Alex,TE
+2021,103,Sunny-DCommissioner,WR
+2021,104,Juan,DEF
+2021,105,Ryan,WR
+2021,106,PJ,RB
+2021,107,Juan Urtecho,WR
+2021,108,Alvaro Obregon,WR
+2021,109,Dixie,DEF
+2021,110,Armando,DEF
+2021,111,Armando,WR
+2021,112,Dixie,K
+2021,113,Alvaro Obregon,RB
+2021,114,Juan Urtecho,TE
+2021,115,PJ,RB
+2021,116,Ryan,WR
+2021,117,Juan,WR
+2021,118,Sunny-DCommissioner,TE
+2021,119,Alex,WR
+2021,120,Hansel,WR
+2021,121,Hansel,WR
+2021,122,Alex,TE
+2021,123,Sunny-DCommissioner,WR
+2021,124,Juan,WR
+2021,125,Ryan,RB
+2021,126,PJ,WR
+2021,127,Juan Urtecho,RB
+2021,128,Alvaro Obregon,TE
+2021,129,Dixie,WR
+2021,130,Armando,TE
+2021,131,Armando,RB
+2021,132,Dixie,RB
+2021,133,Alvaro Obregon,QB
+2021,134,Juan Urtecho,WR
+2021,135,PJ,K
+2021,136,Ryan,DEF
+2021,137,Juan,TE
+2021,138,Sunny-DCommissioner,RB
+2021,139,Alex,RB
+2021,140,Hansel,QB
+2021,141,Hansel,DEF
+2021,142,Alex,DEF
+2021,143,Sunny-DCommissioner,DEF
+2021,144,Juan,QB
+2021,145,Ryan,TE
+2021,146,PJ,DEF
+2021,147,Juan Urtecho,K
+2021,148,Alvaro Obregon,DEF
+2021,149,Dixie,QB
+2021,150,Armando,K
+2021,151,Armando,QB
+2021,152,Dixie,DEF
+2021,153,Alvaro Obregon,K
+2021,154,Juan Urtecho,RB
+2021,155,PJ,RB
+2021,156,Ryan,K
+2021,157,Juan,RB
+2021,158,Sunny-DCommissioner,K
+2021,159,Alex,K
+2021,160,Hansel,K

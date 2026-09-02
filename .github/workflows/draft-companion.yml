@@ -1,0 +1,59 @@
+name: Draft Companion CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, agent/draft-companion-foundation]
+    paths:
+      - 'apps/draft-companion/**'
+      - 'docs/DRAFT_NIGHT_RUNBOOK.md'
+      - 'docs/DRAFT_NIGHT_QA.md'
+      - 'docs/DRAFT_SIMULATOR.md'
+      - 'docs/SIMULATOR_MANAGER_SEQUENCE_MODEL.md'
+      - 'docs/OPPONENT_MODEL_V1.md'
+      - 'docs/OPPONENT_MODEL_V2.md'
+      - 'docs/OPPONENT_MODEL_V2_BACKTEST.md'
+      - 'docs/OPPONENT_SURVIVAL_BACKTEST.md'
+      - 'docs/SURVIVAL_PROBABILITY.md'
+      - 'docs/RELEASE_READINESS.md'
+      - 'docs/OFFSEASON_CONTEXT_JOURNAL.md'
+      - 'research/README.md'
+      - 'research/league_manager_sequence_profiles_2013_2025.json'
+      - 'research/league_manager_adp_profiles_2018_2025.json'
+      - 'README.md'
+      - 'package.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/draft-companion.yml'
+  pull_request:
+    paths:
+      - 'apps/draft-companion/**'
+      - 'docs/DRAFT_NIGHT_QA.md'
+      - 'docs/DRAFT_SIMULATOR.md'
+      - 'docs/SIMULATOR_MANAGER_SEQUENCE_MODEL.md'
+      - 'docs/OPPONENT_MODEL_V1.md'
+      - 'docs/OPPONENT_MODEL_V2.md'
+      - 'docs/OPPONENT_MODEL_V2_BACKTEST.md'
+      - 'docs/OPPONENT_SURVIVAL_BACKTEST.md'
+      - 'docs/SURVIVAL_PROBABILITY.md'
+      - 'docs/OFFSEASON_CONTEXT_JOURNAL.md'
+      - 'research/README.md'
+      - 'research/league_manager_sequence_profiles_2013_2025.json'
+      - 'research/league_manager_adp_profiles_2018_2025.json'
+      - 'README.md'
+      - 'package.json'
+      - 'vitest.config.ts'
+      - '.github/workflows/draft-companion.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck:draft
+      - run: npm run test:draft
+      - run: npm run build:draft

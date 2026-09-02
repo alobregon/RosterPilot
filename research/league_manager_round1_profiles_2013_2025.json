@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "source": "Purple League corrected draft history 2013-2025",
+  "recency_weight_decay": 0.85,
+  "description": "Recency-weighted Round 1 position probabilities used by Draft Simulator historical manager modeling.",
+  "profiles": [
+    {
+      "manager_id": "Alex",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.6268959166513342,
+        "WR": 0.3731040833486658,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Alvaro Obregon",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.6462857900105605,
+        "WR": 0.3537142099894395,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Armando",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.5928436951858295,
+        "WR": 0.25532224650018576,
+        "TE": 0.15183405831398478,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Dixie",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.6989602844970345,
+        "WR": 0.3010397155029654,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Hansel",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.4026413712866024,
+        "WR": 0.5973586287133976,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Juan",
+      "draft_count": 12,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.09128555528487127,
+        "RB": 0.7536680433983275,
+        "WR": 0.1550464013168013,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Juan Urtecho",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.4507113918885203,
+        "WR": 0.5492886081114797,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "PJ",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.028553797537943595,
+        "RB": 0.38805936180151435,
+        "WR": 0.5497941376747261,
+        "TE": 0.03359270298581599,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Ryan",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.43827928837701,
+        "WR": 0.56172071162299,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    },
+    {
+      "manager_id": "Sunny-DCommissioner",
+      "draft_count": 13,
+      "round1_position_probabilities_recency_weighted": {
+        "QB": 0.0,
+        "RB": 0.5876399969371301,
+        "WR": 0.41236000306287,
+        "TE": 0.0,
+        "K": 0.0,
+        "DEF": 0.0
+      }
+    }
+  ]
+}

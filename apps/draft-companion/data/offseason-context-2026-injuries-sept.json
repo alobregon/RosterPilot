@@ -1,0 +1,445 @@
+{
+  "season": 2026,
+  "version": 5,
+  "updatedAt": "2026-09-02",
+  "sources": [
+    {
+      "id": "athlon-wr-injuries-2026-09-01",
+      "publisher": "Athlon Sports / Yahoo Sports",
+      "title": "The Latest Injury Updates Impacting Fantasy Football Wide Receivers",
+      "url": "https://athlonsports.com/fantasy/fantasy-football-injury-updates-wide-receivers-2026",
+      "status": "INGESTED",
+      "notes": "Published Sept. 1, 2026. User supplied the Yahoo-syndicated version; the canonical Athlon article was used for reliable ingestion. Injury, practice and Week 1 status are time-sensitive."
+    },
+    {
+      "id": "athlon-rb-injuries-2026-08-27",
+      "publisher": "Athlon Sports",
+      "title": "The Latest Injury Updates Impacting Fantasy Football Running Backs",
+      "url": "https://athlonsports.com/fantasy/fantasy-football-injury-updates-running-backs-2026",
+      "status": "INGESTED",
+      "notes": "Published Aug. 27, 2026. Injury, practice, recovery and Week 1 status are time-sensitive."
+    },
+    {
+      "id": "cbs-josh-jacobs-exempt-list-2026-08-31",
+      "publisher": "CBS Sports",
+      "title": "Josh Jacobs out indefinitely: How Fantasy Football rankings, drafts should approach Packers' RBs, passing game",
+      "url": "https://www.cbssports.com/fantasy/football/news/josh-jacobs-out-indefinitely-fantasy-football-rankings-marshawn-lloyd/",
+      "status": "INGESTED",
+      "notes": "Published Aug. 31, 2026. Legal/league availability status and resulting role projections are highly time-sensitive; allegations and possible discipline are not treated as adjudicated facts."
+    }
+  ],
+  "entries": [
+    {
+      "id": "athlon-wr-puka-psoas-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Puka Nacua", "team": "LAR" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Nacua returned after nearly three weeks away but had not completed an unrestricted practice because of psoas soreness as of Sept. 1; the Rams still expected him to play Week 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon sees no major-injury signal but recommends monitoring full-practice participation before treating his opening-week workload as completely normal." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-jamarr-knee-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Ja'Marr Chase", "team": "CIN" }],
+      "categories": ["INJURY", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Chase was recovering from a left-knee hyperextension and was expected to be limited in practice, while Cincinnati expected him to be ready for Week 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon does not recommend changing Chase's first-round fantasy value unless his knee responds poorly as activity increases." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-nabers-week1-snap-risk-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Malik Nabers", "team": "NYG" }],
+      "categories": ["INJURY", "WEEK_1", "SNAP_LIMIT"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Nabers said he felt good but did not commit to Week 1, and he avoided Reserve/PUP; he had no preseason action.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon considers an early snap limit possible even if Nabers is cleared for the opener." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-egbuka-toe-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Emeka Egbuka", "team": "TB" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Egbuka had not participated in team work since an Aug. 12 toe sprain and missed practice again Sept. 1, though Tampa Bay remained optimistic about Week 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "The shrinking preparation window creates legitimate early-season utility risk." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-burden-groin-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Luther Burden III", "team": "CHI" }],
+      "categories": ["INJURY", "PRACTICE", "ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Burden returned to the field after a groin issue, but Chicago had not confirmed full team-drill participation as of Sept. 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon views the missed camp time as a possible drag on Burden's early-season emergence." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-pierce-ankle-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Alec Pierce", "team": "IND" }],
+      "categories": ["INJURY", "PUP", "SNAP_LIMIT"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Pierce was activated from Active/PUP and practicing, but his ankle rehab cost him the offseason program and most of camp; Indianapolis had not confirmed an unrestricted workload.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon says a possible early snap limit belongs in Pierce's fantasy evaluation." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-flowers-lower-body-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Zay Flowers", "team": "BAL" }],
+      "categories": ["INJURY", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Flowers had missed recent practices with a lower-body issue, but Baltimore expected him to resume unrestricted work and be available for Week 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon sees no current reason for a meaningful fantasy downgrade." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-higgins-heel-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Tee Higgins", "team": "CIN" }],
+      "categories": ["INJURY", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Higgins was expected to be limited by a bruised heel, which Cincinnati described as minor, with Week 1 availability expected.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon keeps Higgins at normal WR2 value while recommending confirmation of unrestricted practice before the opener." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-evans-adductor-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Mike Evans", "team": "SF" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Evans was limited to side work by an adductor injury, with San Francisco hoping to return him to practice before the opener.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The situation remains unresolved and should be monitored before drafting at full health value." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-carnell-tate-stiffness-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Carnell Tate", "team": "TEN" }],
+      "categories": ["INJURY", "PRACTICE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "General stiffness kept Tate out of Sept. 1 practice, with Tennessee not identifying an affected area or indicating a lengthy absence.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "A small monitoring flag until the rookie returns to normal work." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-downs-calf-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Josh Downs", "team": "IND" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Downs returned to practice Sept. 1 after a calf injury and Indianapolis had not indicated serious Week 1 concern.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "His return prevents a substantial fantasy downgrade unless a setback occurs." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-shakir-undisclosed-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Khalil Shakir", "team": "BUF" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Shakir had missed more than two weeks with an undisclosed issue and Buffalo had not provided a return timetable as of Sept. 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon says fantasy managers should not assume a normal Week 1 slot role until Shakir resumes team work." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-jordyn-tyson-ir-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Jordyn Tyson", "team": "NO" }],
+      "categories": ["INJURY", "IR", "RETURN_TIMELINE"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "New Orleans placed Tyson on injured reserve with a designation to return, guaranteeing at least a four-game absence; the source says the original recovery estimate still pointed toward later October.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "No early-season redraft utility; return timing remains uncertain beyond the minimum IR window." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-mcmillan-knee-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Jalen McMillan", "team": "TB" }],
+      "categories": ["INJURY", "WEEK_1", "ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "McMillan remained sidelined by a prolonged knee problem with no firm return date as of Sept. 1.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon sees too little early-season clarity for standard redraft leagues, particularly with Emeka Egbuka and Chris Godwin ahead when healthy." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-jayden-higgins-acl-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Jayden Higgins", "team": "HOU" }],
+      "categories": ["INJURY", "SEASON_ENDING"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Higgins suffered a torn ACL during an Aug. 18 joint practice and will miss the entire 2026 season.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "No 2026 redraft value." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-keon-coleman-foot-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Keon Coleman", "team": "BUF" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Coleman's right foot/toe sprain no longer required a walking boot and he was present at Sept. 1 practice.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The recovery is progressing with time remaining before Week 1, but full participation is still the next checkpoint." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-tank-dell-ir-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Tank Dell", "team": "HOU" }],
+      "categories": ["INJURY", "IR", "RETURN_TIMELINE"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Houston placed Dell on injured reserve with a designation to return, guaranteeing at least four missed games; the source says a longer recovery remains plausible because of the severity of his knee injury.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Early-season availability is absent and the actual return date may extend beyond the minimum IR window." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-christian-kirk-ir-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Christian Kirk", "team": "SF" }],
+      "categories": ["INJURY", "IR"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "San Francisco placed Kirk on injured reserve with a designation to return, ruling him out for at least the first four games.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon recommends leaving Kirk outside standard redraft player pools for now." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-chris-bell-acl-return-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Chris Bell", "team": "MIA" }],
+      "categories": ["INJURY", "ROLE", "ROOKIE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Bell made his preseason debut less than 10 months after an ACL tear and finished without a reported setback, but missed nearly all of camp.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Availability concern has eased, but Athlon considers an early offensive role unlikely and views him as a dynasty/deep-league watch-list player." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-tyreek-hill-recovery-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Tyreek Hill" }],
+      "categories": ["INJURY", "FREE_AGENT", "RETURN_TIMELINE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Hill remained unsigned and had not provided a return timetable after a major 2025 knee injury involving a dislocation, ACL tear and additional ligament damage.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon considers him unsuitable for standard 2026 redraft leagues at this time." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-pearsall-season-ending-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Ricky Pearsall", "team": "SF" }],
+      "categories": ["INJURY", "SEASON_ENDING"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Pearsall underwent season-ending surgery after swelling developed in the knee that sustained a PCL injury in 2025.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "No 2026 redraft value." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-wr-brazzell-season-ending-2026-09-01",
+      "subjects": [{ "kind": "PLAYER", "name": "Chris Brazzell II", "team": "CAR" }],
+      "categories": ["INJURY", "SEASON_ENDING", "TARGET_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Brazzell suffered a left LCL injury, was moved to injured reserve and will miss the 2026 season.", "sourceIds": ["athlon-wr-injuries-2026-09-01"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "No 2026 redraft value; the injury also creates additional opportunity for Carolina's remaining receivers." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-love-high-ankle-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Jeremiyah Love", "team": "ARI" }, { "kind": "PLAYER", "name": "Tyler Allgeier", "team": "ARI" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Love had no on-field work during the Aug. 24 practice week after a high-ankle sprain; Arizona still hoped for a Week 1 return, with Tyler Allgeier positioned to lead if Love sits.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon considers a normal opening-week workload difficult to project and calls the risk substantial at Love's draft cost." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-jeanty-ankle-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Ashton Jeanty", "team": "LV" }],
+      "categories": ["INJURY", "WEEK_1", "PRACTICE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Jeanty suffered a right ankle sprain Aug. 23; the Raiders believed it was a low rather than high sprain and did not expect a lengthy absence, but Week 1 remained uncertain.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon retains Jeanty's early-round value but says drafting before another health update carries added risk." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-henderson-ankle-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "TreVeyon Henderson", "team": "NE" }, { "kind": "PLAYER", "name": "Rhamondre Stevenson", "team": "NE" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Henderson avoided a serious right-ankle injury and was expected to be available for Week 1, though he missed the preseason finale.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "No substantial draft downgrade, but Athlon notes Stevenson could open the season with the larger backfield share." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-kenneth-walker-ankle-swelling-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Kenneth Walker III", "team": "KC" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Walker had ankle swelling that Kansas City attributed to cleat irritation and was expected to be fine, with a return to full practice the remaining checkpoint.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon does not recommend changing his draft cost unless swelling persists into game-week preparation." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-croskey-merritt-lower-body-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Jacory Croskey-Merritt", "team": "WAS" }],
+      "categories": ["INJURY", "WEEK_1", "ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Croskey-Merritt was limited to side work after an unspecified lower-body injury, and Washington had not provided a return date.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "He retains late-round appeal, but Athlon considers the uncertain Week 1 outlook materially riskier than earlier in camp." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-breece-groin-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Breece Hall", "team": "NYJ" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Hall was doing side-field agility work after a right-groin strain but had not returned to team drills; the Jets expected him for Week 1.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Expected Week 1 availability limits the downgrade, but full-team clearance remains an important checkpoint." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-chuba-hamstring-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Chuba Hubbard", "team": "CAR" }, { "kind": "PLAYER", "name": "Jonathon Brooks", "team": "CAR" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Hubbard remained out of contact work while rehabbing a hamstring, though Carolina said he was on schedule for Week 1; Jonathon Brooks had strengthened his committee case.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon recommends drafting Hubbard with a shared workload in mind even if cleared for the opener." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-rachaad-white-hamstring-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Rachaad White", "team": "WAS" }],
+      "categories": ["INJURY", "PRACTICE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "White had returned to individual work after a hamstring tweak but had not resumed full-speed team periods; Week 1 still appeared realistic.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Health uncertainty remains, but Athlon says White's receiving ability preserves PPR flex appeal." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-kamara-mcl-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Alvin Kamara", "team": "NO" }],
+      "categories": ["INJURY", "RETURN_TIMELINE", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Kamara was recovering from an MCL sprain with a four-to-six-week timetable, and New Orleans added Zamir White while he recovered.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon considers Week 1 in serious doubt and views the added depth plus likely committee as meaningful draft risk." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-monangai-knee-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Kyle Monangai", "team": "CHI" }],
+      "categories": ["INJURY", "RETURN_TIMELINE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Monangai hyperextended his right knee and was expected to miss multiple weeks, though he avoided a more serious injury requiring surgery.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "The multi-week timetable creates meaningful opening-week uncertainty." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-charbonnet-acl-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Zach Charbonnet", "team": "SEA" }],
+      "categories": ["INJURY", "PUP", "RETURN_TIMELINE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Charbonnet remained on Active/PUP while recovering from January ACL injury and February surgery, with Seattle not establishing a return timetable.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon considers an extended absence realistic and frames him primarily as an injury stash for leagues with enough bench or IR space." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-james-conner-foot-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "James Conner", "team": "ARI" }, { "kind": "PLAYER", "name": "Tyler Allgeier", "team": "ARI" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Conner had not reached 11-on-11 work during recovery from foot surgery, and Arizona said it was too early to know whether he would play Week 1; Tyler Allgeier was the healthy top-group back at the time.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Opening-week availability and workload are uncertain, increasing Allgeier's contingent value." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-pacheco-new-back-issue-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Isiah Pacheco", "team": "DET" }],
+      "categories": ["INJURY", "RETURN_TIMELINE", "WEEK_1"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Detroit said Pacheco's prior knee concern had eased but a new back issue had no clear return timetable, leaving Week 1 uncertain.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon finds his limited ceiling difficult to justify in standard drafts until he returns to practice." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-keaton-mitchell-setback-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Keaton Mitchell", "team": "LAC" }],
+      "categories": ["INJURY", "ROLE", "PRACTICE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Mitchell missed practice after what Mike McDaniel called a mild setback, interrupting a push for the No. 2 role behind Omarion Hampton.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "His late-round standalone appeal remains, but the absence weakens the immediate role case and would boost Kimani Vidal if it persists." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-guerendo-pup-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Isaac Guerendo", "team": "SF" }],
+      "categories": ["INJURY", "PUP", "ROLE"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Guerendo remained on Active/PUP beyond the initial expected return window, with a Reserve/PUP move still capable of forcing at least a four-game absence.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "The delayed return and healthier competition reduce his early path to playing time behind Christian McCaffrey." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-trey-benson-ir-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Trey Benson", "team": "ARI" }],
+      "categories": ["INJURY", "IR"],
+      "evidenceType": "REPORTED_FACT",
+      "facts": [{ "summary": "Benson was waived with an injury designation after his surgically repaired knee failed to tolerate a return, then reverted to injured reserve.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon assigns no realistic 2026 Arizona redraft value." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-najee-achilles-return-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Najee Harris", "team": "NYG" }],
+      "categories": ["INJURY", "ROLE", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Harris was handling live team drills without a reported setback less than 11 months after an Achilles tear, but remained in a crowded Giants backfield and still had to secure a role.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "The recovery is encouraging, but Athlon sees little redraft appeal without a clearer roster spot and workload." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-joe-mixon-retirement-report-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Joe Mixon" }],
+      "categories": ["INJURY", "FREE_AGENT", "RETIREMENT"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Athlon cites a July report that Mixon told former teammates his playing career was over, while noting he had not filed retirement paperwork and had undergone another foot procedure.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon recommends keeping Mixon outside all 2026 redraft player pools." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cbs-jacobs-commissioner-exempt-list-2026-08-31",
+      "subjects": [{ "kind": "PLAYER", "name": "Josh Jacobs", "team": "GB" }],
+      "categories": ["AVAILABILITY", "LEGAL", "LEAGUE_STATUS", "SUSPENSION_RISK"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "CBS reports Jacobs was placed on the NFL commissioner's exempt list after being charged with battery and criminal damage to property; while on the list he cannot play or practice. The duration was unknown as of Aug. 31.", "sourceIds": ["cbs-josh-jacobs-exempt-list-2026-08-31"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "HIGH", "origin": "SOURCE_ANALYST", "summary": "CBS advises against drafting Jacobs with any reasonable expectation of near-term availability and treats a lengthy absence, including a season-long absence, as possible." },
+      "timeSensitive": true,
+      "notes": "This is a current availability signal, not a judgment about the underlying allegations or eventual discipline."
+    },
+    {
+      "id": "cbs-marshawn-lloyd-jacobs-opportunity-2026-08-31",
+      "subjects": [{ "kind": "PLAYER", "name": "MarShawn Lloyd", "team": "GB" }],
+      "categories": ["ROLE", "BACKFIELD_COMPETITION", "ADP", "AVAILABILITY"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "CBS expects Lloyd and Christopher Brooks to handle Green Bay rushing work while Jacobs is unavailable and notes that Lloyd entered the season healthy after two injury-limited years.", "sourceIds": ["cbs-josh-jacobs-exempt-list-2026-08-31"] }],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "CBS moves Lloyd into RB3 draft territory with RB2 upside and expects his market price to rise into roughly the top-80, potentially top-60 range." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cbs-christopher-brooks-jacobs-opportunity-2026-08-31",
+      "subjects": [{ "kind": "PLAYER", "name": "Christopher Brooks", "team": "GB" }],
+      "categories": ["ROLE", "BACKFIELD_COMPETITION", "PPR"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "CBS expects Brooks to share rushing duties while Jacobs is unavailable and views him as the likely passing-down option.", "sourceIds": ["cbs-josh-jacobs-exempt-list-2026-08-31"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "CBS considers Brooks a late PPR-format bench swing rather than a high-priority standard-league target." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cbs-kaleb-johnson-green-bay-depth-2026-08-31",
+      "subjects": [{ "kind": "PLAYER", "name": "Kaleb Johnson", "team": "GB" }],
+      "categories": ["TRADE", "ROLE", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Green Bay acquired Kaleb Johnson from Pittsburgh for a future sixth-round pick after Jacobs became unavailable.", "sourceIds": ["cbs-josh-jacobs-exempt-list-2026-08-31"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "LOW_MEDIUM", "origin": "SOURCE_ANALYST", "summary": "CBS views Johnson mainly as contingent depth behind Lloyd while Jacobs remains unavailable." },
+      "timeSensitive": true
+    },
+    {
+      "id": "cbs-packers-pass-volume-without-jacobs-2026-08-31",
+      "subjects": [
+        { "kind": "PLAYER", "name": "Jordan Love", "team": "GB" },
+        { "kind": "PLAYER", "name": "Christian Watson", "team": "GB" },
+        { "kind": "PLAYER", "name": "Tucker Kraft", "team": "GB" },
+        { "kind": "PLAYER", "name": "Matthew Golden", "team": "GB" },
+        { "kind": "PLAYER", "name": "Jayden Reed", "team": "GB" }
+      ],
+      "categories": ["TEAM_ENVIRONMENT", "PASS_VOLUME", "TARGET_OPPORTUNITY"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "CBS says Green Bay has been approximately 55% pass in selected neutral situations with Jordan Love on the field and Jacobs off it, compared with an overall 50/50 pass-run split across the prior two seasons.", "sourceIds": ["cbs-josh-jacobs-exempt-list-2026-08-31"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "CBS expects Jacobs' absence to create a small target-volume boost for Love and Green Bay pass catchers rather than a wholesale offensive transformation." },
+      "timeSensitive": true
+    }
+  ]
+}

@@ -9,3 +9,7 @@ coverage/
 .expo/
 .next/
 *.log
+validate-out/
+rosterpilot-draft-backup-*.json
+FantasyPros_*Rankings*.csv
+FantasyPros_*Rankings*.xlsx

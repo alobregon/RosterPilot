@@ -1,0 +1,481 @@
+Year,Pick,Manager,Position
+2013,1,Dixie,RB
+2013,2,PJ,RB
+2013,3,Juan Urtecho,RB
+2013,4,Ryan,RB
+2013,5,Hansel,RB
+2013,6,Armando,WR
+2013,7,--hidden--,RB
+2013,8,Alex,RB
+2013,9,Alvaro Obregon,RB
+2013,10,Sunny-DCommissioner,RB
+2013,11,Sunny-DCommissioner,RB
+2013,12,Alvaro Obregon,WR
+2013,13,Alex,WR
+2013,14,--hidden--,RB
+2013,15,Armando,WR
+2013,16,Hansel,RB
+2013,17,Ryan,QB
+2013,18,Juan Urtecho,WR
+2013,19,PJ,WR
+2013,20,Dixie,RB
+2013,21,Dixie,WR
+2013,22,PJ,WR
+2013,23,Juan Urtecho,RB
+2013,24,Ryan,WR
+2013,25,Hansel,WR
+2013,26,Armando,TE
+2013,27,--hidden--,QB
+2013,28,Alex,RB
+2013,29,Alvaro Obregon,RB
+2013,30,Sunny-DCommissioner,WR
+2013,31,Sunny-DCommissioner,WR
+2013,32,Alvaro Obregon,WR
+2013,33,Alex,WR
+2013,34,--hidden--,WR
+2013,35,Armando,RB
+2013,36,Hansel,WR
+2013,37,Ryan,WR
+2013,38,Juan Urtecho,WR
+2013,39,PJ,QB
+2013,40,Dixie,WR
+2013,41,Dixie,QB
+2013,42,PJ,RB
+2013,43,Juan Urtecho,RB
+2013,44,Ryan,WR
+2013,45,Hansel,RB
+2013,46,Armando,WR
+2013,47,--hidden--,WR
+2013,48,Alex,RB
+2013,49,Alvaro Obregon,RB
+2013,50,Sunny-DCommissioner,QB
+2013,51,Sunny-DCommissioner,WR
+2013,52,Alvaro Obregon,TE
+2013,53,Alex,QB
+2013,54,--hidden--,WR
+2013,55,Armando,RB
+2013,56,Hansel,TE
+2013,57,Ryan,TE
+2013,58,Juan Urtecho,RB
+2013,59,PJ,TE
+2013,60,Dixie,WR
+2013,61,Dixie,TE
+2013,62,PJ,WR
+2013,63,Juan Urtecho,WR
+2013,64,Ryan,RB
+2013,65,Hansel,WR
+2013,66,Armando,QB
+2013,67,--hidden--,TE
+2013,68,Alex,WR
+2013,69,Alvaro Obregon,WR
+2013,70,Sunny-DCommissioner,WR
+2013,71,Sunny-DCommissioner,RB
+2013,72,Alvaro Obregon,QB
+2013,73,Alex,TE
+2013,74,--hidden--,DEF
+2013,75,Armando,RB
+2013,76,Hansel,QB
+2013,77,Ryan,DEF
+2013,78,Juan Urtecho,WR
+2013,79,PJ,RB
+2013,80,Dixie,WR
+2013,81,Dixie,DEF
+2013,82,PJ,RB
+2013,83,Juan Urtecho,DEF
+2013,84,Ryan,WR
+2013,85,Hansel,DEF
+2013,86,Armando,DEF
+2013,87,--hidden--,RB
+2013,88,Alex,WR
+2013,89,Alvaro Obregon,WR
+2013,90,Sunny-DCommissioner,RB
+2013,91,Sunny-DCommissioner,DEF
+2013,92,Alvaro Obregon,K
+2013,93,Alex,WR
+2013,94,--hidden--,WR
+2013,95,Armando,RB
+2013,96,Hansel,QB
+2013,97,Ryan,RB
+2013,98,Juan Urtecho,WR
+2013,99,PJ,DEF
+2013,100,Dixie,RB
+2013,101,Dixie,RB
+2013,102,PJ,TE
+2013,103,Juan Urtecho,TE
+2013,104,Ryan,K
+2013,105,Hansel,RB
+2013,106,Armando,WR
+2013,107,--hidden--,WR
+2013,108,Alex,RB
+2013,109,Alvaro Obregon,RB
+2013,110,Sunny-DCommissioner,WR
+2013,111,Sunny-DCommissioner,TE
+2013,112,Alvaro Obregon,QB
+2013,113,Alex,WR
+2013,114,--hidden--,RB
+2013,115,Armando,QB
+2013,116,Hansel,WR
+2013,117,Ryan,QB
+2013,118,Juan Urtecho,QB
+2013,119,PJ,RB
+2013,120,Dixie,WR
+2013,121,Dixie,QB
+2013,122,PJ,QB
+2013,123,Juan Urtecho,QB
+2013,124,Ryan,TE
+2013,125,Hansel,WR
+2013,126,Armando,RB
+2013,127,--hidden--,QB
+2013,128,Alex,TE
+2013,129,Alvaro Obregon,WR
+2013,130,Sunny-DCommissioner,TE
+2013,131,Sunny-DCommissioner,WR
+2013,132,Alvaro Obregon,RB
+2013,133,Alex,QB
+2013,134,--hidden--,TE
+2013,135,Armando,WR
+2013,136,Hansel,TE
+2013,137,Ryan,WR
+2013,138,Juan Urtecho,WR
+2013,139,PJ,WR
+2013,140,Dixie,TE
+2013,141,Dixie,WR
+2013,142,PJ,K
+2013,143,Juan Urtecho,K
+2013,144,Ryan,WR
+2013,145,Hansel,RB
+2013,146,Armando,K
+2013,147,--hidden--,K
+2013,148,Alex,K
+2013,149,Alvaro Obregon,WR
+2013,150,Sunny-DCommissioner,K
+2013,151,Sunny-DCommissioner,QB
+2013,152,Alvaro Obregon,DEF
+2013,153,Alex,DEF
+2013,154,--hidden--,RB
+2013,155,Armando,WR
+2013,156,Hansel,K
+2013,157,Ryan,RB
+2013,158,Juan Urtecho,TE
+2013,159,PJ,RB
+2013,160,Dixie,TE
+2014,1,Dixie,RB
+2014,2,Juan,RB
+2014,3,Alex,RB
+2014,4,Hansel,RB
+2014,5,Sunny-DCommissioner,WR
+2014,6,Juan Urtecho,WR
+2014,7,Armando,TE
+2014,8,Ryan,WR
+2014,9,PJ,QB
+2014,10,Alvaro Obregon,RB
+2014,11,Alvaro Obregon,RB
+2014,12,PJ,RB
+2014,13,Ryan,WR
+2014,14,Armando,WR
+2014,15,Juan Urtecho,RB
+2014,16,Sunny-DCommissioner,WR
+2014,17,Hansel,WR
+2014,18,Alex,WR
+2014,19,Juan,RB
+2014,20,Dixie,RB
+2014,21,Dixie,WR
+2014,22,Juan,WR
+2014,23,Alex,RB
+2014,24,Hansel,RB
+2014,25,Sunny-DCommissioner,RB
+2014,26,Juan Urtecho,WR
+2014,27,Armando,QB
+2014,28,Ryan,RB
+2014,29,PJ,WR
+2014,30,Alvaro Obregon,RB
+2014,31,Alvaro Obregon,WR
+2014,32,PJ,RB
+2014,33,Ryan,TE
+2014,34,Armando,RB
+2014,35,Juan Urtecho,RB
+2014,36,Sunny-DCommissioner,RB
+2014,37,Hansel,RB
+2014,38,Alex,TE
+2014,39,Juan,WR
+2014,40,Dixie,WR
+2014,41,Dixie,QB
+2014,42,Juan,WR
+2014,43,Alex,WR
+2014,44,Hansel,WR
+2014,45,Sunny-DCommissioner,QB
+2014,46,Juan Urtecho,TE
+2014,47,Armando,RB
+2014,48,Ryan,RB
+2014,49,PJ,WR
+2014,50,Alvaro Obregon,RB
+2014,51,Alvaro Obregon,WR
+2014,52,PJ,WR
+2014,53,Ryan,WR
+2014,54,Armando,RB
+2014,55,Juan Urtecho,QB
+2014,56,Sunny-DCommissioner,WR
+2014,57,Hansel,WR
+2014,58,Alex,RB
+2014,59,Juan,QB
+2014,60,Dixie,WR
+2014,61,Dixie,TE
+2014,62,Juan,TE
+2014,63,Alex,WR
+2014,64,Hansel,QB
+2014,65,Sunny-DCommissioner,WR
+2014,66,Juan Urtecho,RB
+2014,67,Armando,WR
+2014,68,Ryan,WR
+2014,69,PJ,WR
+2014,70,Alvaro Obregon,TE
+2014,71,Alvaro Obregon,WR
+2014,72,PJ,TE
+2014,73,Ryan,QB
+2014,74,Armando,WR
+2014,75,Juan Urtecho,WR
+2014,76,Sunny-DCommissioner,WR
+2014,77,Hansel,WR
+2014,78,Alex,WR
+2014,79,Juan,RB
+2014,80,Dixie,RB
+2014,81,Dixie,DEF
+2014,82,Juan,WR
+2014,83,Alex,QB
+2014,84,Hansel,RB
+2014,85,Sunny-DCommissioner,RB
+2014,86,Juan Urtecho,WR
+2014,87,Armando,WR
+2014,88,Ryan,DEF
+2014,89,PJ,RB
+2014,90,Alvaro Obregon,RB
+2014,91,Alvaro Obregon,QB
+2014,92,PJ,RB
+2014,93,Ryan,WR
+2014,94,Armando,WR
+2014,95,Juan Urtecho,DEF
+2014,96,Sunny-DCommissioner,RB
+2014,97,Hansel,TE
+2014,98,Alex,WR
+2014,99,Juan,DEF
+2014,100,Dixie,WR
+2014,101,Dixie,WR
+2014,102,Juan,K
+2014,103,Alex,DEF
+2014,104,Hansel,RB
+2014,105,Sunny-DCommissioner,DEF
+2014,106,Juan Urtecho,RB
+2014,107,Armando,DEF
+2014,108,Ryan,RB
+2014,109,PJ,DEF
+2014,110,Alvaro Obregon,QB
+2014,111,Alvaro Obregon,TE
+2014,112,PJ,RB
+2014,113,Ryan,K
+2014,114,Armando,QB
+2014,115,Juan Urtecho,WR
+2014,116,Sunny-DCommissioner,WR
+2014,117,Hansel,QB
+2014,118,Alex,WR
+2014,119,Juan,QB
+2014,120,Dixie,WR
+2014,121,Dixie,RB
+2014,122,Juan,RB
+2014,123,Alex,RB
+2014,124,Hansel,WR
+2014,125,Sunny-DCommissioner,TE
+2014,126,Juan Urtecho,K
+2014,127,Armando,TE
+2014,128,Ryan,RB
+2014,129,PJ,K
+2014,130,Alvaro Obregon,K
+2014,131,Alvaro Obregon,RB
+2014,132,PJ,WR
+2014,133,Ryan,WR
+2014,134,Armando,K
+2014,135,Juan Urtecho,TE
+2014,136,Sunny-DCommissioner,TE
+2014,137,Hansel,TE
+2014,138,Alex,QB
+2014,139,Juan,WR
+2014,140,Dixie,WR
+2014,141,Dixie,QB
+2014,142,Juan,K
+2014,143,Alex,TE
+2014,144,Hansel,DEF
+2014,145,Sunny-DCommissioner,RB
+2014,146,Juan Urtecho,RB
+2014,147,Armando,WR
+2014,148,Ryan,QB
+2014,149,PJ,QB
+2014,150,Alvaro Obregon,WR
+2014,151,Alvaro Obregon,DEF
+2014,152,PJ,WR
+2014,153,Ryan,TE
+2014,154,Armando,WR
+2014,155,Juan Urtecho,QB
+2014,156,Sunny-DCommissioner,K
+2014,157,Hansel,K
+2014,158,Alex,K
+2014,159,Juan,TE
+2014,160,Dixie,K
+2015,1,Armando,RB
+2015,2,Juan Urtecho,RB
+2015,3,Dixie,RB
+2015,4,Hansel,RB
+2015,5,PJ,TE
+2015,6,Juan,RB
+2015,7,Alvaro Obregon,WR
+2015,8,Ryan,RB
+2015,9,Alex,RB
+2015,10,Sunny-DCommissioner,WR
+2015,11,Sunny-DCommissioner,WR
+2015,12,Alex,WR
+2015,13,Ryan,WR
+2015,14,Alvaro Obregon,WR
+2015,15,Juan,WR
+2015,16,PJ,RB
+2015,17,Hansel,RB
+2015,18,Dixie,RB
+2015,19,Juan Urtecho,WR
+2015,20,Armando,WR
+2015,21,Armando,RB
+2015,22,Juan Urtecho,RB
+2015,23,Dixie,QB
+2015,24,Hansel,WR
+2015,25,PJ,WR
+2015,26,Juan,RB
+2015,27,Alvaro Obregon,RB
+2015,28,Ryan,WR
+2015,29,Alex,WR
+2015,30,Sunny-DCommissioner,RB
+2015,31,Sunny-DCommissioner,RB
+2015,32,Alex,WR
+2015,33,Ryan,TE
+2015,34,Alvaro Obregon,WR
+2015,35,Juan,WR
+2015,36,PJ,QB
+2015,37,Hansel,WR
+2015,38,Dixie,WR
+2015,39,Juan Urtecho,WR
+2015,40,Armando,TE
+2015,41,Armando,TE
+2015,42,Juan Urtecho,WR
+2015,43,Dixie,WR
+2015,44,Hansel,RB
+2015,45,PJ,RB
+2015,46,Juan,WR
+2015,47,Alvaro Obregon,RB
+2015,48,Ryan,WR
+2015,49,Alex,RB
+2015,50,Sunny-DCommissioner,TE
+2015,51,Sunny-DCommissioner,RB
+2015,52,Alex,WR
+2015,53,Ryan,WR
+2015,54,Alvaro Obregon,RB
+2015,55,Juan,RB
+2015,56,PJ,WR
+2015,57,Hansel,QB
+2015,58,Dixie,WR
+2015,59,Juan Urtecho,RB
+2015,60,Armando,WR
+2015,61,Armando,RB
+2015,62,Juan Urtecho,WR
+2015,63,Dixie,TE
+2015,64,Hansel,TE
+2015,65,PJ,WR
+2015,66,Juan,TE
+2015,67,Alvaro Obregon,WR
+2015,68,Ryan,WR
+2015,69,Alex,RB
+2015,70,Sunny-DCommissioner,WR
+2015,71,Sunny-DCommissioner,QB
+2015,72,Alex,TE
+2015,73,Ryan,RB
+2015,74,Alvaro Obregon,QB
+2015,75,Juan,QB
+2015,76,PJ,RB
+2015,77,Hansel,RB
+2015,78,Dixie,WR
+2015,79,Juan Urtecho,RB
+2015,80,Armando,QB
+2015,81,Armando,WR
+2015,82,Juan Urtecho,WR
+2015,83,Dixie,RB
+2015,84,Hansel,WR
+2015,85,PJ,WR
+2015,86,Juan,WR
+2015,87,Alvaro Obregon,RB
+2015,88,Ryan,WR
+2015,89,Alex,WR
+2015,90,Sunny-DCommissioner,WR
+2015,91,Sunny-DCommissioner,RB
+2015,92,Alex,QB
+2015,93,Ryan,QB
+2015,94,Alvaro Obregon,WR
+2015,95,Juan,RB
+2015,96,PJ,RB
+2015,97,Hansel,WR
+2015,98,Dixie,WR
+2015,99,Juan Urtecho,WR
+2015,100,Armando,WR
+2015,101,Armando,RB
+2015,102,Juan Urtecho,TE
+2015,103,Dixie,RB
+2015,104,Hansel,WR
+2015,105,PJ,RB
+2015,106,Juan,WR
+2015,107,Alvaro Obregon,RB
+2015,108,Ryan,RB
+2015,109,Alex,TE
+2015,110,Sunny-DCommissioner,DEF
+2015,111,Sunny-DCommissioner,DEF
+2015,112,Alex,DEF
+2015,113,Ryan,K
+2015,114,Alvaro Obregon,TE
+2015,115,Juan,TE
+2015,116,PJ,DEF
+2015,117,Hansel,WR
+2015,118,Dixie,DEF
+2015,119,Juan Urtecho,QB
+2015,120,Armando,WR
+2015,121,Armando,DEF
+2015,122,Juan Urtecho,TE
+2015,123,Dixie,K
+2015,124,Hansel,DEF
+2015,125,PJ,K
+2015,126,Juan,DEF
+2015,127,Alvaro Obregon,TE
+2015,128,Ryan,DEF
+2015,129,Alex,K
+2015,130,Sunny-DCommissioner,WR
+2015,131,Sunny-DCommissioner,QB
+2015,132,Alex,QB
+2015,133,Ryan,WR
+2015,134,Alvaro Obregon,QB
+2015,135,Juan,QB
+2015,136,PJ,WR
+2015,137,Hansel,WR
+2015,138,Dixie,RB
+2015,139,Juan Urtecho,QB
+2015,140,Armando,QB
+2015,141,Armando,TE
+2015,142,Juan Urtecho,DEF
+2015,143,Dixie,RB
+2015,144,Hansel,WR
+2015,145,PJ,QB
+2015,146,Juan,K
+2015,147,Alvaro Obregon,K
+2015,148,Ryan,RB
+2015,149,Alex,WR
+2015,150,Sunny-DCommissioner,WR
+2015,151,Sunny-DCommissioner,K
+2015,152,Alex,RB
+2015,153,Ryan,TE
+2015,154,Alvaro Obregon,DEF
+2015,155,Juan,WR
+2015,156,PJ,TE
+2015,157,Hansel,K
+2015,158,Dixie,WR
+2015,159,Juan Urtecho,K
+2015,160,Armando,K
