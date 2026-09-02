@@ -91,6 +91,41 @@ describe('bounded offseason context signal', () => {
     expect(lemon.reason).toContain('context boost');
   });
 
+  it('turns the latest Jacobs availability status into a strong caution and Lloyd into an opportunity boost', () => {
+    const jacobs = offseasonContextSignalForPlayer({
+      player: player('jacobs', 'Josh Jacobs', 'RB', 37, 4),
+      bestCandidateRank: 37,
+      bestCandidateTier: 4,
+      selectionPick: 37,
+      teamCount: 10,
+    });
+    const lloyd = offseasonContextSignalForPlayer({
+      player: player('lloyd', 'MarShawn Lloyd', 'RB', 144, 9),
+      bestCandidateRank: 144,
+      bestCandidateTier: 9,
+      selectionPick: 144,
+      teamCount: 10,
+    });
+
+    expect(jacobs.adjustment).toBeLessThan(0);
+    expect(jacobs.reason).toContain('CBS Sports context caution');
+    expect(lloyd.adjustment).toBeGreaterThan(0);
+    expect(lloyd.reason).toContain('CBS Sports context boost');
+  });
+
+  it('treats Allgeier as an injury beneficiary rather than inheriting Love and Conner cautions', () => {
+    const allgeier = offseasonContextSignalForPlayer({
+      player: player('allgeier', 'Tyler Allgeier', 'RB', 134, 9),
+      bestCandidateRank: 134,
+      bestCandidateTier: 9,
+      selectionPick: 134,
+      teamCount: 10,
+    });
+
+    expect(allgeier.adjustment).toBeGreaterThan(0);
+    expect(allgeier.reason).toContain('Athlon Sports context boost');
+  });
+
   it('blocks a positive article signal from overriding a meaningful early rank and tier gap', () => {
     const jeanty = offseasonContextSignalForPlayer({
       player: player('jeanty', 'Ashton Jeanty', 'RB', 19, 3),
