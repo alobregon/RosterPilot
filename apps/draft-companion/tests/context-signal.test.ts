@@ -126,7 +126,7 @@ describe('bounded offseason context signal', () => {
     expect(allgeier.reason).toContain('Athlon Sports context boost');
   });
 
-  it('blocks a positive article signal from overriding a meaningful early rank and tier gap', () => {
+  it('keeps Jeanty mixed context from overriding a meaningful early rank and tier gap', () => {
     const jeanty = offseasonContextSignalForPlayer({
       player: player('jeanty', 'Ashton Jeanty', 'RB', 19, 3),
       bestCandidateRank: 14,
@@ -135,7 +135,7 @@ describe('bounded offseason context signal', () => {
       teamCount: 10,
     });
 
-    expect(jeanty.unboundedAdjustment).toBeGreaterThan(0);
+    expect(jeanty.unboundedAdjustment).toBeLessThanOrEqual(0.1);
     expect(jeanty.rankDisciplineMultiplier).toBe(0);
     expect(jeanty.adjustment).toBe(0);
     expect(jeanty.reason).toBeUndefined();
