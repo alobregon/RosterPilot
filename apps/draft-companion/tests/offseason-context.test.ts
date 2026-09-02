@@ -99,6 +99,64 @@ describe('2026 offseason context journal', () => {
     expect(johnston?.outlook?.summary).toContain('cheaper way to invest');
   });
 
+  it('ingests the September WR and RB injury articles as time-sensitive player intel', () => {
+    expect(getOffseasonContextSource('athlon-wr-injuries-2026-09-01')?.status).toBe('INGESTED');
+    expect(getOffseasonContextSource('athlon-rb-injuries-2026-08-27')?.status).toBe('INGESTED');
+
+    const egbuka = getOffseasonContextForPlayers(['Emeka Egbuka']).find(
+      (entry) => entry.id === 'athlon-wr-egbuka-toe-2026-09-01',
+    );
+    const love = getOffseasonContextForPlayers(['Jeremiyah Love']).find(
+      (entry) => entry.id === 'athlon-rb-love-high-ankle-2026-08-27',
+    );
+    const charbonnet = getOffseasonContextForPlayers(['Zach Charbonnet']).find(
+      (entry) => entry.id === 'athlon-rb-charbonnet-acl-2026-08-27',
+    );
+
+    expect(egbuka?.outlook).toMatchObject({ direction: 'NEGATIVE', confidence: 'MEDIUM_HIGH' });
+    expect(love?.outlook).toMatchObject({ direction: 'NEGATIVE', confidence: 'MEDIUM_HIGH' });
+    expect(charbonnet?.outlook).toMatchObject({ direction: 'NEGATIVE', confidence: 'HIGH' });
+    expect([egbuka, love, charbonnet].every((entry) => entry?.timeSensitive)).toBe(true);
+  });
+
+  it('separates injured Arizona backs from Tyler Allgeier beneficiary context', () => {
+    const allgeier = getOffseasonContextForPlayers(['Tyler Allgeier']);
+    const opportunity = allgeier.find(
+      (entry) => entry.id === 'athlon-rb-allgeier-arizona-opportunity-2026-08-27',
+    );
+
+    expect(opportunity?.outlook).toMatchObject({
+      direction: 'POSITIVE',
+      confidence: 'MEDIUM_HIGH',
+      origin: 'SOURCE_ANALYST',
+    });
+    expect(allgeier.some((entry) => entry.id === 'athlon-rb-love-high-ankle-2026-08-27')).toBe(false);
+    expect(allgeier.some((entry) => entry.id === 'athlon-rb-james-conner-foot-2026-08-27')).toBe(false);
+  });
+
+  it('treats the CBS Jacobs exempt-list update as a high-confidence availability downgrade and Lloyd boost', () => {
+    expect(getOffseasonContextSource('cbs-josh-jacobs-exempt-list-2026-08-31')?.status).toBe('INGESTED');
+
+    const jacobs = getOffseasonContextForPlayers(['Josh Jacobs']).find(
+      (entry) => entry.id === 'cbs-jacobs-commissioner-exempt-list-2026-08-31',
+    );
+    const lloyd = getOffseasonContextForPlayers(['MarShawn Lloyd']).find(
+      (entry) => entry.id === 'cbs-marshawn-lloyd-jacobs-opportunity-2026-08-31',
+    );
+
+    expect(jacobs?.categories).toEqual(expect.arrayContaining(['AVAILABILITY', 'LEAGUE_STATUS']));
+    expect(jacobs?.outlook).toMatchObject({
+      direction: 'NEGATIVE',
+      confidence: 'HIGH',
+      origin: 'SOURCE_ANALYST',
+    });
+    expect(lloyd?.outlook).toMatchObject({
+      direction: 'POSITIVE',
+      confidence: 'MEDIUM_HIGH',
+      origin: 'SOURCE_ANALYST',
+    });
+  });
+
   it('returns the Ladd McConkey environment entries with explicit inference labels', () => {
     const entries = getOffseasonContextForPlayers(['Ladd McConkey']);
     const environment = entries.find((entry) => entry.id === 'lac-ladd-2026-environment');
