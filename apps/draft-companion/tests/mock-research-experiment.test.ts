@@ -20,6 +20,8 @@ const config: DraftConfig = {
   draftStrategy: 'BALANCED',
 };
 
+const SKILL_POSITIONS = new Set<Position>(['QB', 'RB', 'WR', 'TE']);
+
 type Scenario = {
   name: string;
   runs: number;
@@ -40,21 +42,32 @@ interface ScenarioSummary {
   completed: number;
   legal: number;
   uniqueRosters: number;
+  decisions: number;
   averagePositionCounts: Record<Position, number>;
+  multiQbRuns: number;
+  multiTeRuns: number;
+  sixPlusRbRuns: number;
+  sevenPlusWrRuns: number;
   averageFirstRound: Partial<Record<Position, number>>;
-  averageRankReach: number;
-  averagePositiveReach: number;
-  p90PositiveReach: number;
-  maxPositiveReach: number;
-  reachesOver5: number;
-  reachesOver10: number;
+  averageSkillRankReach: number;
+  averageSkillPositiveReach: number;
+  p90SkillPositiveReach: number;
+  maxSkillPositiveReach: number;
+  skillReachesOver5: number;
+  skillReachesOver10: number;
   averageTopRecommendationPercent: number;
   contextChangedWinner: number;
+  contextChangedWinnerRate: number;
   contextChangedTop3Order: number;
+  contextChangedTop3Rate: number;
   selectedWithContext: number;
   contextTierDrops: number;
+  topContextFlipWinners: Array<{ name: string; count: number }>;
   averageSelectedChanceBack: number | null;
   selectedWithChanceBackAtLeast65: number;
+  timingConflicts: number;
+  timingConflictRate: number;
+  topTimingConflictPairs: Array<{ selected: string; alternative: string; count: number }>;
   topRosterPlayers: Array<{ name: string; count: number; rate: number }>;
   roundPositionRates: Record<string, Partial<Record<Position, number>>>;
 }
@@ -102,19 +115,23 @@ function summarize(runs: MockResearchRun[], players: PlayerRanking[]): ScenarioS
   const rosterFrequency = new Map<string, number>();
   const rosterSignatures = new Set<string>();
   const roundPositions = new Map<number, Record<Position, number>>();
-  const positiveReaches: number[] = [];
-  let reachTotal = 0;
+  const skillPositiveReaches: number[] = [];
+  const contextFlipWinners = new Map<string, number>();
+  const timingPairs = new Map<string, number>();
+  let skillReachTotal = 0;
+  let skillDecisionCount = 0;
   let decisionCount = 0;
   let topPercentTotal = 0;
   let contextChangedWinner = 0;
   let contextChangedTop3Order = 0;
   let selectedWithContext = 0;
   let contextTierDrops = 0;
-  let reachesOver5 = 0;
-  let reachesOver10 = 0;
+  let skillReachesOver5 = 0;
+  let skillReachesOver10 = 0;
   let survivalTotal = 0;
   let survivalCount = 0;
   let highChanceBack = 0;
+  let timingConflicts = 0;
 
   for (const run of runs) {
     rosterSignatures.add([...run.userPlayerIds].sort().join('|'));
@@ -127,12 +144,21 @@ function summarize(runs: MockResearchRun[], players: PlayerRanking[]): ScenarioS
 
     for (const decision of run.decisions) {
       decisionCount += 1;
-      reachTotal += decision.rankReach;
       topPercentTotal += decision.topRecommendationPercent;
-      if (decision.rankReach > 0) positiveReaches.push(decision.rankReach);
-      if (decision.rankReach > 5) reachesOver5 += 1;
-      if (decision.rankReach > 10) reachesOver10 += 1;
-      if (decision.contextChangedWinner) contextChangedWinner += 1;
+      if (SKILL_POSITIONS.has(decision.position)) {
+        skillDecisionCount += 1;
+        skillReachTotal += decision.rankReach;
+        if (decision.rankReach > 0) skillPositiveReaches.push(decision.rankReach);
+        if (decision.rankReach > 5) skillReachesOver5 += 1;
+        if (decision.rankReach > 10) skillReachesOver10 += 1;
+      }
+      if (decision.contextChangedWinner) {
+        contextChangedWinner += 1;
+        contextFlipWinners.set(
+          decision.selectedPlayerId,
+          (contextFlipWinners.get(decision.selectedPlayerId) ?? 0) + 1,
+        );
+      }
       if (decision.contextChangedTop3Order) contextChangedTop3Order += 1;
       if (Math.abs(decision.contextAdjustment) >= 0.05) selectedWithContext += 1;
       if (decision.contextChangedWinner && decision.contextTierDrop > 0) contextTierDrops += 1;
@@ -141,17 +167,33 @@ function summarize(runs: MockResearchRun[], players: PlayerRanking[]): ScenarioS
         survivalCount += 1;
         if (decision.survivalProbability >= 0.65) highChanceBack += 1;
       }
+      if (decision.timingConflict) {
+        timingConflicts += 1;
+        const key = `${decision.selectedPlayerName}|||${decision.timingAlternativeName ?? 'Unknown'}`;
+        timingPairs.set(key, (timingPairs.get(key) ?? 0) + 1);
+      }
       const counts = roundPositions.get(decision.round) ?? emptyPositionCounts();
       counts[decision.position] += 1;
       roundPositions.set(decision.round, counts);
     }
   }
 
-  positiveReaches.sort((a, b) => a - b);
+  skillPositiveReaches.sort((a, b) => a - b);
   const topRosterPlayers = [...rosterFrequency.entries()]
     .map(([id, count]) => ({ name: playerById.get(id)?.name ?? id, count, rate: round3(count / runs.length) }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
     .slice(0, 15);
+  const topContextFlipWinners = [...contextFlipWinners.entries()]
+    .map(([id, count]) => ({ name: playerById.get(id)?.name ?? id, count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+    .slice(0, 10);
+  const topTimingConflictPairs = [...timingPairs.entries()]
+    .map(([key, count]) => {
+      const [selected, alternative] = key.split('|||');
+      return { selected, alternative, count };
+    })
+    .sort((a, b) => b.count - a.count || a.selected.localeCompare(b.selected))
+    .slice(0, 10);
   const roundPositionRates: Record<string, Partial<Record<Position, number>>> = {};
   for (const [round, counts] of [...roundPositions.entries()].sort((a, b) => a[0] - b[0])) {
     const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
@@ -167,28 +209,39 @@ function summarize(runs: MockResearchRun[], players: PlayerRanking[]): ScenarioS
     completed: runs.filter((run) => run.completed).length,
     legal: runs.filter((run) => run.legalStartingRoster).length,
     uniqueRosters: rosterSignatures.size,
+    decisions: decisionCount,
     averagePositionCounts: mapPositionCounts(positionTotals, (value) => round2(value / runs.length)),
+    multiQbRuns: runs.filter((run) => run.userCounts.QB >= 2).length,
+    multiTeRuns: runs.filter((run) => run.userCounts.TE >= 2).length,
+    sixPlusRbRuns: runs.filter((run) => run.userCounts.RB >= 6).length,
+    sevenPlusWrRuns: runs.filter((run) => run.userCounts.WR >= 7).length,
     averageFirstRound: Object.fromEntries(
       Object.entries(firstRounds).map(([position, values]) => [
         position,
         round2(values.reduce((sum, value) => sum + value, 0) / values.length),
       ]),
     ),
-    averageRankReach: round2(reachTotal / Math.max(1, decisionCount)),
-    averagePositiveReach: positiveReaches.length
-      ? round2(positiveReaches.reduce((sum, value) => sum + value, 0) / positiveReaches.length)
+    averageSkillRankReach: round2(skillReachTotal / Math.max(1, skillDecisionCount)),
+    averageSkillPositiveReach: skillPositiveReaches.length
+      ? round2(skillPositiveReaches.reduce((sum, value) => sum + value, 0) / skillPositiveReaches.length)
       : 0,
-    p90PositiveReach: percentile(positiveReaches, 0.9),
-    maxPositiveReach: positiveReaches.at(-1) ?? 0,
-    reachesOver5,
-    reachesOver10,
+    p90SkillPositiveReach: percentile(skillPositiveReaches, 0.9),
+    maxSkillPositiveReach: skillPositiveReaches.at(-1) ?? 0,
+    skillReachesOver5,
+    skillReachesOver10,
     averageTopRecommendationPercent: round2(topPercentTotal / Math.max(1, decisionCount)),
     contextChangedWinner,
+    contextChangedWinnerRate: round3(contextChangedWinner / Math.max(1, decisionCount)),
     contextChangedTop3Order,
+    contextChangedTop3Rate: round3(contextChangedTop3Order / Math.max(1, decisionCount)),
     selectedWithContext,
     contextTierDrops,
+    topContextFlipWinners,
     averageSelectedChanceBack: survivalCount ? round3(survivalTotal / survivalCount) : null,
     selectedWithChanceBackAtLeast65: highChanceBack,
+    timingConflicts,
+    timingConflictRate: round3(timingConflicts / Math.max(1, decisionCount)),
+    topTimingConflictPairs,
     topRosterPlayers,
     roundPositionRates,
   };
@@ -259,6 +312,15 @@ describe('100-mock behavior research with Sept. 2 rankings', () => {
       generatedFor: 'FantasyPros_2026_Draft_ALL_Rankings(5).csv',
       rankingRowsUsed: players.length,
       stochasticRuns: allRuns.length,
+      neutralControlPicks: control.decisions.map((decision) => ({
+        round: decision.round,
+        overallPick: decision.overallPick,
+        player: decision.selectedPlayerName,
+        position: decision.position,
+        rank: decision.overallRank,
+        contextAdjustment: decision.contextAdjustment,
+        chanceBack: decision.survivalProbability == null ? null : round3(decision.survivalProbability),
+      })),
       neutralControl: summarize([control], players),
       overall: summarize(allRuns, players),
       scenarios: Object.fromEntries(
