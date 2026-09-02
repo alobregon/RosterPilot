@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { recommendForCurrentPick } from '../lib/decision';
+import { backupQbRosterPenalty, recommendForCurrentPick } from '../lib/decision';
 import { conditionalAvailabilityPercent, projectUpcomingTargets } from '../lib/targets';
-import type { DraftConfig, PlayerRanking } from '../lib/types';
+import type { DraftConfig, DraftPick, PlayerRanking } from '../lib/types';
 
 const config: DraftConfig = {
   teamCount: 10,
@@ -66,5 +66,45 @@ describe('pre-turn targeting vs on-clock recommendations', () => {
     });
     expect(result.map((item) => item.player.id)).toEqual(['gibbs', 'bijan', 'chase']);
     expect(result.find((item) => item.player.id === 'gibbs')?.marketFall).toBe(6);
+  });
+
+  it('strongly suppresses QB2 while skill starters or FLEX are still incomplete', () => {
+    const qb2: PlayerRanking = { id: 'qb2', name: 'QB Two', position: 'QB', overallRank: 70, adp: 70, tier: 3 };
+    const roster: PlayerRanking[] = [
+      { id: 'qb1', name: 'QB One', position: 'QB', overallRank: 20 },
+      { id: 'rb1', name: 'RB One', position: 'RB', overallRank: 10 },
+      { id: 'wr1', name: 'WR One', position: 'WR', overallRank: 11 },
+    ];
+    expect(backupQbRosterPenalty(qb2, roster, config, 74)).toBe(12);
+  });
+
+  it('keeps a meaningful QB2 penalty at ordinary value after starters are filled', () => {
+    const qb2: PlayerRanking = { id: 'qb2', name: 'QB Two', position: 'QB', overallRank: 130, adp: 130, tier: 6 };
+    const roster: PlayerRanking[] = [
+      { id: 'qb1', name: 'QB One', position: 'QB', overallRank: 20 },
+      { id: 'rb1', name: 'RB One', position: 'RB', overallRank: 10 },
+      { id: 'rb2', name: 'RB Two', position: 'RB', overallRank: 30 },
+      { id: 'rb3', name: 'RB Three', position: 'RB', overallRank: 50 },
+      { id: 'wr1', name: 'WR One', position: 'WR', overallRank: 11 },
+      { id: 'wr2', name: 'WR Two', position: 'WR', overallRank: 31 },
+      { id: 'wr3', name: 'WR Three', position: 'WR', overallRank: 51 },
+      { id: 'te1', name: 'TE One', position: 'TE', overallRank: 40 },
+    ];
+    expect(backupQbRosterPenalty(qb2, roster, config, 134)).toBe(10);
+  });
+
+  it('does not hard-ban QB2 when an exceptional value falls multiple rounds', () => {
+    const qb2: PlayerRanking = { id: 'qb2', name: 'Falling QB', position: 'QB', overallRank: 90, adp: 92, tier: 4 };
+    const roster: PlayerRanking[] = [
+      { id: 'qb1', name: 'QB One', position: 'QB', overallRank: 20 },
+      { id: 'rb1', name: 'RB One', position: 'RB', overallRank: 10 },
+      { id: 'rb2', name: 'RB Two', position: 'RB', overallRank: 30 },
+      { id: 'rb3', name: 'RB Three', position: 'RB', overallRank: 50 },
+      { id: 'wr1', name: 'WR One', position: 'WR', overallRank: 11 },
+      { id: 'wr2', name: 'WR Two', position: 'WR', overallRank: 31 },
+      { id: 'wr3', name: 'WR Three', position: 'WR', overallRank: 51 },
+      { id: 'te1', name: 'TE One', position: 'TE', overallRank: 40 },
+    ];
+    expect(backupQbRosterPenalty(qb2, roster, config, 134)).toBe(2);
   });
 });
