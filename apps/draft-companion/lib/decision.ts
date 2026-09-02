@@ -11,7 +11,9 @@ import type { AvailabilityLabel, DraftConfig, DraftPick, PlayerRanking, Recommen
  * reports market falls only after they actually occur, uses the calibrated
  * direct-survival model when the candidate is inside its validated domain,
  * applies the bounded Purple League V1 history signal only as a tie-breaker,
- * and applies curated offseason context as a final bounded close-call signal.
+ * applies curated offseason context as a final bounded close-call signal, and
+ * suppresses ordinary QB2 selections in shallow one-QB formats while preserving
+ * an escape hatch for exceptional draft-day value.
  */
 export function recommendForCurrentPick(args: {
   players: PlayerRanking[];
@@ -25,6 +27,11 @@ export function recommendForCurrentPick(args: {
 }): Recommendation[] {
   const { players, picks, config, currentOverallPick, favoritePlayerIds = [], managerIds = [], teamNames = [], limit = 3 } = args;
   const favoriteIds = new Set(favoritePlayerIds);
+  const playerById = new Map(players.map((player) => [player.id, player]));
+  const userRoster = picks
+    .filter((pick) => pick.draftSlot === config.userDraftSlot)
+    .map((pick) => playerById.get(pick.playerId))
+    .filter((player): player is PlayerRanking => Boolean(player));
   const candidates = recommendPlayers({
     players,
     picks,
@@ -73,9 +80,11 @@ export function recommendForCurrentPick(args: {
       selectionPick: currentOverallPick,
       teamCount: config.teamCount,
     });
+    const qb2Penalty = backupQbRosterPenalty(item.player, userRoster, config, currentOverallPick);
     const rawScore = item.rawScore
       - earlyRankPenalty
       - tierDamping
+      - qb2Penalty
       + availabilityScoreAdjustment
       + context.adjustment;
 
@@ -89,6 +98,7 @@ export function recommendForCurrentPick(args: {
     if (history.reasons.length) reasons.unshift(history.reasons[0]);
     if (marketFall != null && marketFall >= 5) reasons.unshift(`${Math.round(marketFall)} picks past estimated market ADP`);
     if (context.reason) reasons.unshift(context.reason);
+    if (qb2Penalty > 0) reasons.unshift('QB2 carries a roster-cost penalty in this 1-QB format');
 
     return {
       ...item,
@@ -107,6 +117,46 @@ export function recommendForCurrentPick(args: {
     .slice(0, limit);
   const shares = relativeRecommendationPercents(top.map((item) => item.rawScore));
   return top.map((item, index) => ({ ...item, recommendationPercent: shares[index] ?? 0 }));
+}
+
+/**
+ * Bounded roster-cost penalty for carrying a second quarterback in a one-QB
+ * league. The rule is intentionally not a ban: a truly exceptional ECR/ADP
+ * fall can still overcome a small residual penalty. Missing RB/WR/TE/FLEX
+ * starters make QB2 especially expensive because the bench slot has a much
+ * higher opportunity cost.
+ */
+export function backupQbRosterPenalty(
+  player: PlayerRanking,
+  roster: readonly PlayerRanking[],
+  config: DraftConfig,
+  selectionPick: number,
+): number {
+  if (player.position !== 'QB' || config.qbStarters !== 1) return 0;
+  const counts = positionCounts(roster);
+  if (counts.QB < 1) return 0;
+
+  const baseSkillDeficit = Math.max(0, config.rbStarters - counts.RB)
+    + Math.max(0, config.wrStarters - counts.WR)
+    + Math.max(0, config.teStarters - counts.TE);
+  const flexTarget = config.rbStarters + config.wrStarters + config.teStarters + config.flexStarters;
+  const flexIncomplete = counts.RB + counts.WR + counts.TE < flexTarget;
+  if (baseSkillDeficit > 0 || flexIncomplete) return 12;
+
+  const rankingFall = selectionPick - player.overallRank;
+  const marketFall = player.adp == null ? rankingFall : selectionPick - player.adp;
+  const bestValueFall = Math.max(rankingFall, marketFall);
+  if (bestValueFall >= 20) return 2;
+  if (bestValueFall >= 12) return 5;
+  if (bestValueFall >= 8) return 7;
+  return 10;
+}
+
+function positionCounts(roster: readonly PlayerRanking[]): Record<'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST', number> {
+  return roster.reduce<Record<'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DST', number>>((counts, player) => {
+    counts[player.position] += 1;
+    return counts;
+  }, { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0 });
 }
 
 function availabilityLabel(existing: AvailabilityLabel, urgency: number): AvailabilityLabel {
