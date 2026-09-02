@@ -1,0 +1,74 @@
+{
+  "season": 2026,
+  "version": 6,
+  "updatedAt": "2026-09-02",
+  "sources": [],
+  "entries": [
+    {
+      "id": "athlon-rb-love-high-ankle-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Jeremiyah Love", "team": "ARI" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Love had no on-field work during the Aug. 24 practice week after a high-ankle sprain; Arizona still hoped for a Week 1 return, with Tyler Allgeier positioned to lead if Love sits.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Athlon considers a normal opening-week workload difficult to project and calls the risk substantial at Love's draft cost." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-henderson-ankle-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "TreVeyon Henderson", "team": "NE" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Henderson avoided a serious right-ankle injury and was expected to be available for Week 1, though he missed the preseason finale.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "No substantial draft downgrade, but Athlon notes Rhamondre Stevenson could open the season with the larger backfield share." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-chuba-hamstring-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Chuba Hubbard", "team": "CAR" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Hubbard remained out of contact work while rehabbing a hamstring, though Carolina said he was on schedule for Week 1; Jonathon Brooks had strengthened his committee case.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_NEGATIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon recommends drafting Hubbard with a shared workload in mind even if cleared for the opener." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-james-conner-foot-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "James Conner", "team": "ARI" }],
+      "categories": ["INJURY", "WEEK_1", "BACKFIELD_COMPETITION"],
+      "evidenceType": "MIXED",
+      "facts": [{ "summary": "Conner had not reached 11-on-11 work during recovery from foot surgery, and Arizona said it was too early to know whether he would play Week 1; Tyler Allgeier was the healthy top-group back at the time.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "NEGATIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "Opening-week availability and workload are uncertain." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-allgeier-arizona-opportunity-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Tyler Allgeier", "team": "ARI" }],
+      "categories": ["ROLE", "BACKFIELD_COMPETITION", "INJURY_BENEFICIARY"],
+      "evidenceType": "MIXED",
+      "facts": [
+        { "summary": "Athlon said Allgeier would lead Arizona's backfield if Jeremiyah Love missed time.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] },
+        { "summary": "At the same update, James Conner had not reached 11-on-11 work and Love remained sidelined, leaving Allgeier as the healthy member of Arizona's projected top group.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }
+      ],
+      "outlook": { "direction": "POSITIVE", "confidence": "MEDIUM_HIGH", "origin": "SOURCE_ANALYST", "summary": "The injuries ahead of him create meaningful near-term workload upside for Allgeier if either Love or Conner is unavailable or limited." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-stevenson-early-share-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Rhamondre Stevenson", "team": "NE" }],
+      "categories": ["ROLE", "BACKFIELD_COMPETITION", "INJURY_BENEFICIARY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "TreVeyon Henderson missed the preseason finale after an ankle injury, though he was expected back for Week 1.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Athlon says Henderson's interruption could help Stevenson open the season with the larger backfield share." },
+      "timeSensitive": true
+    },
+    {
+      "id": "athlon-rb-jonathon-brooks-committee-rise-2026-08-27",
+      "subjects": [{ "kind": "PLAYER", "name": "Jonathon Brooks", "team": "CAR" }],
+      "categories": ["ROLE", "BACKFIELD_COMPETITION", "INJURY_BENEFICIARY"],
+      "evidenceType": "ANALYST_OUTLOOK",
+      "facts": [{ "summary": "Chuba Hubbard was still out of contact work while rehabbing a hamstring when Athlon reported that Brooks had strengthened his case for a committee role.", "sourceIds": ["athlon-rb-injuries-2026-08-27"] }],
+      "outlook": { "direction": "MIXED_POSITIVE", "confidence": "MEDIUM", "origin": "SOURCE_ANALYST", "summary": "Brooks' committee case improves while Hubbard works back, adding short-term role upside without guaranteeing a lead-back workload." },
+      "timeSensitive": true
+    }
+  ]
+}
