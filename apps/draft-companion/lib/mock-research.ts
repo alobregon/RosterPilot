@@ -30,6 +30,9 @@ export interface MockResearchDecision {
   noContextWinnerRank: number;
   noContextWinnerTier?: number;
   contextTierDrop: number;
+  timingConflict: boolean;
+  timingAlternativeName?: string;
+  timingAlternativeSurvivalProbability?: number;
 }
 
 export interface MockResearchRun {
@@ -100,6 +103,13 @@ export function simulateDecisionEngineMock(args: {
       const contextTierDrop = selected.player.tier != null && noContextWinner.player.tier != null
         ? selected.player.tier - noContextWinner.player.tier
         : 0;
+      const timingAlternative = selected.survivalProbability != null && selected.survivalProbability >= 0.65
+        ? recommendations.slice(1).find((item) =>
+            item.survivalProbability != null
+            && item.survivalProbability <= 0.35
+            && item.rawScore >= selected.rawScore - 2,
+          )
+        : undefined;
 
       decisions.push({
         overallPick,
@@ -120,6 +130,9 @@ export function simulateDecisionEngineMock(args: {
         noContextWinnerRank: noContextWinner.player.overallRank,
         noContextWinnerTier: noContextWinner.player.tier,
         contextTierDrop,
+        timingConflict: Boolean(timingAlternative),
+        timingAlternativeName: timingAlternative?.player.name,
+        timingAlternativeSurvivalProbability: timingAlternative?.survivalProbability,
       });
       userPlayerIds.push(selected.player.id);
       picks = [...picks, draftPickAtOverall(overallPick, selected.player.id, config.teamCount)]
