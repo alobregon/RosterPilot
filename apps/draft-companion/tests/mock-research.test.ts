@@ -43,7 +43,7 @@ describe('mock research harness', () => {
     expect(result.legalStartingRoster).toBe(true);
     expect(result.userPlayerIds).toHaveLength(4);
     expect(result.decisions).toHaveLength(4);
-    expect(result.decisions.every((decision) => Number.isFinite(decision.topRecommendationPercent))).toBe(true);
+    expect(result.decisions.every((decision) => Number.isFinite(decision.topRecommendationStrength))).toBe(true);
     expect(result.userCounts.QB).toBeGreaterThanOrEqual(1);
     expect(result.userCounts.RB).toBeGreaterThanOrEqual(1);
     expect(result.userCounts.WR).toBeGreaterThanOrEqual(1);

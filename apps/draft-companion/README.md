@@ -13,7 +13,10 @@ Standalone web application for RosterPilot's live fantasy-football draft assista
 - undo or restart the draft
 - filter/search remaining players
 - automatically persist normalized rankings, picks, league configuration, and strategy in browser storage
-- calculate three explainable recommendations with a single relative **Recommendation %** that sums to 100%
+- calculate three explainable recommendations with an independent 0-100 **Recommendation strength**
+- explain draft value, verified player context, and the user's roster after each suggested pick
+- keep a deterministic explanation available when OpenAI is absent or unavailable
+- optionally use OpenAI Structured Outputs to polish the grounded explanation without changing scores or ordering
 - model roster fit, tiers, bye weeks, recent positional runs, opponent demand, and heuristic future availability
 - support Balanced, Hero RB, Zero RB, Robust RB, WR Heavy, Late QB, Elite TE, and Upside Heavy strategy presets
 
@@ -79,8 +82,23 @@ See `docs/RANKING_IMPORT_FORMATS.md` for the provider mapping and validation det
 
 ## Recommendation Engine V2
 
-The Top 3 expose one percentage each. These values are relative preference shares, not outcome probabilities, and always sum to 100%.
+The Top 3 expose one independent recommendation-strength percentage each. It is the rounded deterministic composite score, not a probability that the player will succeed and not a share that must sum to 100%.
 
 Future Availability V1 estimates whether a candidate is likely to survive until the user's following selection by combining ranking pressure, opponent roster needs between turns, snake-turn opportunities, positional runs, and tier scarcity. Strategy is applied as a bounded preference rather than an override of rankings or roster legality.
 
 See `docs/RECOMMENDATION_ENGINE_V2.md` for weights, heuristics, validation, and strategy behavior.
+
+## Recommendation explanations
+
+Every on-clock recommendation includes a decisive verdict, a value/context explanation, and the resulting roster construction. The rules engine always creates this narrative from imported rankings, draft state, and the curated offseason evidence journal. Evidence-backed source links remain attached to the recommendation.
+
+When `OPENAI_API_KEY` is configured, the browser asks the server-only `/api/recommendations/explain` route to polish the three narratives. The model receives only the deterministic result and approved evidence. It cannot reorder the candidates or change their scores, and invalid evidence IDs are discarded. If the request fails or no key is configured, the UI silently retains the complete rules-generated explanation.
+
+For local development, create `apps/draft-companion/.env.local`:
+
+```bash
+OPENAI_API_KEY=your_api_key
+OPENAI_RECOMMENDATION_MODEL=gpt-5.6-luna
+```
+
+Never expose the API key through a `NEXT_PUBLIC_` variable.

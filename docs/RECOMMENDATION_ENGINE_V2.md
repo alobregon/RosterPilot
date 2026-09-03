@@ -2,7 +2,7 @@
 
 ## Goal
 
-Recommendation Engine V2 keeps the engine deterministic and explainable while adding live-draft context. The UI exposes one **Recommendation %** for each of the Top 3. Those three percentages are relative preferences and always sum to 100%; they are not probabilities that a player will succeed.
+Recommendation Engine V2 keeps the engine deterministic and explainable while adding live-draft context. The UI exposes one independent **Recommendation strength** for each of the Top 3. It is a 0-100 composite score, not a probability that a player will succeed and not a share that must sum to 100%.
 
 ## Inputs
 
@@ -39,19 +39,19 @@ Favorites are a separate bounded adjustment of up to +5 raw-score points. The bo
 
 Curated offseason context is applied later in the on-clock wrapper as a final **+/-3 raw-score-point maximum** tie-breaker. It does not alter the imported player ranking, tier, ADP, survival probability, or any base-score component.
 
-## Recommendation %
+## Recommendation strength
 
-After candidates are scored, the Top 3 raw scores are converted to relative shares with a softmax transform. Integer rounding uses a largest-remainder method so the displayed values always total 100%.
+After candidates are scored, each Top-3 raw score is independently rounded and clamped to the 0-100 range. This supports the draft-advice presentation `Player — Position — 91%` and preserves the distance between the engine's absolute evaluations. A set such as `91% / 86% / 82%` is valid and intentionally does not sum to 100%.
 
 Example:
 
 ```text
-C. Lamb        36%
-J. Taylor      33%
-C. McCaffrey   31%
+C. Lamb        91%
+J. Taylor      87%
+C. McCaffrey   84%
 ```
 
-This communicates a close choice. A result such as `58% / 27% / 15%` communicates a much clearer preference.
+The ordering still comes directly from raw score. Return probability remains a separate calibrated quantity.
 
 ## Future Availability V1
 
@@ -186,7 +186,7 @@ Across all slots:
 
 - every user roster completed 16 selections
 - every roster filled QB, RB, WR, TE, DST, and K requirements
-- recommendation percentages summed to 100% for the Top 3
+- recommendation strengths remained within 0-100 and followed raw-score order
 - no final-pick recommendation referenced a nonexistent later selection
 - balanced roster construction avoided the earlier extreme RB-heavy result
 
@@ -207,7 +207,18 @@ Walkthrough-derived context regression coverage additionally verifies close-call
 
 ## Recommendation explanation UI
 
-The UI continues to expose exactly one percentage per candidate. Supporting decision context is shown as non-numeric labels or explanation text rather than additional confidence values.
+The UI exposes exactly one recommendation-strength percentage per candidate. Supporting decision context is shown as non-numeric labels or explanation text rather than additional confidence values.
+
+Each card now includes:
+
+- a decisive verdict (`This is my pick.` for the top candidate);
+- draft-value language grounded in the current pick and imported ranking;
+- current player context drawn only from the curated evidence journal;
+- a sentence describing the user's roster after making the pick;
+- source links for the facts used;
+- expandable deterministic engine signals.
+
+The rules engine always generates a complete fallback narrative. If configured, the server-side OpenAI Responses API may polish only the wording through Structured Outputs. Candidate order, recommendation strength, roster state, and evidence remain application-owned. Model-returned evidence IDs are allowlisted against the evidence sent for that player before the enhanced copy reaches the UI.
 
 Current signals include:
 
@@ -250,6 +261,6 @@ The harness validates:
 - user roster length;
 - legal fixed starter and FLEX coverage;
 - required DST/K completion;
-- Recommendation % normalization at every user pick.
+- Recommendation strength bounds and raw-score ordering at every user pick.
 
 The real 861-player pool was re-run through all ten draft slots with Josh Allen and Ladd McConkey marked as Favorites. Slots 1 and 2 used the current Hero RB opening default. All ten user rosters completed legally.

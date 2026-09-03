@@ -6,9 +6,9 @@ Draft Companion now exposes a separate probability for the question:
 
 > If I pass on this player now, what is the probability the player is still available at my next pick?
 
-This is intentionally different from **Recommendation %**.
+This is intentionally different from **Recommendation strength**.
 
-- `Recommendation %` is relative preference among the three players currently recommended.
+- `Recommendation strength` is the deterministic 0-100 composite evaluation for one player.
 - `Chance back by #N` is an absolute, historically calibrated estimate of player survival to the user's following pick.
 
 The two values must not be interpreted as the same quantity.
@@ -123,7 +123,7 @@ Recommendation: 47%
 
 These mean:
 
-- `47%` — this player receives 47% of the relative preference share across the displayed Top 3;
+- `87% recommendation strength` — the player's deterministic value, roster-fit, scarcity, and strategy signals combine into a strong recommendation;
 - `72% chance back by #34` — the calibrated model estimates a 72% chance the player remains available at pick 34 if passed now.
 
 The return probability tooltip states that it is based on historical market ADP, picks to survive, and opponent roster need, and that manager identity is excluded from the percentage.

@@ -21,7 +21,6 @@ const WEIGHTS = {
   futureAvailability: 0.05,
 } as const;
 const RANKING_VALUE_HALF_LIFE = 100;
-const RECOMMENDATION_SHARE_TEMPERATURE = 8;
 const STRATEGY_MAX_ADJUSTMENT = 6;
 const FAVORITE_MAX_ADJUSTMENT = 5;
 
@@ -126,12 +125,10 @@ export function recommendPlayers(args: {
   const top = scored
     .sort((a, b) => b.rawScore - a.rawScore || a.player.overallRank - b.player.overallRank)
     .slice(0, limit);
-  const shares = relativeRecommendationPercents(top.map((item) => item.rawScore));
-
-  return top.map((item, index) => ({
+  return top.map((item) => ({
     player: item.player,
     rawScore: item.rawScore,
-    recommendationPercent: shares[index] ?? 0,
+    recommendationStrength: scoreAsRecommendationStrength(item.rawScore),
     availabilityLabel: item.availability.label,
     returnPick: item.availability.returnPick ?? undefined,
     positionTrend: item.positionTrend,
@@ -161,18 +158,8 @@ export function opponentPickOpportunities(selectionPick: number, returnPick: num
   return slots;
 }
 
-export function relativeRecommendationPercents(scores: number[]): number[] {
-  if (!scores.length) return [];
-  if (scores.length === 1) return [100];
-  const maxScore = Math.max(...scores);
-  const weights = scores.map((score) => Math.exp((score - maxScore) / RECOMMENDATION_SHARE_TEMPERATURE));
-  const total = weights.reduce((sum, weight) => sum + weight, 0);
-  const exact = weights.map((weight) => (weight / total) * 100);
-  const result = exact.map(Math.floor);
-  let remaining = 100 - result.reduce((sum, value) => sum + value, 0);
-  const order = exact.map((value, index) => ({ index, fraction: value - Math.floor(value) })).sort((a, b) => b.fraction - a.fraction || a.index - b.index);
-  for (let i = 0; i < remaining; i += 1) result[order[i % order.length].index] += 1;
-  return result;
+export function scoreAsRecommendationStrength(score: number): number {
+  return clamp(Math.round(score), 0, 100);
 }
 
 function buildRecommendationContext(players: PlayerRanking[], picks: DraftPick[], config: DraftConfig, currentOverallPick: number): RecommendationContext {

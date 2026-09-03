@@ -8,6 +8,11 @@ import { managerProfileOptions } from '@/lib/opponent-model';
 import { DRAFT_STORAGE_KEY, parseDraftSnapshot, serializeDraftSnapshot } from '@/lib/persistence';
 import { validateRankingPool } from '@/lib/preflight';
 import { recommendForCurrentPick } from '@/lib/decision';
+import {
+  buildRecommendationNarrativeRequest,
+  mergeAiRecommendationNarratives,
+  type AiRecommendationNarrative,
+} from '@/lib/explanation';
 import { deriveDraftSession } from '@/lib/session';
 import { defaultTeamNames, resizeTeamNames, validateDraftSetup } from '@/lib/setup';
 import { autoDraftOpponentsUntilUserTurn, simulateNextOpponentPick } from '@/lib/simulation';
@@ -70,6 +75,10 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [storage, setStorage] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [aiNarratives, setAiNarratives] = useState<{
+    key: string;
+    narratives: AiRecommendationNarrative[];
+  }>({ key: '', narratives: [] });
 
   const setup = useMemo(() => validateDraftSetup(config), [config]);
   const preflight = useMemo(() => validateRankingPool(players, config), [players, config]);
@@ -150,6 +159,54 @@ export default function Page() {
           }),
     [started, session.complete, session.currentOverallPick, correcting, onClock, nextUserPick, players, picks, config],
   );
+  const narrativeKey = useMemo(
+    () => [
+      session.currentOverallPick,
+      ...userRoster.map((player) => player.id),
+      ...recs.map((recommendation) => `${recommendation.player.id}:${recommendation.recommendationStrength}`),
+    ].join('|'),
+    [session.currentOverallPick, userRoster, recs],
+  );
+  const displayedRecs = useMemo(
+    () => aiNarratives.key === narrativeKey
+      ? mergeAiRecommendationNarratives(recs, aiNarratives.narratives)
+      : recs,
+    [recs, aiNarratives, narrativeKey],
+  );
+
+  useEffect(() => {
+    if (!onClock || !recs.length) return;
+
+    const controller = new AbortController();
+    const request = buildRecommendationNarrativeRequest({
+      recommendations: recs,
+      roster: userRoster,
+      config,
+      currentOverallPick: session.currentOverallPick,
+    });
+    void fetch('/api/recommendations/explain', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json() as Promise<{ narratives?: AiRecommendationNarrative[] }>;
+      })
+      .then((result) => {
+        if (result?.narratives?.length) {
+          setAiNarratives({ key: narrativeKey, narratives: result.narratives });
+        }
+      })
+      .catch((error: unknown) => {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+          console.warn('Using local recommendation explanation fallback.', error);
+        }
+      });
+
+    return () => controller.abort();
+  }, [onClock, recs, userRoster, config, session.currentOverallPick, narrativeKey]);
 
   const visible = useMemo(
     () =>
@@ -200,7 +257,6 @@ export default function Page() {
     } finally {
       setHydrated(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -355,7 +411,7 @@ export default function Page() {
       sort={sort}
       search={search}
       board={board}
-      recs={recs}
+      recs={displayedRecs}
       targets={targets}
       userRoster={userRoster}
       strategyLabel={strategyLabel}

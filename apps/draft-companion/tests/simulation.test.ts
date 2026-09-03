@@ -59,10 +59,11 @@ describe('full draft simulation harness', () => {
     expect(hasLegalStartingRoster(result.userCounts, config)).toBe(true);
   });
 
-  it('keeps every displayed recommendation set normalized to 100 percent', () => {
+  it('keeps every displayed recommendation strength bounded and rank ordered', () => {
     const result = simulateDeterministicDraft({ players: syntheticPool(), config });
     for (const snapshot of result.userRecommendations) {
-      expect(snapshot.recommendations.reduce((sum, recommendation) => sum + recommendation.recommendationPercent, 0)).toBe(100);
+      expect(snapshot.recommendations.every((recommendation) => recommendation.recommendationStrength >= 0 && recommendation.recommendationStrength <= 100)).toBe(true);
+      expect(snapshot.recommendations[0].recommendationStrength).toBeGreaterThanOrEqual(snapshot.recommendations[1].recommendationStrength);
     }
   });
 });

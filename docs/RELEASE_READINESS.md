@@ -7,7 +7,7 @@
 - Browser-local persistence plus portable JSON backup/restore
 - Hardened backup validation for duplicates, invalid metadata, contradictory state, and out-of-range picks
 - Ranking-pool preflight before Start Draft, including league-wide positional depth
-- Recommendation Engine V2 with one normalized Recommendation %
+- Recommendation Engine V2 with one independent Recommendation strength
 - Favorites/My Guys with bounded, price-sensitive influence
 - Default-aware draft-slot strategy changes that preserve explicit non-default strategy choices
 - Opponent roster saturation and Future Availability market signals

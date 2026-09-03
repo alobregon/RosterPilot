@@ -91,10 +91,32 @@ export interface RecommendationBreakdown {
   favoriteFit: number;
 }
 
+export type RecommendationAnalysisSource = 'RULES' | 'OPENAI';
+
+export interface RecommendationEvidence {
+  id: string;
+  kind: 'FACT' | 'OUTLOOK';
+  summary: string;
+  publisher?: string;
+  title?: string;
+  url?: string;
+}
+
+export interface RecommendationAnalysis {
+  verdict: string;
+  why: string;
+  rosterImpact: string;
+  caution?: string;
+  evidenceIds: string[];
+  evidence: RecommendationEvidence[];
+  source: RecommendationAnalysisSource;
+}
+
 export interface Recommendation {
   player: PlayerRanking;
   rawScore: number;
-  recommendationPercent: number;
+  /** Independent 0-100 recommendation strength; it is not an outcome probability. */
+  recommendationStrength: number;
   availabilityLabel: AvailabilityLabel;
   returnPick?: number;
   survivalProbability?: number;
@@ -104,4 +126,6 @@ export interface Recommendation {
   contextAdjustment?: number;
   breakdown: RecommendationBreakdown;
   reasons: string[];
+  /** Grounded decision narrative. Rules always provide a fallback; OpenAI may enhance it. */
+  analysis?: RecommendationAnalysis;
 }

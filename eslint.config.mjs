@@ -4,5 +4,5 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  { ignores: ['node_modules', 'dist', 'build', '.next', '.expo'] }
+  { ignores: ['**/node_modules/**', '**/dist/**', '**/build/**', '**/.next/**', '**/.expo/**'] }
 );

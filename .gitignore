@@ -9,6 +9,7 @@ coverage/
 .expo/
 .next/
 *.log
+*.tsbuildinfo
 validate-out/
 rosterpilot-draft-backup-*.json
 FantasyPros_*Rankings*.csv

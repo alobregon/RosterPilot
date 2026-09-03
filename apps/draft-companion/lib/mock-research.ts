@@ -1,7 +1,6 @@
 import { draftPickAtOverall } from './corrections';
 import { recommendForCurrentPick } from './decision';
 import { draftSlotForOverallPick, roundForOverallPick } from './draft';
-import { relativeRecommendationPercents } from './recommendation';
 import { hasLegalStartingRoster, simulateNextOpponentPick } from './simulation';
 import type {
   DraftConfig,
@@ -20,7 +19,7 @@ export interface MockResearchDecision {
   overallRank: number;
   tier?: number;
   rankReach: number;
-  topRecommendationPercent: number;
+  topRecommendationStrength: number;
   survivalProbability?: number;
   contextAdjustment: number;
   contextChangedWinner: boolean;
@@ -97,9 +96,6 @@ export function simulateDecisionEngineMock(args: {
       const noContextWinner = noContext[0] ?? selected;
       const withTop3 = recommendations.slice(0, 3).map((item) => item.player.id);
       const noContextTop3 = noContext.slice(0, 3).map((item) => item.player.id);
-      const topRecommendationPercent = relativeRecommendationPercents(
-        recommendations.slice(0, 3).map((item) => item.rawScore),
-      )[0] ?? 100;
       const contextTierDrop = selected.player.tier != null && noContextWinner.player.tier != null
         ? selected.player.tier - noContextWinner.player.tier
         : 0;
@@ -120,7 +116,7 @@ export function simulateDecisionEngineMock(args: {
         overallRank: selected.player.overallRank,
         tier: selected.player.tier,
         rankReach: selected.player.overallRank - overallPick,
-        topRecommendationPercent,
+        topRecommendationStrength: selected.recommendationStrength,
         survivalProbability: selected.survivalProbability,
         contextAdjustment: selected.contextAdjustment ?? 0,
         contextChangedWinner: selected.player.id !== noContextWinner.player.id,

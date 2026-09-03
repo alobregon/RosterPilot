@@ -11,6 +11,7 @@ import type {
   SimulationRoomProfile,
 } from '@/lib/types';
 import type { UpcomingTarget } from '@/lib/targets';
+import { RecommendationAnalysis } from './recommendation-analysis';
 
 const ROUND_COLUMN_WIDTH = 64;
 const MIN_TEAM_COLUMN_WIDTH = 122;
@@ -296,16 +297,16 @@ function CalibratedRecommendations({ props }: { props: DraftUiWithTargetsProps }
   return <section className="panel recommendationPanel calibratedRecommendationPanel" style={{ display: 'block', order: -1 }}>
     <div className="panelHeader">
       <div><span className="eyebrow">Decision engine</span><h2>Top 3</h2></div>
-      <span className="countPill">Recommendation %</span>
+      <span className="countPill">Recommendation strength</span>
     </div>
     <p className="muted" style={{ margin: '-4px 0 12px' }}>Return probability is calibrated separately from recommendation strength.</p>
-    {props.recs.length ? <div className="recommendationList">{props.recs.map((recommendation, index) => <article className="recommendation" key={recommendation.player.id}>
+    {props.recs.length ? <div className="recommendationList">{props.recs.map((recommendation, index) => <article className={index === 0 ? 'recommendation topRecommendation' : 'recommendation'} key={recommendation.player.id}>
       <div className="recommendationTopline">
         <span className="medal">#{index + 1}</span>
         <div><strong>{props.favorites.has(recommendation.player.id) ? '★ ' : ''}{recommendation.player.name}</strong><small>{recommendation.player.position} • Rank {recommendation.player.overallRank}</small></div>
-        <span className="score">{recommendation.recommendationPercent}%</span>
+        <span className="score">{recommendation.recommendationStrength}%</span>
       </div>
-      <div className="scoreTrack"><span style={{ width: `${recommendation.recommendationPercent}%` }} /></div>
+      <div className="scoreTrack"><span style={{ width: `${recommendation.recommendationStrength}%` }} /></div>
       <div className="recommendationSignals">
         {recommendation.survivalProbability != null
           ? <span
@@ -321,8 +322,8 @@ function CalibratedRecommendations({ props }: { props: DraftUiWithTargetsProps }
         {props.favorites.has(recommendation.player.id) ? <span className="signalChip favorite">★ Favorite</span> : null}
         {(props.config.draftStrategy ?? 'BALANCED') !== 'BALANCED' && recommendation.breakdown.strategyFit >= 85 ? <span className="signalChip">{props.strategyLabel} fit</span> : null}
       </div>
+      <RecommendationAnalysis recommendation={recommendation} isTopPick={index === 0} />
       <button className="secondaryButton" onClick={() => props.onDraft(recommendation.player)} aria-label={`Draft ${recommendation.player.name} for my team`}>Draft for my team</button>
-      <ul>{recommendation.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
     </article>)}</div> : <div className="emptyState">No recommendations available.</div>}
   </section>;
 }

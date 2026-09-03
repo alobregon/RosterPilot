@@ -1,5 +1,6 @@
 import { offseasonContextSignalForPlayer } from './context-signal';
-import { recommendPlayers, relativeRecommendationPercents } from './recommendation';
+import { attachRecommendationAnalyses } from './explanation';
+import { recommendPlayers, scoreAsRecommendationStrength } from './recommendation';
 import { roundForOverallPick } from './draft';
 import { opponentHistoryAvailabilitySignal } from './opponent-model';
 import { survivalProbabilityForPlayer } from './survival';
@@ -115,8 +116,16 @@ export function recommendForCurrentPick(args: {
   const top = rescored
     .sort((a, b) => b.rawScore - a.rawScore || a.player.overallRank - b.player.overallRank)
     .slice(0, limit);
-  const shares = relativeRecommendationPercents(top.map((item) => item.rawScore));
-  return top.map((item, index) => ({ ...item, recommendationPercent: shares[index] ?? 0 }));
+  return attachRecommendationAnalyses({
+    recommendations: top.map((item) => ({
+      ...item,
+      recommendationStrength: scoreAsRecommendationStrength(item.rawScore),
+    })),
+    players,
+    picks,
+    config,
+    currentOverallPick,
+  });
 }
 
 /**

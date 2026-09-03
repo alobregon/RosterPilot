@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { draftPickAtOverall } from '../lib/corrections';
 import {
   canCompleteStartingRosterAfterPick,
   hasLegalStartingRoster,

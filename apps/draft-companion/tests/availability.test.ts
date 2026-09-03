@@ -3,7 +3,6 @@ import {
   futureAvailabilityForPlayer,
   opponentPickOpportunities,
   recommendPlayers,
-  relativeRecommendationPercents,
 } from '../lib/recommendation';
 import { followingUserOverallPick } from '../lib/draft';
 import type { DraftConfig, DraftPick, PlayerRanking } from '../lib/types';
@@ -91,20 +90,16 @@ describe('future availability', () => {
   });
 });
 
-describe('single recommendation percentage', () => {
-  it('always sums the displayed recommendations to 100 percent', () => {
-    expect(relativeRecommendationPercents([90, 89, 88])).toEqual([38, 33, 29]);
-    expect(relativeRecommendationPercents([90])).toEqual([100]);
-  });
-
-  it('exposes one public percentage instead of strength plus share', () => {
+describe('recommendation strength', () => {
+  it('exposes one independent public strength without the legacy relative share', () => {
     const players: PlayerRanking[] = [
       { id: 'a', name: 'A', position: 'WR', overallRank: 1, tier: 1 },
       { id: 'b', name: 'B', position: 'RB', overallRank: 2, tier: 1 },
       { id: 'c', name: 'C', position: 'WR', overallRank: 3, tier: 1 },
     ];
     const result = recommendPlayers({ players, picks: [], config, currentOverallPick: 1, limit: 3 });
-    expect(result.reduce((sum, item) => sum + item.recommendationPercent, 0)).toBe(100);
-    expect(result.some((item) => 'strength' in item)).toBe(false);
+    expect(result.every((item) => item.recommendationStrength === Math.round(item.rawScore))).toBe(true);
+    expect(result[0].recommendationStrength).toBeGreaterThanOrEqual(result[1].recommendationStrength);
+    expect(result.some((item) => 'recommendationPercent' in item)).toBe(false);
   });
 });

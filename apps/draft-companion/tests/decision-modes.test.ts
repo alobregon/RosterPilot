@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { backupQbRosterPenalty, recommendForCurrentPick } from '../lib/decision';
 import { conditionalAvailabilityPercent, projectUpcomingTargets } from '../lib/targets';
-import type { DraftConfig, DraftPick, PlayerRanking } from '../lib/types';
+import type { DraftConfig, PlayerRanking } from '../lib/types';
 
 const config: DraftConfig = {
   teamCount: 10,

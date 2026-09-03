@@ -13,7 +13,7 @@
 ## During the draft
 
 - Enter each selection from the player pool. The board advances to the next open overall pick.
-- Recommendation cards show one relative Recommendation % across the Top 3. The percentages sum to 100 and are not outcome probabilities.
+- Recommendation cards show one independent Recommendation strength per candidate. It is not an outcome probability and the Top 3 do not need to sum to 100.
 - Use explanation chips for starter need, tier cliffs, market falls, Favorites, strategy fit, and position runs.
 - Download another backup periodically or after major corrections.
 

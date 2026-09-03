@@ -3,7 +3,6 @@ import {
   futureAvailabilityForPlayer,
   opponentPickOpportunities,
   recommendPlayers,
-  relativeRecommendationPercents,
 } from '../lib/recommendation';
 import type { DraftConfig, DraftPick, PlayerRanking } from '../lib/types';
 
@@ -28,10 +27,6 @@ function assert(condition: unknown, message: string): asserts condition {
 assert(followingUserOverallPick(7, config) === 14, '1.07 should return at #14');
 const opps = opponentPickOpportunities(7, 14, 10, 7);
 assert(JSON.stringify(opps) === JSON.stringify([8, 9, 10, 10, 9, 8]), 'intervening snake slots are wrong');
-
-const shares = relativeRecommendationPercents([90, 89, 88]);
-assert(shares.reduce((a, b) => a + b, 0) === 100, 'recommendation shares must sum to 100');
-assert(shares[0] > shares[1] && shares[1] > shares[2], 'shares should preserve score order');
 
 const players: PlayerRanking[] = [
   { id: 'rb-user', name: 'User RB', position: 'RB', overallRank: 1, tier: 1, byeWeek: 9 },
@@ -69,7 +64,7 @@ assert(availability.strongNeedTeams === 3, 'teams 8/9/10 should all show strong 
 
 const result = recommendPlayers({ players, picks, config, currentOverallPick: 27, limit: 3 });
 assert(result.length === 3, 'expected top 3');
-assert(result.reduce((sum, item) => sum + item.recommendationPercent, 0) === 100, 'top 3 recommendation % must sum 100');
+assert(result.every((item) => item.recommendationStrength >= 0 && item.recommendationStrength <= 100), 'top 3 recommendation strengths must stay in range');
 assert(result.every((item) => !('strength' in item)), 'public recommendation should expose only one percentage');
 
-console.log(JSON.stringify({ opps, shares, availability, top3: result.map((r) => ({ id: r.player.id, pct: r.recommendationPercent, raw: r.rawScore, reasons: r.reasons })) }, null, 2));
+console.log(JSON.stringify({ opps, availability, top3: result.map((r) => ({ id: r.player.id, strength: r.recommendationStrength, raw: r.rawScore, reasons: r.reasons })) }, null, 2));

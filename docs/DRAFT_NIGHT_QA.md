@@ -53,7 +53,7 @@
 ## Live draft
 - [ ] Enter picks rapidly without the page jumping vertically back to the board after each selection.
 - [ ] The current pick and on-clock team remain visually clear.
-- [ ] Top-3 Recommendation % values sum to exactly 100%.
+- [ ] Top-3 Recommendation strength values are each between 0% and 100% and follow score order.
 - [ ] Favorites, market-fall, positional-run, starter-need, and strategy signals remain readable.
 - [ ] Favorites and Drafted filters behave correctly.
 

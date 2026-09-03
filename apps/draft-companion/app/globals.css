@@ -107,6 +107,7 @@ button { color: inherit; }
 
 .recommendationList { display: grid; gap: 12px; }
 .recommendation { background: var(--panel-soft); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+.recommendation.topRecommendation { border-color: rgba(127, 230, 178, .48); box-shadow: inset 0 0 0 1px rgba(127, 230, 178, .08); }
 .recommendationTopline { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 .recommendationTopline div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .recommendationTopline small { color: var(--muted); }
@@ -115,6 +116,16 @@ button { color: inherit; }
 .scoreTrack { height: 5px; margin: 12px 0; background: #0b0f15; border-radius: 999px; overflow: hidden; }
 .scoreTrack span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-strong), var(--accent)); border-radius: inherit; }
 .recommendation ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .82rem; line-height: 1.5; }
+.recommendationAnalysis { display: grid; gap: 7px; margin: 2px 0 12px; }
+.recommendationAnalysis p { margin: 0; font-size: .84rem; line-height: 1.52; color: #d7dee8; }
+.recommendationAnalysis .recommendationVerdict { color: var(--text); font-weight: 850; font-size: .9rem; }
+.recommendationAnalysis .recommendationCaution { color: #ffd18a; }
+.recommendationSources { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; color: var(--muted); font-size: .68rem; }
+.recommendationSources a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(127, 230, 178, .35); }
+.recommendationSources a:hover { border-bottom-color: var(--accent); }
+.recommendationDetails { color: var(--muted); font-size: .72rem; }
+.recommendationDetails summary { cursor: pointer; width: max-content; }
+.recommendationDetails ul { margin-top: 6px; }
 
 .rosterList { display: grid; gap: 7px; }
 .rosterRow { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--border); }

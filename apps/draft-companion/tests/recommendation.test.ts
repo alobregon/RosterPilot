@@ -10,9 +10,12 @@ const players: PlayerRanking[] = [
 ];
 
 describe('recommendation engine', () => {
-  it('returns three recommendations with one percentage that sums to 100', () => {
+  it('returns three independently scored recommendation strengths', () => {
     const result = recommendPlayers({ players, picks: [], config, currentOverallPick: 1 });
-    expect(result).toHaveLength(3); expect(result.reduce((sum, item) => sum + item.recommendationPercent, 0)).toBe(100); expect(result[0].recommendationPercent).toBeGreaterThanOrEqual(result[1].recommendationPercent);
+    expect(result).toHaveLength(3);
+    expect(result.every((item) => item.recommendationStrength >= 0 && item.recommendationStrength <= 100)).toBe(true);
+    expect(result[0].recommendationStrength).toBeGreaterThanOrEqual(result[1].recommendationStrength);
+    expect(result[0].recommendationStrength).toBe(Math.round(result[0].rawScore));
   });
 
   it('does not recommend drafted players', () => {
